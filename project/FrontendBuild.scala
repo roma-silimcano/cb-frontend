@@ -18,8 +18,8 @@ private object AppDependencies {
   import play.PlayImport._
   import play.core.PlayVersion
 
-  private val playHealthVersion = "1.1.0"    
-  private val playJsonLoggerVersion = "2.1.1"      
+  private val playHealthVersion = "1.1.0"
+  private val playJsonLoggerVersion = "2.1.1"
   private val frontendBootstrapVersion = "6.4.0"
   private val govukTemplateVersion = "4.0.0"
   private val playUiVersion = "4.11.0"
@@ -27,7 +27,11 @@ private object AppDependencies {
   private val playAuthorisedFrontendVersion = "5.0.0"
   private val playConfigVersion = "2.0.1"
   private val hmrcTestVersion = "1.6.0"
-  
+  private val metricsPlayVersion = "0.2.1"
+  private val scalatest = "2.2.6"
+  private val mockito = "1.9.5"
+  private val scalacheck = "1.12.1"
+
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
@@ -37,7 +41,11 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-json-logger" % playJsonLoggerVersion,
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
-    "uk.gov.hmrc" %% "play-ui" % playUiVersion
+    "uk.gov.hmrc" %% "play-ui" % playUiVersion,
+    "com.kenshoo" %% "metrics-play" % metricsPlayVersion,
+    "org.scalatest" %% "scalatest" % scalatest,
+    "org.mockito" % "mockito-all" % mockito,
+    "org.scalacheck" %% "scalacheck" % scalacheck
   )
 
   trait TestDependencies {
@@ -59,5 +67,3 @@ private object AppDependencies {
 
   def apply() = compile ++ Test()
 }
-
-
