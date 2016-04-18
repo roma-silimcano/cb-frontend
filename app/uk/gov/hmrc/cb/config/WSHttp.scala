@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
+import uk.gov.hmrc.play.config.{AppName, RunMode}
+import uk.gov.hmrc.play.http.ws.{WSDelete, WSGet, WSPost, WSPut}
 
-
-object HelloWorld extends HelloWorld
-
-trait HelloWorld extends FrontendController {
-
-  def helloWorld = Action.async {
-    implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
-  }
-
+/**
+ * Created by adamconder on 18/04/2016.
+ */
+object WSHttp extends WSGet with WSPut with WSPost with WSDelete with AppName with RunMode {
+  override val hooks = NoneRequired
 }
