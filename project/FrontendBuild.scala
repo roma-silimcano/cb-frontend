@@ -32,6 +32,9 @@ private object AppDependencies {
   private val mockito = "1.9.5"
   private val scalacheck = "1.12.1"
 
+  private val pegdown = "1.6.0"
+  private val jsoup = "1.8.3"
+
   val compile = Seq(
     ws,
     "uk.gov.hmrc" %% "frontend-bootstrap" % frontendBootstrapVersion,
@@ -42,10 +45,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
-    "com.kenshoo" %% "metrics-play" % metricsPlayVersion,
-    "org.scalatest" %% "scalatest" % scalatest,
-    "org.mockito" % "mockito-all" % mockito,
-    "org.scalacheck" %% "scalacheck" % scalacheck
+    "com.kenshoo" %% "metrics-play" % metricsPlayVersion
   )
 
   trait TestDependencies {
@@ -57,13 +57,28 @@ private object AppDependencies {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
-        "org.scalatest" %% "scalatest" % "2.2.6" % scope,
-        "org.pegdown" % "pegdown" % "1.6.0" % scope,
-        "org.jsoup" % "jsoup" % "1.8.3" % scope,
+        "org.scalatest" %% "scalatest" % scalatest % scope,
+        "org.pegdown" % "pegdown" % pegdown % scope,
+        "org.jsoup" % "jsoup" % jsoup % scope,
         "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
       )
     }.test
   }
 
-  def apply() = compile ++ Test()
+  object IntegrationTest {
+    def apply() = new TestDependencies {
+
+      override lazy val scope: String = "it"
+
+      override lazy val test = Seq(
+        "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
+        "org.scalatest" %% "scalatest" % scalatest % scope,
+        "org.pegdown" % "pegdown" % pegdown % scope,
+        "org.jsoup" % "jsoup" % jsoup % scope,
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+      )
+    }.test
+  }
+
+  def apply() = compile ++ Test() ++ IntegrationTest()
 }
