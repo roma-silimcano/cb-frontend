@@ -16,17 +16,16 @@
 
 package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.test.UnitSpec
 import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
 class ApplicationConfigSpec extends UnitSpec with WithFakeApplication {
 
   "Application Config" must {
+
     "load google analytics properties file" in {
-
-      val appConfig = AppConfig
-
-      (appConfig.analyticsToken) must be("N/A")
+      val appConfig = FrontendAppConfig
+      appConfig.analyticsToken shouldBe "N/A"
     }
+
   }
 }
