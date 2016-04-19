@@ -14,20 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
+import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
+class ApplicationConfigSpec extends UnitSpec with WithFakeApplication {
 
-object HelloWorld extends HelloWorld
+  "Application Config" must {
 
-trait HelloWorld extends FrontendController {
+    "load google analytics properties file" in {
+      val appConfig = FrontendAppConfig
+      appConfig.analyticsToken shouldBe "N/A"
+    }
 
-  def helloWorld = Action.async {
-    implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
+    "load assets 2.149.0" in {
+      val appConfig = FrontendAppConfig
+      appConfig.assetsPrefix shouldBe "http://localhost:9032/assets/2.149.0"
+    }
+
   }
-
 }

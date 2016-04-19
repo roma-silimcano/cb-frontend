@@ -14,19 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.config
 
-import play.api.Play.{configuration, current}
+import play.api.Play._
 import uk.gov.hmrc.play.config.ServicesConfig
 
-trait AppConfig {
-  val assetsPrefix: String
-  val analyticsToken: String
-  val analyticsHost: String
-  val reportAProblemPartialUrl: String
-  val reportAProblemNonJSUrl: String
-}
-
+/**
+ * Created by adamconder on 18/04/2016.
+ */
 object FrontendAppConfig extends AppConfig with ServicesConfig {
 
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))

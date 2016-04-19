@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
+import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
+import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector => Auditing}
 
-
-object HelloWorld extends HelloWorld
-
-trait HelloWorld extends FrontendController {
-
-  def helloWorld = Action.async {
-    implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
-  }
-
+/**
+ * Created by adamconder on 18/04/2016.
+ */
+object FrontendAuditConnector extends Auditing with AppName {
+  override lazy val auditingConfig = LoadAuditingConfig(s"auditing")
 }

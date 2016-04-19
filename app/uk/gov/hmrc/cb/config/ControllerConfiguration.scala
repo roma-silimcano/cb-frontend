@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
-
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
+package uk.gov.hmrc.cb.config
 
 
-object HelloWorld extends HelloWorld
+import com.typesafe.config.Config
+import play.api.{Application, Configuration, Play}
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
+import net.ceedubs.ficus.Ficus._
 
-trait HelloWorld extends FrontendController {
-
-  def helloWorld = Action.async {
-    implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
-  }
-
+/**
+ * Created by adamconder on 18/04/2016.
+ */
+object ControllerConfiguration extends ControllerConfig {
+  lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
 }

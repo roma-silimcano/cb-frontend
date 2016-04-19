@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-import play.api.mvc._
-import scala.concurrent.Future
+import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
+import uk.gov.hmrc.play.config.{AppName, RunMode}
 
+/**
+ * Created by adamconder on 18/04/2016.
+ */
+object AuditFilter extends FrontendAuditFilter with RunMode with AppName {
 
-object HelloWorld extends HelloWorld
+  override lazy val maskedFormFields = Seq("password")
 
-trait HelloWorld extends FrontendController {
+  override lazy val applicationPort = None
 
-  def helloWorld = Action.async {
-    implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
-  }
+  override lazy val auditConnector = FrontendAuditConnector
 
+  override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }

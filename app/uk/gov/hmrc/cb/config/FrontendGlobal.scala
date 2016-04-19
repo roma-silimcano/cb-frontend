@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.config
 
 import java.io.File
 
-import com.typesafe.config.Config
-import net.ceedubs.ficus.Ficus._
 import play.api.Mode._
 import play.api.mvc.Request
-import play.api.{Application, Configuration, Play}
+import play.api.{Application, Configuration}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.play.audit.filters.FrontendAuditFilter
-import uk.gov.hmrc.play.config.{AppName, ControllerConfig, RunMode}
 import uk.gov.hmrc.play.frontend.bootstrap.DefaultFrontendGlobal
-import uk.gov.hmrc.play.http.logging.filters.FrontendLoggingFilter
 
-
+/**
+ * Created by adamconder on 18/04/2016.
+ */
 object FrontendGlobal
   extends DefaultFrontendGlobal {
 
@@ -51,23 +48,4 @@ object FrontendGlobal
     uk.gov.hmrc.cb.views.html.error_template(pageTitle, heading, message)
 
   override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = app.configuration.getConfig(s"microservice.metrics")
-}
-
-object ControllerConfiguration extends ControllerConfig {
-  lazy val controllerConfigs = Play.current.configuration.underlying.as[Config]("controllers")
-}
-
-object LoggingFilter extends FrontendLoggingFilter {
-  override def controllerNeedsLogging(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsLogging
-}
-
-object AuditFilter extends FrontendAuditFilter with RunMode with AppName {
-
-  override lazy val maskedFormFields = Seq("password")
-
-  override lazy val applicationPort = None
-
-  override lazy val auditConnector = FrontendAuditConnector
-
-  override def controllerNeedsAuditing(controllerName: String) = ControllerConfiguration.paramsForController(controllerName).needsAuditing
 }
