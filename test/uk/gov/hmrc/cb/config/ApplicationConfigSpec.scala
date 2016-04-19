@@ -27,5 +27,10 @@ class ApplicationConfigSpec extends UnitSpec with WithFakeApplication {
       appConfig.analyticsToken shouldBe "N/A"
     }
 
+    "load assets 2.149.0" in {
+      val appConfig = FrontendAppConfig
+      appConfig.assetsPrefix shouldBe "http://localhost:9032/assets/2.149.0"
+    }
+
   }
 }
