@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.config
 
 import uk.gov.hmrc.play.audit.http.config.LoadAuditingConfig
 import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector => Auditing}
 
 /**
  * Created by adamconder on 18/04/2016.
