@@ -16,9 +16,11 @@
 
 package uk.gov.hmrc.cb.config
 
+
 import com.typesafe.config.Config
-import play.api.Play
-import uk.gov.hmrc.play.config.ControllerConfig
+import play.api.{Application, Configuration, Play}
+import uk.gov.hmrc.play.config.{AppName, ControllerConfig}
+import net.ceedubs.ficus.Ficus._
 
 /**
  * Created by adamconder on 18/04/2016.
