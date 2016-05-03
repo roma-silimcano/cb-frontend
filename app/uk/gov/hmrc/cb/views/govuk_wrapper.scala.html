@@ -22,13 +22,15 @@
 }
 
 @headerNavLinks = {
+    @if(appConfig.navigationEnabled) {
   <li><a id="homeNavHref" href="http://www.google.com"
          data-journey-click="primary-navigation:Click:Home">Home</a></li>
+    }
 }
 
 @insideHeader = {
     @uiLayouts.header_nav(
-      navTitle = Some("cb-frontend"),
+      navTitle = Some(Messages("cb.application.service.name")),
       navTitleLink = None,
       showBetaLink = false,
       navLinks = Some(headerNavLinks))

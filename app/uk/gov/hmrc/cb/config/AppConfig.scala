@@ -25,4 +25,5 @@ trait AppConfig {
   val analyticsHost: String
   val reportAProblemPartialUrl: String
   val reportAProblemNonJSUrl: String
+  val navigationEnabled : Boolean
 }
