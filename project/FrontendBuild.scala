@@ -60,7 +60,9 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalatest % scope,
         "org.pegdown" % "pegdown" % pegdown % scope,
         "org.jsoup" % "jsoup" % jsoup % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "org.mockito" % "mockito-all" % mockito,
+        "org.scalacheck" %% "scalacheck" % scalacheck
       )
     }.test
   }
@@ -75,7 +77,9 @@ private object AppDependencies {
         "org.scalatest" %% "scalatest" % scalatest % scope,
         "org.pegdown" % "pegdown" % pegdown % scope,
         "org.jsoup" % "jsoup" % jsoup % scope,
-        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope
+        "com.typesafe.play" %% "play-test" % PlayVersion.current % scope,
+        "org.mockito" % "mockito-all" % mockito,
+        "org.scalacheck" %% "scalacheck" % scalacheck
       )
     }.test
   }
