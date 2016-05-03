@@ -27,11 +27,13 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
   private val contactHost = configuration.getString(s"contact-frontend.host").getOrElse("")
-  private val contactFormServiceIdentifier = "MyService"
+  private val contactFormServiceIdentifier = "child-benefit-frontend"
+  override val navigationEnabled : Boolean = configuration.getBoolean(s"cb-frontend.navigation").getOrElse(true)
 
   override lazy val assetsPrefix = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   override lazy val analyticsToken = loadConfig(s"google-analytics.token")
   override lazy val analyticsHost = loadConfig(s"google-analytics.host")
   override lazy val reportAProblemPartialUrl = s"$contactHost/contact/problem_reports_ajax?service=$contactFormServiceIdentifier"
   override lazy val reportAProblemNonJSUrl = s"$contactHost/contact/problem_reports_nonjs?service=$contactFormServiceIdentifier"
+
 }
