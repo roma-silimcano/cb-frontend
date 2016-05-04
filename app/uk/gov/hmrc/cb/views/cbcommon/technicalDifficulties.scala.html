@@ -1,0 +1,13 @@
+@()(implicit request:Request[_])
+
+@import play.api.i18n._
+@import uk.gov.hmrc.play.views.html._
+@import play.api.Play
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.technical.difficulties.heading"), heading = Messages("cb.technical.difficulties.heading")) {
+<div class="column-two-thirds column-two-thirds__bottom_padding">
+    <div class="form-group">
+        <p id="service-down-information" class="font-small">@Messages("cb.technical.difficulties.text")</p>
+    </div>
+</div>
+}
