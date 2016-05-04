@@ -1,3 +1,6 @@
 # microservice specific routes
 
 GET        /hello-world             uk.gov.hmrc.cb.controllers.HelloWorld.helloWorld
+
+GET        /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefit.present
+POST        /update-child-benefit   uk.gov.hmrc.cb.controllers.UpdateChildBenefit.submit
