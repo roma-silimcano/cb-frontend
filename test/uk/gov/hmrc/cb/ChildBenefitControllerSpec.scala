@@ -20,10 +20,11 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import play.api.http._
+import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.test.UnitSpec
-import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 /**
  * Created by andrew on 03/05/16.
  */
@@ -36,5 +37,15 @@ class ChildBenefitControllerSpec extends UnitSpec with WithFakeApplication {
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
+    "return html content type" in {
+      val result = ChildBenefit.technicalDifficulties(fakeRequest)
+      contentType(result) shouldBe Some("text/html")
+      charset(result) shouldBe Some("utf-8")
+    }
+
+    "return valid string" in {
+      val result = await(ChildBenefit.technicalDifficulties(fakeRequest))
+      bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.technical.difficulties.heading"))
+    }
   }
 }

@@ -1,3 +1,5 @@
 # microservice specific routes
 
-GET        /hello-world             uk.gov.hmrc.cb.controllers.HelloWorld.helloWorld
+GET        /hello-world                 uk.gov.hmrc.cb.controllers.HelloWorld.helloWorld
+
+GET        /technical-difficulties      uk.gov.hmrc.cb.controllers.ChildBenefit.technicalDifficulties

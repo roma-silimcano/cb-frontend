@@ -24,6 +24,7 @@ import uk.gov.hmrc.play.frontend.controller.FrontendController
 
 import scala.concurrent.Future
 
+
 /**
  * Created by andrew on 03/05/16.
  */
@@ -36,7 +37,7 @@ trait ChildBenefit extends FrontendController with Actions{
 
   def technicalDifficulties = Action.async {
     implicit request =>
-      Future.successful(InternalServerError)
+      Future.successful(InternalServerError(uk.gov.hmrc.cb.views.html.cbcommon.technicalDifficulties()))
   }
 
 }
