@@ -3,5 +3,7 @@ cb.application.service.name = Child Benefit digital service
 cb.application.name = Child Benefit
 cb.application.title = Child Benefit
 
+cb.error.update.child.benefit.required = Please indicate yes or no to whether you want to update your Child Benefit
+
 cb.technical.difficulties.heading = We''re experiencing technical difficulties
 cb.technical.difficulties.text = We''re having difficulties with the child benefit service, please try again in a few minutes.
