@@ -2,4 +2,6 @@
 
 GET        /hello-world                 uk.gov.hmrc.cb.controllers.HelloWorld.helloWorld
 
+GET        /confirmation                uk.gov.hmrc.cb.controllers.SubmissionConfirmationController.get
+
 GET        /technical-difficulties      uk.gov.hmrc.cb.controllers.ChildBenefit.technicalDifficulties
