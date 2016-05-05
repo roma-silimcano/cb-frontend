@@ -42,4 +42,24 @@ trait UpdateChildBenefitController extends ChildBenefitController {
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.update_child_benefit(childBenefitForm.form)))
   }
 
+  def submit = Action.async {
+    implicit request =>
+      UpdateChildBenefitForm.form.bindFromRequest().fold(
+        formWithErrors => {
+          Future.successful(BadRequest(uk.gov.hmrc.cb.views.html.update_child_benefit(formWithErrors)))
+        },
+        success => {
+          success.updateChildBenefit match {
+            case Some(x) =>
+              if (x) {
+                Future.successful(Redirect(routes.UpdateChildBenefitController.present()))
+              } else {
+                Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
+              }
+            case _ =>
+              Future.successful(Redirect(routes.UpdateChildBenefitController.present()))
+          }
+        }
+      )
+  }
 }

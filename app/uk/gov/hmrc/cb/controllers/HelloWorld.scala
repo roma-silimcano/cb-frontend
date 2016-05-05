@@ -27,7 +27,7 @@ trait HelloWorld extends FrontendController {
 
   def helloWorld = Action.async {
     implicit request =>
-		  Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
+      Future.successful(Ok(uk.gov.hmrc.cb.views.html.helloworld.hello_world()))
   }
 
 }
