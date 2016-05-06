@@ -31,7 +31,7 @@ object SubmissionConfirmationController extends SubmissionConfirmationController
   override protected def authConnector : AuthConnector = FrontendAuthConnector
 }
 
-trait SubmissionConfirmationController extends ChildBenefit {
+trait SubmissionConfirmationController extends ChildBenefitController {
 
   protected def authConnector : AuthConnector
 

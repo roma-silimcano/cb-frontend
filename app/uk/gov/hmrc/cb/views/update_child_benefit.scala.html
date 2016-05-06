@@ -1,0 +1,23 @@
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.cb.forms
+
+@(updateChildBenefitForm: Form[_])(implicit request: Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.application.name"), heading = Messages("cb.application.main")){
+
+    @helpers.form(action = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.submit){
+
+            @helpers.errorSummary(heading = Messages("error.message.title"), form = updateChildBenefitForm)
+
+            @helpers.inputRadioGroup(
+                updateChildBenefitForm("updateChildBenefit"),
+                Seq(("true", Messages("site.yes")), ("false", Messages("site.no"))),
+                '_fieldsetAttributes -> "id=updateChildBenefit",
+                '_groupClass -> "form-group inline",
+                '_labelClass -> "block-label",
+                '_legend -> Messages("cb.update.child.benefit"),
+                '_legendClass -> "bold-medium")
+
+            <input id="submit" class="button" type="submit" value="Submit">
+        }
+}
