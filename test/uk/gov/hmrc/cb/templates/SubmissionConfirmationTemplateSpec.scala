@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.templates
 
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
+import uk.gov.hmrc.cb.models.Claimant
 import uk.gov.hmrc.cb.views
 import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 import play.api.test.Helpers._
@@ -27,20 +28,20 @@ import play.api.test.Helpers._
  */
 class SubmissionConfirmationTemplateSpec extends UnitSpec with WithFakeApplication {
 
+  val claimant = Claimant(name = "Louise", reference = 12345)
+
   "SubmissionConfirmation Template" should {
 
     "render title" in {
-      val name = "Adam"
-      val template = views.html.confirmation_submission(name = name)(FakeRequest("GET", ""))
+      val template = views.html.confirmation_submission(claimant = claimant)(FakeRequest("GET", ""))
       val doc = Jsoup.parse(contentAsString(template))
-      doc.getElementById("page-title").text() shouldBe "Thank you for your submission"
+      doc.getElementById("page-title").text() shouldBe "Thank you Louise for updating your Child Benefit"
     }
 
     "render the confirmation message" in {
-      val name = "Adam"
-      val template = views.html.confirmation_submission(name = name)(FakeRequest("GET", ""))
+      val template = views.html.confirmation_submission(claimant = claimant)(FakeRequest("GET", ""))
       val doc = Jsoup.parse(contentAsString(template))
-      doc.getElementById("confirmation-message").text() shouldBe "Thank you Adam for your submission, we'll contact you by email with your result."
+      doc.getElementById("confirmation-message").text() shouldBe "Thank you Louise for updating your Child Benefit. Your reference number is 12345."
     }
 
   }

@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.controllers.SubmissionConfirmationController
+import uk.gov.hmrc.cb.models.Claimant
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
@@ -31,7 +32,6 @@ class SubmissionConfirmationSpec extends UnitSpec with WithFakeApplication with 
 
   val mockSubmissionConfirmationController = new SubmissionConfirmationController {
     override val authConnector : AuthConnector = mock[AuthConnector]
-    override protected val name = "Adam"
   }
 
   "SubmissionController" when {
