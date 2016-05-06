@@ -8,5 +8,5 @@ cb.error.update.child.benefit.required = Please indicate yes or no to whether yo
 cb.technical.difficulties.heading = We''re experiencing technical difficulties
 cb.technical.difficulties.text = We''re having difficulties with the child benefit service, please try again in a few minutes.
 
-cb.confirmation.title = Thank you for your Submission
+cb.confirmation.title = Thank you for your submission
 cb.confirmation.lede = Thank you {0} for your submission, we''ll contact you by email with your result.

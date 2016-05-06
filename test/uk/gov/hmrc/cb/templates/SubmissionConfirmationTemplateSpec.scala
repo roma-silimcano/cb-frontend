@@ -33,7 +33,7 @@ class SubmissionConfirmationTemplateSpec extends UnitSpec with WithFakeApplicati
       val name = "Adam"
       val template = views.html.confirmation_submission(name = name)(FakeRequest("GET", ""))
       val doc = Jsoup.parse(contentAsString(template))
-      doc.getElementById("page-title").text() shouldBe "Thank you for your Submission"
+      doc.getElementById("page-title").text() shouldBe "Thank you for your submission"
     }
 
     "render the confirmation message" in {
