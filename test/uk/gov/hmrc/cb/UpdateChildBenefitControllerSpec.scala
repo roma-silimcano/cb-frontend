@@ -29,7 +29,7 @@ import play.api.test.Helpers._
   * Created by chrisianson on 04/05/16.
   */
 class UpdateChildBenefitControllerSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
-  val endPoint: String = "/update-child-benefit"
+  val endPoint: String = "/confirmation"
   val techDiffEndpoint: String = "/technical-difficulties"
 
   def mockUpdateChildBenefitController = new UpdateChildBenefitController {

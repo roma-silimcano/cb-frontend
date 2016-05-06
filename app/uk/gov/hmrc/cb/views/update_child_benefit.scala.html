@@ -3,7 +3,7 @@
 
 @(updateChildBenefitForm: Form[_])(implicit request: Request[_])
 
-@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.application.name"), heading = Messages("cb.application.main")){
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.update.child.benefit"), heading = Messages("cb.update.child.benefit")){
 
     @helpers.form(action = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.submit){
 
@@ -11,13 +11,13 @@
 
             @helpers.inputRadioGroup(
                 updateChildBenefitForm("updateChildBenefit"),
-                Seq(("true", Messages("site.yes")), ("false", Messages("site.no"))),
+                Seq(("true", Messages("cb.common.yes")), ("false", Messages("cb.common.no"))),
                 '_fieldsetAttributes -> "id=updateChildBenefit",
                 '_groupClass -> "form-group inline",
                 '_labelClass -> "block-label",
                 '_legend -> Messages("cb.update.child.benefit"),
-                '_legendClass -> "bold-medium")
+                '_legendClass -> "bold-medium visuallyhidden")
 
-            <input id="submit" class="button" type="submit" value="Submit">
+            <input id="continue-button" class="button" type="submit" value="@Messages("cb.common.continue")">
         }
 }

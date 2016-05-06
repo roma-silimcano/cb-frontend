@@ -52,12 +52,12 @@ trait UpdateChildBenefitController extends ChildBenefitController {
           success.updateChildBenefit match {
             case Some(x) =>
               if (x) {
-                Future.successful(Redirect(routes.UpdateChildBenefitController.present()))
+                Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
               } else {
                 Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
               }
             case _ =>
-              Future.successful(Redirect(routes.UpdateChildBenefitController.present()))
+              Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
           }
         }
       )
