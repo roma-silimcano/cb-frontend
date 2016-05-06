@@ -1,0 +1,12 @@
+@import play.api.i18n._
+@import uk.gov.hmrc.play.views.html._
+
+@(claimant : uk.gov.hmrc.cb.models.Claimant)(implicit request : Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(
+    title = Messages("cb.confirmation.title", claimant.name),
+    heading = Messages("cb.confirmation.title", claimant.name)) {
+
+    <p id="confirmation-message" class="font-medium">@Messages("cb.confirmation.lede", claimant.name, claimant.reference.toString)</p>
+
+}
