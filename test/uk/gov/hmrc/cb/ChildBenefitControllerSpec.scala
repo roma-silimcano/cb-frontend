@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb
 
 import play.api.http.Status
-import play.api.test.FakeRequest
-import play.api.test.Helpers._
-import play.api.http._
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.test.UnitSpec
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 /**
  * Created by andrew on 03/05/16.
@@ -31,20 +29,24 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 class ChildBenefitControllerSpec extends UnitSpec with WithFakeApplication {
   val fakeRequest = FakeRequest("GET","/technical-difficulties")
 
+  def testChildBenefitController = new ChildBenefitController {
+    override protected def authConnector: AuthConnector = ???
+  }
+
   "GET /technical-difficulties" should {
     "return an InternalServerError" in {
-      val result = ChildBenefit.technicalDifficulties(fakeRequest)
+      val result = testChildBenefitController.technicalDifficulties(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
     "return html content type" in {
-      val result = ChildBenefit.technicalDifficulties(fakeRequest)
+      val result = testChildBenefitController.technicalDifficulties(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "return valid string" in {
-      val result = await(ChildBenefit.technicalDifficulties(fakeRequest))
+      val result = await(testChildBenefitController.technicalDifficulties(fakeRequest))
       bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.technical.difficulties.heading"))
     }
   }
