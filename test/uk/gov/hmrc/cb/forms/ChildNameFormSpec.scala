@@ -31,13 +31,53 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
     "accept a valid max length value for first name and last name" in {
       val data = ChildNamePageModel(
-        firstName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"),
-        lastName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
+        firstName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ"),
+        lastName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ")
       )
       ChildNameForm.form.bind(
         Map(
-          "firstName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
-          "lastName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+          "firstName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ",
+          "lastName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid UTF-8 character for first name and last name" in {
+      val data = ChildNamePageModel(
+        firstName = Some("AƉam"),
+        lastName = Some("Ἀχαιός")
+      )
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "AƉam",
+          "lastName" -> "Ἀχαιός"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid Logographic character for first name and last name" in {
+      val data = ChildNamePageModel(
+        firstName = Some("亚当"),
+        lastName = Some("亚当")
+      )
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "亚当",
+          "lastName" -> "亚当"
         )
       ).fold(
           formWithErrors => {
