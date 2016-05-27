@@ -29,7 +29,7 @@ case class Child (
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
                  dob: Option[LocalDate] = None,
-                 gender: Genders.Gender = Genders.Male,
+                 gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
                  )
 

@@ -36,7 +36,7 @@ trait ChildrenManager {
         firstname = None,
         surname = None,
         dob = None,
-        gender = Genders.Male,
+        gender = Genders.None,
         previousClaim = false
       )
     }

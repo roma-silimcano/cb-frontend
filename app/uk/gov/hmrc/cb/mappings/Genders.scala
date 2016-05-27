@@ -29,6 +29,7 @@ object Genders extends Enumeration {
   val Male = Value(0, "male")
   val Female= Value(1, "female")
   val Indeterminate = Value(2, "indeterminate")
+  val None = Value(3, "none")
 
   val enumReads: Reads[Gender] = EnumUtils.enumReads(Genders)
 

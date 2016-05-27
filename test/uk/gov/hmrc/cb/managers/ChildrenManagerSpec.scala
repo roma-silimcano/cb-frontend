@@ -29,13 +29,13 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
 
   def fixture = new {
-    val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
-    val child2 = Child(2, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
-    val child3 = Child(3, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
-    val child4 = Child(4, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
-    val child5 = Child(5, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
-    val replacementChild1 = Child(2, uniqueReferenceNumber = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.Male, previousClaim = false)
-    val replacementChild2 = Child(2, uniqueReferenceNumber = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.Male, previousClaim = false)
+    val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child2 = Child(2, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child3 = Child(3, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child4 = Child(4, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child5 = Child(5, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val replacementChild1 = Child(2, uniqueReferenceNumber = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
+    val replacementChild2 = Child(2, uniqueReferenceNumber = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
   }
 
   "ChildrenManager" when {
@@ -155,10 +155,10 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
       }
 
       "return exception when child list is empty" in {
-        val result = intercept[Exception] {
+        val result = intercept[NoSuchElementException] {
           childrenService.getChildById(1, List())
         }
-        result shouldBe a[Exception]
+        result shouldBe a[NoSuchElementException]
       }
     }
 
@@ -171,7 +171,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
       val result = childrenService.replaceChildInAList(childList, 2, modifiedChild)
       result shouldBe List(
         fixture.child1,
-    fixture.replacementChild2
+        fixture.replacementChild2
       )
       result.length shouldBe 2
     }
