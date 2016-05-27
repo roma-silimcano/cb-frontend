@@ -1,6 +1,23 @@
+/*
+ * Copyright 2016 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.cb.forms
 
 import play.api.i18n.Messages
+import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
 /**
@@ -8,12 +25,17 @@ import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
  */
 class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
+  // TODO do we allow spaces? such as: 'van helden'
+  // TODO is O'brian a valid surname?
+
+  val maxLength = "tZWfHEhJlSIdAuSnaSjGgWTWeYWrPXYrMPmycvLyJXfSmrIcqrvgrDtISXsdhaOPKAKzHAfzUOiKzIIVkyEbEeCSrVtwFYcyUHQAzFfAFMaFckTtycGiGQrEbIsPsuMW"
+
   "ChildNameForm" should {
 
     /* valid */
 
     "accept a valid value for first name and last name" in {
-      val data = ChildNamePageModel(firstName = Some("adam"), lastName = Some("conder"))
+      val data = ChildNamePageModel(firstName = "adam", lastName = "conder")
       ChildNameForm.form.bind(
         Map(
           "firstName" -> "adam",
@@ -31,13 +53,13 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
     "accept a valid max length value for first name and last name" in {
       val data = ChildNamePageModel(
-        firstName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ"),
-        lastName = Some("abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ")
+        firstName = maxLength,
+        lastName = maxLength
       )
       ChildNameForm.form.bind(
         Map(
-          "firstName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ",
-          "lastName" -> "abcefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZZZZZZZZZZZ"
+          "firstName" -> maxLength,
+          "lastName" -> maxLength
         )
       ).fold(
           formWithErrors => {
@@ -51,8 +73,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
     "accept a valid UTF-8 character for first name and last name" in {
       val data = ChildNamePageModel(
-        firstName = Some("AƉam"),
-        lastName = Some("Ἀχαιός")
+        firstName = "AƉam",
+        lastName = "Ἀχαιός"
       )
       ChildNameForm.form.bind(
         Map(
@@ -71,8 +93,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
     "accept a valid Logographic character for first name and last name" in {
       val data = ChildNamePageModel(
-        firstName = Some("亚当"),
-        lastName = Some("亚当")
+        firstName = "亚当",
+        lastName = "亚当"
       )
       ChildNameForm.form.bind(
         Map(
@@ -94,9 +116,10 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     "throw a ValidationError when provided special characters for last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "adam",
-          "lastName" = "@£$^%&&&&"
-        ).fold(
+          "firstName" -> "adam",
+          "lastName" -> "@£$^%&&&&"
+        )
+      ).fold(
          hasErrors =>
            hasErrors.errors.head.message shouldBe Messages("cb.error.child.last.name.invalid"),
           success => {
@@ -104,31 +127,31 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
             success shouldBe None
           }
         )
-      )
     }
 
     "throw a ValidationError when provided special characters for first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "@%^&$@!",
-          "lastName" = "Conder"
-        ).fold(
+          "firstName" -> "@%^&$@!",
+          "lastName" -> "Conder"
+        )
+      ).fold(
             hasErrors =>
               hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid"),
             success => {
               success should not be Some(ChildNamePageModel(_, _))
               success shouldBe None
             }
-          )
-      )
+        )
     }
 
     "throw a ValidationError when provided special characters for last name and first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "@%^&$@!",
-          "lastName" = "$%^@@@2"
-        ).fold(
+          "firstName" -> "@%^&$@!",
+          "lastName" -> "$%^@@@2"
+        )
+      ).fold(
             hasErrors => {
               hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
               hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
@@ -137,7 +160,6 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
               success should not be Some(ChildNamePageModel(_, _))
               success shouldBe None
             }
-          )
       )
     }
 
@@ -146,9 +168,10 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     "throw a ValidationError when provided numbers for last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "Adam",
-          "lastName" = "12345"
-        ).fold(
+          "firstName" -> "Adam",
+          "lastName" -> "12345"
+        )
+      ).fold(
             hasErrors => {
               hasErrors.errors.head.message shouldBe Messages("cb.error.child.last.name.invalid")
             },
@@ -156,42 +179,41 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
               success should not be Some(ChildNamePageModel(_, _))
               success shouldBe None
             }
-          )
       )
     }
 
     "throw a ValidationError when provided numbers for first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "12345",
-          "lastName" = "Conder"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "12345",
+          "lastName" -> "Conder"
+        )
+      ).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
     "throw a ValidationError when provided numbers for last name and first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "12345",
-          "lastName" = "12345"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "12345",
+          "lastName" -> "12345"
+        )
+      ).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
@@ -201,34 +223,34 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     "throw a ValidationError for an empty first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "",
-          "lastName" = "conder"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "",
+          "lastName" -> "conder"
+        )
+      ).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
     "throw a ValidationError for an empty last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "adam",
-          "lastName" = ""
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "adam",
+          "lastName" -> ""
+        )
+      ).fold(
+          hasErrors => {
+            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
 
     }
@@ -236,18 +258,18 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     "throw a ValidationError for an empty first name and an empty last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "",
-          "lastName" = ""
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "",
+          "lastName" -> ""
+        )
+      ).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
@@ -256,52 +278,49 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     "throw a ValidationError for a value larger than max length for first name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "B4lXqZv4jpFywUefGRmcK2aaiHaQ4h0SNIrFeLScWKh7yRwlttDcDattfvN7sS9NPx91Ba5LgmLzGJ5Lq8IsJzlUWp5YXmK2CBEJkwTgaLloPTi6pgbyPKQjH5G9DSTqs",
-          "lastName" = "conder"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> {maxLength + "s"},
+          "lastName" -> "conder"
+        )).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
     "throw a ValidationError for a value larger than max length for last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "adam",
-          "lastName" = "B4lXqZv4jpFywUefGRmcK2aaiHaQ4h0SNIrFeLScWKh7yRwlttDcDattfvN7sS9NPx91Ba5LgmLzGJ5Lq8IsJzlUWp5YXmK2CBEJkwTgaLloPTi6pgbyPKQjH5G9DSTqs"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> "adam",
+          "lastName" -> {maxLength + "s"}
+        )).fold(
+          hasErrors => {
+            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
     "throw a ValidationError for a value larger than max length for first name and last name" in {
       ChildNameForm.form.bind(
         Map(
-          "firstName" = "B4lXqZv4jpFywUefGRmcK2aaiHaQ4h0SNIrFeLScWKh7yRwlttDcDattfvN7sS9NPx91Ba5LgmLzGJ5Lq8IsJzlUWp5YXmK2CBEJkwTgaLloPTi6pgbyPKQjH5G9DSTqs",
-          "lastName" = "B4lXqZv4jpFywUefGRmcK2aaiHaQ4h0SNIrFeLScWKh7yRwlttDcDattfvN7sS9NPx91Ba5LgmLzGJ5Lq8IsJzlUWp5YXmK2CBEJkwTgaLloPTi6pgbyPKQjH5G9DSTqs"
-        ).fold(
-            hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
-            },
-            success => {
-              success should not be Some(ChildNamePageModel(_, _))
-              success shouldBe None
-            }
-          )
+          "firstName" -> {maxLength + "s"},
+          "lastName" -> {maxLength + "s"}
+        )).fold(
+          hasErrors => {
+            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+          },
+          success => {
+            success should not be Some(ChildNamePageModel(_, _))
+            success shouldBe None
+          }
       )
     }
 
