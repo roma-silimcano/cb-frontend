@@ -19,6 +19,7 @@ package uk.gov.hmrc.cb.managers
 import java.util.NoSuchElementException
 
 import org.joda.time.LocalDate
+import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -28,13 +29,13 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
 
   def fixture = new {
-    val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None)
-    val child2 = Child(2, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None)
-    val child3 = Child(3, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None)
-    val child4 = Child(4, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None)
-    val child5 = Child(5, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None)
-    val replacementChild1 = Child(2, uniqueReferenceNumber = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()))
-    val replacementChild2 = Child(2, uniqueReferenceNumber = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()))
+    val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
+    val child2 = Child(2, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
+    val child3 = Child(3, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
+    val child4 = Child(4, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
+    val child5 = Child(5, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.Male, previousClaim = false)
+    val replacementChild1 = Child(2, uniqueReferenceNumber = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.Male, previousClaim = false)
+    val replacementChild2 = Child(2, uniqueReferenceNumber = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.Male, previousClaim = false)
   }
 
   "ChildrenManager" when {

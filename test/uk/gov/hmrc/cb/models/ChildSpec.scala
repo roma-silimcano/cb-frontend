@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cb.models
 
 import org.joda.time.LocalDate
+import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
@@ -28,7 +29,7 @@ class ChildSpec extends UnitSpec {
 
     "instantiate an instance of child" in {
 
-      val child = new Child(1, Some(123456), Some("Shane"), Some("Wilson"), Some(LocalDate.now()))
+      val child = new Child(1, Some(123456), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
 
       child shouldBe a[Child]
       child.id shouldBe 1
@@ -36,6 +37,8 @@ class ChildSpec extends UnitSpec {
       child.firstname.get shouldBe "Shane"
       child.surname.get shouldBe "Wilson"
       child.dob.get shouldBe LocalDate.now()
+      child.gender shouldBe Genders.Male
+      child.previousClaim shouldBe false
     }
   }
 }

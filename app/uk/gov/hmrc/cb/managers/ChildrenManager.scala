@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.managers
 
+import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 
 /**
@@ -34,7 +35,9 @@ trait ChildrenManager {
         uniqueReferenceNumber = None,
         firstname = None,
         surname = None,
-        dob = None
+        dob = None,
+        gender = Genders.Male,
+        previousClaim = false
       )
     }
 

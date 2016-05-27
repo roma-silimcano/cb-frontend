@@ -14,25 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.mappings
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
-import uk.gov.hmrc.cb.mappings.Genders
+import play.api.libs.json.{Format, Reads, Writes}
+import uk.gov.hmrc.cb.utils.EnumUtils
 
 /**
-  * Created by chrisianson on 26/05/16.
+  * Created by chrisianson on 27/05/16.
   */
-case class Child (
-                 id: Short,
-                 uniqueReferenceNumber: Option[Int] = None,
-                 firstname: Option[String] = None,
-                 surname: Option[String] = None,
-                 dob: Option[LocalDate] = None,
-                 gender: Genders.Gender = Genders.Male,
-                 previousClaim: Boolean = false
-                 )
+object Genders extends Enumeration {
 
-object Child {
-  implicit val formats = Json.format[Child]
+  type Gender = Value
+
+  val Male = Value(0, "male")
+  val Female= Value(1, "female")
+  val Indeterminate = Value(2, "indeterminate")
+
+  val enumReads: Reads[Gender] = EnumUtils.enumReads(Genders)
+
+  val enumWrites: Writes[Gender] = EnumUtils.enumWrites
+
+  implicit def enumFormats : Format[Gender] = EnumUtils.enumFormat(Genders)
 }
