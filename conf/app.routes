@@ -6,5 +6,5 @@ GET        /confirmation            uk.gov.hmrc.cb.controllers.SubmissionConfirm
 
 GET        /technical-difficulties  uk.gov.hmrc.cb.controllers.TechnicalDifficultiesController.get
 
-GET        /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.present
-POST       /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.submit
+GET        /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.get
+POST       /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.post

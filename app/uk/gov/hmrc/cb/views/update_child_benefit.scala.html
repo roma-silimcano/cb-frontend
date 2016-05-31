@@ -5,7 +5,7 @@
 
 @uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.update.child.benefit"), heading = Messages("cb.update.child.benefit")){
 
-    @helpers.form(action = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.submit){
+    @helpers.form(action = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.post){
 
             @helpers.errorSummary(heading = Messages("error.message.title"), form = updateChildBenefitForm)
 

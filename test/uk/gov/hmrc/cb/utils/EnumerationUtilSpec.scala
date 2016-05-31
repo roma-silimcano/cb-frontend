@@ -55,7 +55,5 @@ class EnumerationUtilSpec extends UnitSpec with WithFakeApplication {
           errors.head._2.head.message shouldBe "Enumeration expected of type: 'class uk.gov.hmrc.cb.mappings.Genders$', but it does not appear to contain the value: 'something'"
       }
     }
-
   }
-
 }
