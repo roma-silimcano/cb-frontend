@@ -23,4 +23,4 @@ package uk.gov.hmrc.cb.models
 case class Claimant(
                    name : String,
                    reference : Int
-                     )
+                   )

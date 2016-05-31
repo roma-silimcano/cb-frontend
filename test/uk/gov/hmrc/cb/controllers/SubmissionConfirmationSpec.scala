@@ -54,9 +54,6 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
         val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", ""))
         await(status(result)) shouldBe Status.OK
       }
-
     }
-
   }
-
 }

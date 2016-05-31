@@ -45,5 +45,4 @@ object EnumUtils {
     new Writes[E#Value] {
       def writes(v: E#Value): JsValue = JsString(v.toString)
     }
-
 }
