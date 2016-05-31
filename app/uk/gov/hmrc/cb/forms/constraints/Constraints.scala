@@ -14,13 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.forms.constraints
+
+import java.util.regex.Pattern
 
 /**
- * Created by adamconder on 06/05/2016.
+ * Created by adamconder on 27/05/2016.
  */
+object Constraints {
 
-case class Claimant(
-                   name : String,
-                   reference : Int
-                   )
+//  val pattern = Pattern.compile("([a-zA-Z])\\w\\p{L}+", Pattern.UNICODE_CHARACTER_CLASS)
+
+  /**
+   * This will match:
+   *  ^                beginning of string
+   * [A-Za-z']+        one or more letters or apostrophe
+   * ( [A-Za-z']+)*    zero or more instances of (a single space followed by one or more letters or apostrophe)
+   * $                 end of string
+   */
+  val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
+
+}

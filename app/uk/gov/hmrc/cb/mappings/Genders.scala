@@ -14,13 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.mappings
+
+import play.api.libs.json.{Format, Reads, Writes}
+import uk.gov.hmrc.cb.utils.EnumUtils
 
 /**
- * Created by adamconder on 06/05/2016.
- */
+  * Created by chrisianson on 27/05/16.
+  */
+object Genders extends Enumeration {
 
-case class Claimant(
-                   name : String,
-                   reference : Int
-                   )
+  type Gender = Value
+
+  val Male = Value(0, "male")
+  val Female= Value(1, "female")
+  val Indeterminate = Value(2, "indeterminate")
+  val None = Value(3, "none")
+
+  val enumReads: Reads[Gender] = EnumUtils.enumReads(Genders)
+
+  val enumWrites: Writes[Gender] = EnumUtils.enumWrites
+
+  implicit def enumFormats : Format[Gender] = EnumUtils.enumFormat(Genders)
+}

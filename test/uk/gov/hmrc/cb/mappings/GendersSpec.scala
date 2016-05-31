@@ -14,13 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.mappings
+
+import play.api.libs.json.Json
+import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
 /**
- * Created by adamconder on 06/05/2016.
+ * Created by adamconder on 31/05/2016.
  */
+class GendersSpec extends UnitSpec with WithFakeApplication {
 
-case class Claimant(
-                   name : String,
-                   reference : Int
-                   )
+  "Genders" should {
+
+    "convert to JSON" in {
+      val gender = Genders.Male
+      Json.toJson(gender) shouldBe Json.parse(
+        """
+          |"male"
+        """.stripMargin)
+    }
+
+  }
+
+}

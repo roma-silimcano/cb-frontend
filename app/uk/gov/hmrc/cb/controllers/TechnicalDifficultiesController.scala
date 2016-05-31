@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.controllers
+
+import play.api.mvc.Action
+import uk.gov.hmrc.play.frontend.controller.FrontendController
+
+import scala.concurrent.Future
 
 /**
- * Created by adamconder on 06/05/2016.
+ * Created by adamconder on 31/05/2016.
  */
+object TechnicalDifficultiesController extends TechnicalDifficultiesController
 
-case class Claimant(
-                   name : String,
-                   reference : Int
-                   )
+trait TechnicalDifficultiesController extends FrontendController {
+
+  def get = Action.async {
+    implicit request =>
+      Future.successful(InternalServerError(uk.gov.hmrc.cb.views.html.cbcommon.technicalDifficulties()))
+  }
+
+}

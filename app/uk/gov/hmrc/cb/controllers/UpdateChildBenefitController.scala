@@ -27,37 +27,29 @@ import scala.concurrent.Future
   * Created by chrisianson on 04/05/16.
   */
 object UpdateChildBenefitController extends UpdateChildBenefitController {
-  override protected def authConnector: AuthConnector = FrontendAuthConnector
+  override val authConnector = FrontendAuthConnector
 }
 
 trait UpdateChildBenefitController extends ChildBenefitController {
 
-  protected def authConnector: AuthConnector
-
-  def present = Action.async {
+  def get = Action.async {
     implicit request =>
-
       val childBenefitForm = UpdateChildBenefitForm
-
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.update_child_benefit(childBenefitForm.form)))
   }
 
-  def submit = Action.async {
+  def post = Action.async {
     implicit request =>
       UpdateChildBenefitForm.form.bindFromRequest().fold(
         formWithErrors => {
           Future.successful(BadRequest(uk.gov.hmrc.cb.views.html.update_child_benefit(formWithErrors)))
         },
         success => {
-          success.updateChildBenefit match {
-            case Some(x) =>
-              if (x) {
-                Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
-              } else {
-                Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
-              }
-            case _ =>
-              Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
+          val update = success.updateChildBenefit.get
+          if (update) {
+            Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
+          } else {
+            Future.successful(Redirect(routes.TechnicalDifficultiesController.get()))
           }
         }
       )

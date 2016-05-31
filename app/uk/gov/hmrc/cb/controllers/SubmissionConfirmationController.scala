@@ -26,19 +26,17 @@ import scala.concurrent.Future
 /**
  * Created by adamconder on 05/05/2016.
  */
-
 object SubmissionConfirmationController extends SubmissionConfirmationController {
-  override protected def authConnector : AuthConnector = FrontendAuthConnector
+  override val authConnector : AuthConnector = FrontendAuthConnector
 }
 
 trait SubmissionConfirmationController extends ChildBenefitController {
 
-  protected def authConnector : AuthConnector
+  private val REFERENCE_NUMBER = 12345
 
-  def get() = Action.async {
+  def get = Action.async {
     implicit request =>
-      val claimant = Claimant(name = "Louise", reference = 12345)
+      val claimant = Claimant(name = "Louise", reference = REFERENCE_NUMBER)
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
   }
-
 }

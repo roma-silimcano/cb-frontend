@@ -14,13 +14,23 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb
+
+import org.scalatest.Suite
+import play.api.test.FakeApplication
+import uk.gov.hmrc.play.test.WithFakeApplication
 
 /**
- * Created by adamconder on 06/05/2016.
+ * Created by adamconder on 31/05/2016.
  */
+trait CBFakeApplication extends WithFakeApplication {
+  this: Suite =>
 
-case class Claimant(
-                   name : String,
-                   reference : Int
-                   )
+  val config : Map[String, _] = Map(
+    "csrf.sign.tokens" -> false,
+    "microservice.services.auth.host" -> "localhost",
+    "microservice.services.auth.port" -> "8500"
+  )
+  override lazy val fakeApplication = FakeApplication(additionalConfiguration = config)
+
+}
