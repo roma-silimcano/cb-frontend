@@ -20,6 +20,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.SubmissionConfirmationController
 import uk.gov.hmrc.cb.models.Claimant
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

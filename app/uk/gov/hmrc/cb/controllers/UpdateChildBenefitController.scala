@@ -36,9 +36,7 @@ trait UpdateChildBenefitController extends ChildBenefitController {
 
   def present = Action.async {
     implicit request =>
-
       val childBenefitForm = UpdateChildBenefitForm
-
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.update_child_benefit(childBenefitForm.form)))
   }
 
@@ -49,15 +47,11 @@ trait UpdateChildBenefitController extends ChildBenefitController {
           Future.successful(BadRequest(uk.gov.hmrc.cb.views.html.update_child_benefit(formWithErrors)))
         },
         success => {
-          success.updateChildBenefit match {
-            case Some(x) =>
-              if (x) {
-                Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
-              } else {
-                Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
-              }
-            case _ =>
-              Future.successful(Redirect(routes.ChildBenefitController.technicalDifficulties()))
+          val update = success.updateChildBenefit.get
+          if (update) {
+            Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
+          } else {
+            Future.successful(Redirect(routes.TechnicalDifficultiesController.get()))
           }
         }
       )
