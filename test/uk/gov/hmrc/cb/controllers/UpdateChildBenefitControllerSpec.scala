@@ -53,25 +53,25 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
     s"GET $endPoint" should {
 
       "return 200" in {
-        val result = mockUpdateChildBenefitController.present(fakeRequestGet)
+        val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         status(result) shouldBe Status.OK
       }
 
       "be able to see the radio button elements" in {
-        val result = mockUpdateChildBenefitController.present(fakeRequestGet)
+        val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         val doc = Jsoup.parse(contentAsString(result))
         doc.getElementById("updateChildBenefit-true").attr("type") shouldBe "radio"
         doc.getElementById("updateChildBenefit-false").attr("type") shouldBe "radio"
       }
 
       "return html content type" in {
-        val result = mockUpdateChildBenefitController.present(fakeRequestGet)
+        val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         contentType(result) shouldBe Some("text/html")
         charset(result) shouldBe Some("utf-8")
       }
 
       "return valid string" in {
-        val result = await(mockUpdateChildBenefitController.present(fakeRequestGet))
+        val result = await(mockUpdateChildBenefitController.get(fakeRequestGet))
         bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.update.child.benefit"))
       }
     }
@@ -85,29 +85,28 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
 
     s"POST $endPoint" should {
       "Submit the form with YES and redirect to the same endpoint" in {
-        val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostTrue)
+        val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostTrue)
         status(result) shouldBe Status.SEE_OTHER
         result.header.headers("Location") should include(endPoint)
       }
 
-      "submit the form with NO and redirect to the technical difficulties endpoint" in {
-        val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostFalse)
+      "post the form with NO and redirect to the technical difficulties endpoint" in {
+        val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostFalse)
         status(result) shouldBe Status.SEE_OTHER
         result.header.headers("Location") should include(techDiffEndpoint)
       }
 
-      "submit the form with an invalid result and return a BAD REQUEST code" in {
-        val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostInvalid)
+      "post the form with an invalid result and return a BAD REQUEST code" in {
+        val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostInvalid)
         status(result) shouldBe Status.BAD_REQUEST
       }
 
-      "submit the form with an invalid result and return with an error message" in {
-        val result = await(mockUpdateChildBenefitController.submit.apply(fakeRequestPostInvalid))
+      "post the form with an invalid result and return with an error message" in {
+        val result = await(mockUpdateChildBenefitController.post.apply(fakeRequestPostInvalid))
         bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.error.update.child.benefit.required"))
       }
 
     }
-
   }
 
 }

@@ -16,7 +16,9 @@
 
 package uk.gov.hmrc.cb.utils
 
+import play.api.data.validation.ValidationError
 import play.api.libs.json.{JsError, JsSuccess, Json}
+import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.mappings.Genders.Gender
 import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
@@ -35,12 +37,44 @@ class EnumerationUtilSpec extends UnitSpec with WithFakeApplication {
           | "enum" : "something"
           |}
         """.stripMargin)
-      json.validate[Gender] match {
-        case JsSuccess(v, _) =>
-          !v.isInstanceOf[Gender]
-        case JsError(errors) =>
-          errors.head._2.head.message shouldBe "String value expected"
-      }
+
+      json.validate[Gender] shouldBe JsError(ValidationError("String value expected"))
+    }
+
+    "return a JsSuccess when it can parse json object Male" in {
+      val json = Json.parse(
+        """
+          |"male"
+        """.stripMargin)
+
+      json.validate[Gender] shouldBe JsSuccess(Genders.Male)
+    }
+
+    "return a JsSuccess when it can parse json object Female" in {
+      val json = Json.parse(
+        """
+          |"female"
+        """.stripMargin)
+
+      json.validate[Gender] shouldBe JsSuccess(Genders.Female)
+    }
+
+    "return a JsSuccess when it can parse json object Indeterminate" in {
+      val json = Json.parse(
+        """
+          |"indeterminate"
+        """.stripMargin)
+
+      json.validate[Gender] shouldBe JsSuccess(Genders.Indeterminate)
+    }
+
+    "return a JsSuccess when it can parse json object None" in {
+      val json = Json.parse(
+        """
+          |"none"
+        """.stripMargin)
+
+      json.validate[Gender] shouldBe JsSuccess(Genders.None)
     }
 
     "return a JsError when it cannot parse json string" in {
@@ -48,14 +82,8 @@ class EnumerationUtilSpec extends UnitSpec with WithFakeApplication {
         """
           |"something"
         """.stripMargin)
-      json.validate[Gender] match {
-        case JsSuccess(v, _) =>
-          !v.isInstanceOf[Gender]
-        case JsError(errors) =>
-          errors.head._2.head.message shouldBe "Enumeration expected of type: 'class uk.gov.hmrc.cb.mappings.Genders$', but it does not appear to contain the value: 'something'"
-      }
+
+      json.validate[Gender] shouldBe JsError(ValidationError("Enumeration expected of type: 'class uk.gov.hmrc.cb.mappings.Genders$', but it does not appear to contain the value: 'something'"))
     }
-
   }
-
 }

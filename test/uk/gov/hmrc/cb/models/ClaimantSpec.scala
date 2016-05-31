@@ -31,7 +31,5 @@ class ClaimantSpec extends UnitSpec with WithFakeApplication {
       claimant.name shouldBe "Louise"
       claimant.reference shouldBe 12345
     }
-
   }
-
 }

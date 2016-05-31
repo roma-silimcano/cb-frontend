@@ -32,13 +32,13 @@ object UpdateChildBenefitController extends UpdateChildBenefitController {
 
 trait UpdateChildBenefitController extends ChildBenefitController {
 
-  def present = Action.async {
+  def get = Action.async {
     implicit request =>
       val childBenefitForm = UpdateChildBenefitForm
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.update_child_benefit(childBenefitForm.form)))
   }
 
-  def submit = Action.async {
+  def post = Action.async {
     implicit request =>
       UpdateChildBenefitForm.form.bindFromRequest().fold(
         formWithErrors => {
