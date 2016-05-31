@@ -14,18 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.config
 
-import uk.gov.hmrc.play.frontend.auth.Actions
+import org.scalatest.mock.MockitoSugar
+import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.test.UnitSpec
 
 /**
- * Created by andrew on 03/05/16.
+ * Created by adamconder on 31/05/2016.
  */
+class FrontendAuthConnectorSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-trait ChildBenefitController extends FrontendController with Actions {
+  "FrontendAuthConnector" should {
 
-  val authConnector: AuthConnector
+    "be an instance of FrontendAuthConnector" in {
+      val connector = FrontendAuthConnector
+      connector shouldBe a[AuthConnector]
+    }
+
+  }
 
 }

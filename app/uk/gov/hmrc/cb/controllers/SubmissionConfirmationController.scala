@@ -28,12 +28,10 @@ import scala.concurrent.Future
  */
 
 object SubmissionConfirmationController extends SubmissionConfirmationController {
-  override protected val authConnector : AuthConnector = FrontendAuthConnector
+  override val authConnector : AuthConnector = FrontendAuthConnector
 }
 
 trait SubmissionConfirmationController extends ChildBenefitController {
-
-  protected val authConnector : AuthConnector
 
   def get() = Action.async {
     implicit request =>

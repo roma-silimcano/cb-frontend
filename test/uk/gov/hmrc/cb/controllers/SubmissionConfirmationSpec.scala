@@ -35,6 +35,14 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
 
   "SubmissionController" when {
 
+    "initialising" should {
+
+      "wire up the dependencies correctly" in {
+        SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
+      }
+
+    }
+
     "GET /confirmation" should {
 
       "not respond with NOT_FOUND" in {
