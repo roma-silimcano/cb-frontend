@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.forms
 
+import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
 import uk.gov.hmrc.cb.config.FrontendAppConfig
@@ -30,7 +31,11 @@ object ChildNameForm {
 
   private def validate(x : String) : Boolean = {
     lazy val lengthConstraint : Int = FrontendAppConfig.childLengthMaxConstraint
-    x.nonEmpty && x.length <= lengthConstraint && Constraints.pattern.matcher(x).matches()
+    val valid = x.nonEmpty && x.length <= lengthConstraint && x.matches(Constraints.nameConstraint)
+    if (!valid) {
+      Logger.info(s"[ChildNameForm][Validate] invalid name specified: $x")
+    }
+    valid
   }
 
   val form : Form[ChildNamePageModel] = Form(

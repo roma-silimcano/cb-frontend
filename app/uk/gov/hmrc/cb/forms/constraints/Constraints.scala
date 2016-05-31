@@ -23,8 +23,15 @@ import java.util.regex.Pattern
  */
 object Constraints {
 
-  val pattern = Pattern.compile("([a-zA-Z])\\w\\p{L}+", Pattern.UNICODE_CHARACTER_CLASS)
+//  val pattern = Pattern.compile("([a-zA-Z])\\w\\p{L}+", Pattern.UNICODE_CHARACTER_CLASS)
 
-  val noNumbersAndSpecialCharacters = "([a-zA-Z])\\w+"
+  /**
+   * This will match:
+   *  ^                beginning of string
+   * [A-Za-z']+        one or more letters or apostrophe
+   * ( [A-Za-z']+)*    zero or more instances of (a single space followed by one or more letters or apostrophe)
+   * $                 end of string
+   */
+  val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
 
 }

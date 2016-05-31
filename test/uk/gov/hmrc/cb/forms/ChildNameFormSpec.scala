@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
   // TODO do we allow spaces? such as: 'van helden'
-  // TODO is O'brian a valid surname?
 
   val maxLength = "tZWfHEhJlSIdAuSnaSjGgWTWeYWrPXYrMPmycvLyJXfSmrIcqrvgrDtISXsdhaOPKAKzHAfzUOiKzIIVkyEbEeCSrVtwFYcyUHQAzFfAFMaFckTtycGiGQrEbIsPsuMW"
 
@@ -40,6 +39,159 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         Map(
           "firstName" -> "adam",
           "lastName" -> "conder"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name and last name which have a space" in {
+      val data = ChildNamePageModel(firstName = "Adam David", lastName = "Van Helsen")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Adam David",
+          "lastName" -> "Van Helsen"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name which has a space" in {
+      val data = ChildNamePageModel(firstName = "Adam David", lastName = "Conder")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Adam David",
+          "lastName" -> "Conder"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for last name which has a space" in {
+      val data = ChildNamePageModel(firstName = "Adam", lastName = "Van Helsen")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Adam",
+          "lastName" -> "Van Helsen"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name and last name which are hyphen separated" in {
+      val data = ChildNamePageModel(firstName = "Sarah-Louise", lastName = "Matthew-Jones")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Sarah-Louise",
+          "lastName" -> "Matthew-Jones"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name which is hyphen separated" in {
+      val data = ChildNamePageModel(firstName = "Sarah-Louise", lastName = "Conder")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Sarah-Louise",
+          "lastName" -> "Conder"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for last name which is hyphen separated" in {
+      val data = ChildNamePageModel(firstName = "Adam", lastName = "Matthew-Jones")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Adam",
+          "lastName" -> "Matthew-Jones"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name and last name which have an apostrophe" in {
+      val data = ChildNamePageModel(firstName = "O'Brian", lastName = "O'Brian")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "O'Brian",
+          "lastName" -> "O'Brian"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for first name which has an apostrophe" in {
+      val data = ChildNamePageModel(firstName = "O'Brian", lastName = "Conder")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "O'Brian",
+          "lastName" -> "Conder"
+        )
+      ).fold(
+          formWithErrors => {
+            formWithErrors.errors shouldBe empty
+          },
+          success => {
+            success shouldBe data
+          }
+        )
+    }
+
+    "accept a valid value for last name which has an apostrophe" in {
+      val data = ChildNamePageModel(firstName = "Adam", lastName = "O'Brian")
+      ChildNameForm.form.bind(
+        Map(
+          "firstName" -> "Adam",
+          "lastName" -> "O'Brian"
         )
       ).fold(
           formWithErrors => {
