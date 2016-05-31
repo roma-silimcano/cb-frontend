@@ -27,12 +27,12 @@ import scala.concurrent.Future
   * Created by chrisianson on 04/05/16.
   */
 object UpdateChildBenefitController extends UpdateChildBenefitController {
-  override protected def authConnector: AuthConnector = FrontendAuthConnector
+  override protected val authConnector: AuthConnector = FrontendAuthConnector
 }
 
 trait UpdateChildBenefitController extends ChildBenefitController {
 
-  protected def authConnector: AuthConnector
+  protected val authConnector: AuthConnector
 
   def present = Action.async {
     implicit request =>

@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.controllers
 
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.cb.controllers.TechnicalDifficultiesController
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.play.test.UnitSpec
 /**
  * Created by andrew on 03/05/16.
  */
-class TechnicalDifficultiesControllerSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+class TechnicalDifficultiesControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
   val fakeRequest = FakeRequest("GET","/technical-difficulties")
 
   object testChildBenefitController extends TechnicalDifficultiesController {

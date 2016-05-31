@@ -14,25 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.controllers
 
 import org.jsoup.Jsoup
-import play.api.http.Status
-import play.api.test.FakeRequest
-import uk.gov.hmrc.cb.controllers.UpdateChildBenefitController
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.scalatest.mock.MockitoSugar
+import play.api.http.Status
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.test.UnitSpec
+
 /**
   * Created by chrisianson on 04/05/16.
   */
-class UpdateChildBenefitControllerSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
   val endPoint: String = "/confirmation"
   val techDiffEndpoint: String = "/technical-difficulties"
 
-  object mockUpdateChildBenefitController extends UpdateChildBenefitController {
+  val mockUpdateChildBenefitController = new UpdateChildBenefitController {
     override val authConnector: AuthConnector = mock[AuthConnector]
   }
 
