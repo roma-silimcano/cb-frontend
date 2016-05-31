@@ -325,12 +325,9 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "return values from the form" in {
-      val form = ChildNameForm.form.bind(
-        Map(
-          "firstName" -> "adam",
-          "lastName" -> "conder"
-        ))
-      form.get shouldBe ChildNamePageModel("adam", "conder")
+      val data = ChildNamePageModel("adam", "conder")
+      val form = ChildNameForm.form.fill(data)
+      form.get shouldBe data
     }
 
   }
