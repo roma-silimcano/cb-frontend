@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.mappings
 
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.libs.json.Json
+import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
 
 /**
- * Created by andrew on 03/05/16.
+ * Created by adamconder on 31/05/2016.
  */
+class GendersSpec extends UnitSpec with WithFakeApplication {
 
-trait ChildBenefitController extends FrontendController with Actions {
+  "Genders" should {
 
-  protected val authConnector: AuthConnector
+    "convert to JSON" in {
+      val gender = Genders.Male
+      Json.toJson(gender) shouldBe Json.parse(
+        """
+          |"male"
+        """.stripMargin)
+    }
+
+  }
 
 }

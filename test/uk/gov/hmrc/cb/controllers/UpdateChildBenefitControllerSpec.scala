@@ -14,26 +14,27 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.controllers
 
 import org.jsoup.Jsoup
-import play.api.http.Status
-import play.api.test.FakeRequest
-import uk.gov.hmrc.cb.controllers.UpdateChildBenefitController
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import org.scalatest.mock.MockitoSugar
+import play.api.http.Status
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.test.UnitSpec
+
 /**
   * Created by chrisianson on 04/05/16.
   */
-class UpdateChildBenefitControllerSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
   val endPoint: String = "/confirmation"
   val techDiffEndpoint: String = "/technical-difficulties"
 
-  def mockUpdateChildBenefitController = new UpdateChildBenefitController {
-    override protected def authConnector: AuthConnector = mock[AuthConnector]
+  val mockUpdateChildBenefitController = new UpdateChildBenefitController {
+    override val authConnector: AuthConnector = mock[AuthConnector]
   }
 
   val fakeRequestGet = FakeRequest("GET", endPoint)
@@ -41,26 +42,25 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with WithFakeApplication
   s"GET $endPoint" should {
 
     "return 200" in {
-      mockUpdateChildBenefitController
-      val result = UpdateChildBenefitController.present(fakeRequestGet)
+      val result = mockUpdateChildBenefitController.present(fakeRequestGet)
       status(result) shouldBe Status.OK
     }
 
     "be able to see the radio button elements" in {
-      val result = UpdateChildBenefitController.present(fakeRequestGet)
+      val result = mockUpdateChildBenefitController.present(fakeRequestGet)
       val doc = Jsoup.parse(contentAsString(result))
       doc.getElementById("updateChildBenefit-true").attr("type") shouldBe "radio"
       doc.getElementById("updateChildBenefit-false").attr("type") shouldBe "radio"
     }
 
     "return html content type" in {
-      val result = UpdateChildBenefitController.present(fakeRequestGet)
+      val result = mockUpdateChildBenefitController.present(fakeRequestGet)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "return valid string" in {
-      val result = await(UpdateChildBenefitController.present(fakeRequestGet))
+      val result = await(mockUpdateChildBenefitController.present(fakeRequestGet))
       bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.update.child.benefit"))
     }
   }
@@ -74,24 +74,24 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with WithFakeApplication
 
   s"POST $endPoint" should {
     "Submit the form with YES and redirect to the same endpoint" in {
-      val result = UpdateChildBenefitController.submit.apply(fakeRequestPostTrue)
+      val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostTrue)
       status(result) shouldBe Status.SEE_OTHER
       result.header.headers("Location") should include(endPoint)
     }
 
     "submit the form with NO and redirect to the technical difficulties endpoint" in {
-      val result = UpdateChildBenefitController.submit.apply(fakeRequestPostFalse)
+      val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostFalse)
       status(result) shouldBe Status.SEE_OTHER
       result.header.headers("Location") should include(techDiffEndpoint)
     }
 
     "submit the form with an invalid result and return a BAD REQUEST code" in {
-      val result = UpdateChildBenefitController.submit.apply(fakeRequestPostInvalid)
+      val result = mockUpdateChildBenefitController.submit.apply(fakeRequestPostInvalid)
       status(result) shouldBe Status.BAD_REQUEST
     }
 
     "submit the form with an invalid result and return with an error message" in {
-      val result = await(UpdateChildBenefitController.submit.apply(fakeRequestPostInvalid))
+      val result = await(mockUpdateChildBenefitController.submit.apply(fakeRequestPostInvalid))
       bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.error.update.child.benefit.required"))
     }
 

@@ -16,16 +16,21 @@
 
 package uk.gov.hmrc.cb.controllers
 
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.controller.FrontendController
 
+import scala.concurrent.Future
+
 /**
- * Created by andrew on 03/05/16.
+ * Created by adamconder on 31/05/2016.
  */
+object TechnicalDifficultiesController extends TechnicalDifficultiesController
 
-trait ChildBenefitController extends FrontendController with Actions {
+trait TechnicalDifficultiesController extends FrontendController {
 
-  protected val authConnector: AuthConnector
+  def get = Action.async {
+    implicit request =>
+      Future.successful(InternalServerError(uk.gov.hmrc.cb.views.html.cbcommon.technicalDifficulties()))
+  }
 
 }

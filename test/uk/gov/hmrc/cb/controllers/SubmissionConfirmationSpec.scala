@@ -14,21 +14,20 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.controllers
 
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.cb.controllers.SubmissionConfirmationController
-import uk.gov.hmrc.cb.models.Claimant
+import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
+import uk.gov.hmrc.play.test.UnitSpec
 
 /**
  * Created by adamconder on 05/05/2016.
  */
-class SubmissionConfirmationSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
   val mockSubmissionConfirmationController = new SubmissionConfirmationController {
     override val authConnector : AuthConnector = mock[AuthConnector]

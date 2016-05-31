@@ -14,39 +14,39 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb
+package uk.gov.hmrc.cb.controllers
 
+import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.cb.controllers.ChildBenefitController
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.play.test.UnitSpec
 /**
  * Created by andrew on 03/05/16.
  */
-class ChildBenefitControllerSpec extends UnitSpec with WithFakeApplication {
+class TechnicalDifficultiesControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
   val fakeRequest = FakeRequest("GET","/technical-difficulties")
 
-  def testChildBenefitController = new ChildBenefitController {
-    override protected def authConnector: AuthConnector = ???
+  object testChildBenefitController extends TechnicalDifficultiesController {
+
   }
 
   "GET /technical-difficulties" should {
     "return an InternalServerError" in {
-      val result = testChildBenefitController.technicalDifficulties(fakeRequest)
+      val result = testChildBenefitController.get(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
     "return html content type" in {
-      val result = testChildBenefitController.technicalDifficulties(fakeRequest)
+      val result = testChildBenefitController.get(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "return valid string" in {
-      val result = await(testChildBenefitController.technicalDifficulties(fakeRequest))
+      val result = await(testChildBenefitController.get(fakeRequest))
       bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.technical.difficulties.heading"))
     }
   }

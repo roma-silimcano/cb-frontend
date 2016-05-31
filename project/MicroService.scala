@@ -24,7 +24,7 @@ trait MicroService {
     import ScoverageSbtPlugin._
 
     Seq(
-      ScoverageKeys.coverageExcludedPackages := "<empty>;app.*;config.*;testOnlyDoNotUseInAppConf.*;views.*;uk.gov.hmrc.*;prod.*;",
+      ScoverageKeys.coverageExcludedPackages := "<empty>;uk.gov.hmrc.cb.config.*;testOnlyDoNotUseInAppConf.*;uk.gov.hmrc.cb.views.*;prod.*;uk.gov.hmrc.BuildInfo.*;app.Routes.*;",
       ScoverageKeys.coverageMinimum := 100,
       ScoverageKeys.coverageFailOnMinimum := true,
       ScoverageKeys.coverageHighlighting := true

@@ -14,18 +14,26 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.mappings
 
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.FrontendController
+import play.api.libs.json.{Format, Reads, Writes}
+import uk.gov.hmrc.cb.utils.EnumUtils
 
 /**
- * Created by andrew on 03/05/16.
- */
+  * Created by chrisianson on 27/05/16.
+  */
+object Genders extends Enumeration {
 
-trait ChildBenefitController extends FrontendController with Actions {
+  type Gender = Value
 
-  protected val authConnector: AuthConnector
+  val Male = Value(0, "male")
+  val Female= Value(1, "female")
+  val Indeterminate = Value(2, "indeterminate")
+  val None = Value(3, "none")
 
+  val enumReads: Reads[Gender] = EnumUtils.enumReads(Genders)
+
+  val enumWrites: Writes[Gender] = EnumUtils.enumWrites
+
+  implicit def enumFormats : Format[Gender] = EnumUtils.enumFormat(Genders)
 }
