@@ -16,17 +16,21 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
     override val authConnector = mock[AuditConnector]
   }
 
-  "ChildNameController" should {
+  "ChildNameController" when {
 
-    "respond to GET /child-benefit/children/1/name" in {
-      val result = route(FakeRequest("GET", "/child-benefit/children/1/name"))
-      status(result.get) should not be NOT_FOUND
-    }
+    "calling /child-benefit/children/1/name" should {
 
-    "respond to POST /child-benefit/children/1/name" in {
-      val result = route(FakeRequest("POST", "/child-benefit/children/1/name"))
-      status(result.get) shouldBe SEE_OTHER
-      result.get.header.headers("Location") should include("/confirmation")
+      "respond to GET /child-benefit/children/1/name" in {
+        val result = route(FakeRequest("GET", "/child-benefit/children/1/name"))
+        status(result.get) should not be NOT_FOUND
+      }
+
+      "respond to POST /child-benefit/children/1/name" in {
+        val result = route(FakeRequest("POST", "/child-benefit/children/1/name"))
+        status(result.get) shouldBe SEE_OTHER
+        result.get.header.headers("Location") should include("/confirmation")
+      }
+
     }
 
   }
