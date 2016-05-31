@@ -25,8 +25,6 @@ import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
  */
 class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
 
-  // TODO do we allow spaces? such as: 'van helden'
-
   val maxLength = "tZWfHEhJlSIdAuSnaSjGgWTWeYWrPXYrMPmycvLyJXfSmrIcqrvgrDtISXsdhaOPKAKzHAfzUOiKzIIVkyEbEeCSrVtwFYcyUHQAzFfAFMaFckTtycGiGQrEbIsPsuMW"
 
   "ChildNameForm" should {
