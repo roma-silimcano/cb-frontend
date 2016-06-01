@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 /**
   * Created by chrisianson on 01/06/16.
   */
-object CBSessionCache extends SessionCache with AppName with ServicesConfig {
+object KeystoreConnector extends SessionCache with AppName with ServicesConfig {
   override lazy val http = WSHttp
   override lazy val defaultSource = appName
   override lazy val baseUri = KeystoreConnectorConfig.baseUri

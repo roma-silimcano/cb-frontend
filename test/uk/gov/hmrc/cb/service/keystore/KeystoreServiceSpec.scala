@@ -21,6 +21,7 @@ import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import play.api.http.Status
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
@@ -37,10 +38,8 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     lazy val authConnector = FrontendAuthConnector
   }
 
-  object TestController extends TestController with KeystoreService with CBAuthConnector
-
   trait TestController extends FrontendController with Actions {
-    this: KeystoreService with CBAuthConnector =>
+    this: CBAuthConnector =>
 
     val cacheClient : ChildBenefitKeystoreService
 
@@ -80,15 +79,24 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     }
   }
 
-  val testController = new TestController with KeystoreService with CBAuthConnector {
+  val testController = new TestController with CBAuthConnector {
     override val cacheClient = mock[ChildBenefitKeystoreService]
   }
 
   "KeystoreService " when {
 
+
+    /**
+     *
+     * Adam: Example not going through the controller
+     * when(TestKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
+        val result = await(TestKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(), any(), any()))
+        result shouldBe Some("test")
+     */
+
     "GET data should " should {
 
-      "(GET) return 200 when data is not found for key" in {
+      "(GET) return 200 when data is found for key" in {
         implicit val request = FakeRequest()
         val controller = testController
         /// could return Some("") or None both but return Status.OK / None is where the object hasn't been saved to keystore yet
