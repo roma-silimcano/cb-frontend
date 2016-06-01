@@ -37,10 +37,10 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     lazy val authConnector = FrontendAuthConnector
   }
 
-  object TestController extends TestController with CBSession with KeystoreService with CBAuthConnector
+  object TestController extends TestController with KeystoreService with CBAuthConnector
 
   trait TestController extends FrontendController with Actions {
-    this: CBSession with KeystoreService with CBAuthConnector =>
+    this: KeystoreService with CBAuthConnector =>
 
     val cacheClient : ChildBenefitKeystoreService
 
@@ -80,7 +80,7 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     }
   }
 
-  val testController = new TestController with KeystoreService with CBSession with CBAuthConnector {
+  val testController = new TestController with KeystoreService with CBAuthConnector {
     override val cacheClient = mock[ChildBenefitKeystoreService]
   }
 
