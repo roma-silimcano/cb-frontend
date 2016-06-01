@@ -34,5 +34,4 @@ class KeystoreConnectorSpec extends UnitSpec with WithFakeApplication {
       result shouldBe "keystore"
     }
   }
-
 }

@@ -80,7 +80,6 @@ object KeystoreService extends CBKeystoreKeys {
         case _ =>
           "noSessionIdFound"
       }
-
     }
   }
 }
