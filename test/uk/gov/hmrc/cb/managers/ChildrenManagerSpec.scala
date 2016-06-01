@@ -26,7 +26,7 @@ import uk.gov.hmrc.play.test.UnitSpec
 /**
   * Created by chrisianson on 26/05/16.
   */
-class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
+class ChildrenManagerSpec extends UnitSpec {
 
   def fixture = new {
     val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
@@ -43,19 +43,19 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
     "creating children" should {
 
       "create a list of children objects" in {
-        val result = childrenService.createListOfChildren(requiredNumberOfChildren = 1)
+        val result = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 1)
         result shouldBe List(
           fixture.child1
         )
       }
 
       "return an empty List when provided 0" in {
-        val result = childrenService.createListOfChildren(requiredNumberOfChildren = 0)
+        val result = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 0)
         result shouldBe List.empty
       }
 
       "create a list of 5 child objects when passed 5" in {
-        val result = childrenService.createListOfChildren(requiredNumberOfChildren = 5)
+        val result = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 5)
         result shouldBe List(
           fixture.child1,
           fixture.child2,
@@ -74,7 +74,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
           fixture.child1,
           fixture.child2
         )
-        val result = childrenService.modifyListOfChildren(requiredNumberOfChildren = 1, children = input)
+        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 1, children = input)
         result shouldBe List(
           fixture.child1
         )
@@ -88,7 +88,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
           fixture.child3,
           fixture.child4
         )
-        val result = childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
+        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
           fixture.child1,
           fixture.child2
@@ -100,7 +100,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
         val input = List(
           fixture.child1
         )
-        val result = childrenService.modifyListOfChildren(requiredNumberOfChildren = 3, children = input)
+        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 3, children = input)
         result shouldBe List(
           fixture.child1,
           fixture.child2,
@@ -114,7 +114,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
           fixture.replacementChild1,
           fixture.replacementChild2
         )
-        val result = childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
+        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
           fixture.replacementChild1,
           fixture.replacementChild2
@@ -126,40 +126,56 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
     "get childById" should {
 
       "return a child by id when an index exists" in {
-        val children = childrenService.createListOfChildren(5)
-        val result = childrenService.getChildById(3, children)
+        val children = ChildrenManager.childrenService.createListOfChildren(5)
+        val result = ChildrenManager.childrenService.getChildById(3, children)
         result shouldBe fixture.child3
       }
 
       "return last child by id" in {
-        val children = childrenService.createListOfChildren(5)
-        val result = childrenService.getChildById(5, children)
+        val children = ChildrenManager.childrenService.createListOfChildren(5)
+        val result = ChildrenManager.childrenService.getChildById(5, children)
 
         result shouldBe fixture.child5
       }
 
       "return an exception when an id is greater than length of list" in {
         val result = intercept[NoSuchElementException] {
-          val children = childrenService.createListOfChildren(2)
-          childrenService.getChildById(5, children)
+          val children = ChildrenManager.childrenService.createListOfChildren(2)
+          ChildrenManager.childrenService.getChildById(5, children)
         }
         result shouldBe a[NoSuchElementException]
       }
 
       "return exception when id is 0" in {
         val result = intercept[NoSuchElementException] {
-          val children = childrenService.createListOfChildren(requiredNumberOfChildren = 3)
-          childrenService.getChildById(0, children)
+          val children = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 3)
+          ChildrenManager.childrenService.getChildById(0, children)
         }
         result shouldBe a[NoSuchElementException]
       }
 
       "return exception when child list is empty" in {
         val result = intercept[NoSuchElementException] {
-          childrenService.getChildById(1, List())
+          ChildrenManager.childrenService.getChildById(1, List())
         }
         result shouldBe a[NoSuchElementException]
       }
+    }
+
+    "performing a lookup" should {
+
+      "determine if a child exists by id - true" in {
+        val children = ChildrenManager.childrenService.createListOfChildren(5)
+        val result = ChildrenManager.childrenService.childExistsAtIndex(3, children)
+        result shouldBe true
+      }
+
+      "determine if a child exists by id - false" in {
+        val children = ChildrenManager.childrenService.createListOfChildren(5)
+        val result = ChildrenManager.childrenService.childExistsAtIndex(6, children)
+        result shouldBe false
+      }
+
     }
 
     "replacing child in a list" in {
@@ -168,7 +184,7 @@ class ChildrenManagerSpec extends UnitSpec with ChildrenManager {
         fixture.child2
       )
       val modifiedChild = fixture.replacementChild2
-      val result = childrenService.replaceChildInAList(childList, 2, modifiedChild)
+      val result = ChildrenManager.childrenService.replaceChildInAList(childList, 2, modifiedChild)
       result shouldBe List(
         fixture.child1,
         fixture.replacementChild2

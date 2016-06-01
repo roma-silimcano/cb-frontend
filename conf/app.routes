@@ -8,3 +8,5 @@ GET        /technical-difficulties  uk.gov.hmrc.cb.controllers.TechnicalDifficul
 
 GET        /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.get
 POST       /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.post
+
+GET        /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameController.get(id : Int)

@@ -23,7 +23,7 @@ import uk.gov.hmrc.cb.models.Child
   * Created by chrisianson on 26/05/16.
   */
 
-trait ChildrenManager {
+object ChildrenManager {
 
   val childrenService = new ChildrenService
 
@@ -93,5 +93,10 @@ trait ChildrenManager {
     def replaceChildInAList(children: List[Child], index: Int, newChild: Child): List[Child] = {
       children.patch(index-1, Seq(newChild), 1)
     }
+
+    def childExistsAtIndex(index: Int, children : List[Child]) = {
+      children.exists(x => x.id == index.toShort)
+    }
+
   }
 }
