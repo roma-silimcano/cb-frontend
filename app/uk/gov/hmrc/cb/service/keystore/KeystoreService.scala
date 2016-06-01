@@ -27,7 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Created by chrisianson on 01/06/16.
   */
-object KeystoreService extends CBKeystoreKeys {
+trait KeystoreService extends CBKeystoreKeys {
 
   val cacheClient = new ChildBenefitKeystoreService
   val sessionCache: SessionCache = CBSessionCache

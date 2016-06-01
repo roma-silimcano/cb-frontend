@@ -19,7 +19,9 @@ package uk.gov.hmrc.cb.service.keystore
 /**
   * Created by chrisianson on 01/06/16.
   */
-class CBKeystoreKeys {
-
+trait CBKeystoreKeys {
   val childrenKey : String = "cb-children"
+}
+
+object CBKeystoreKeys extends CBKeystoreKeys {
 }
