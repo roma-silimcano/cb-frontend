@@ -36,6 +36,8 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
 
   implicit val request = FakeRequest()
 
+  val keystoreService = KeystoreService
+
   trait TestService extends FrontendController with Actions {
     val cacheClient: ChildBenefitKeystoreService
   }
@@ -81,13 +83,6 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     }
   }
 
-  "cacheClient" should {
-
-    "be instance of ChildBenefitKeystoreService" in {
-      testKeystoreService.cacheClient shouldBe a[ChildBenefitKeystoreService]
-    }
-  }
-
   "GET data should " should {
 
     "(GET) return 200 when data is found for key" in {
@@ -115,6 +110,13 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
       when(testKeystoreService.cacheClient.cacheEntryForSession[String](any(), mockEq("childdetails"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
       val result = await(testKeystoreService.testKeystoreSave() (request))
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+    }
+  }
+
+  "KeystoreService.cacheClient" should {
+
+    "be instance of ChildBenefitKeystoreService" in {
+      keystoreService.cacheClient shouldBe a[ChildBenefitKeystoreService]
     }
   }
 }
