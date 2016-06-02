@@ -27,6 +27,7 @@ import scala.concurrent.{ExecutionContext, Future}
 /**
   * Created by chrisianson on 01/06/16.
   */
+
 object KeystoreService extends CBKeystoreKeys {
 
   val cacheClient = new ChildBenefitKeystoreService

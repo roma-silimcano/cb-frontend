@@ -40,7 +40,6 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
       "wire up the dependencies correctly" in {
         SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
       }
-
     }
 
     "GET /confirmation" should {

@@ -21,9 +21,9 @@ import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
 import play.api.test.FakeRequest
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import play.api.http.Status
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -34,20 +34,23 @@ import scala.concurrent.Future
   */
 class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
 
-  trait CBAuthConnector {
-    lazy val authConnector = FrontendAuthConnector
+  implicit val request = FakeRequest()
+
+  trait TestService extends FrontendController with Actions {
+    val cacheClient: ChildBenefitKeystoreService
   }
 
-  trait TestController extends FrontendController with Actions {
-    this: CBAuthConnector =>
+  val testKeystoreService = new TestService {
 
-    val cacheClient : ChildBenefitKeystoreService
+    override val cacheClient = mock[ChildBenefitKeystoreService]
+
+    lazy val authConnector = FrontendAuthConnector
 
     def testKeystoreSave() = UnauthorisedAction {
       implicit request =>
-        cacheClient.cacheEntryForSession[String]("test", "calDetails").map {
+        cacheClient.cacheEntryForSession[String]("test", "childdetails").map {
           res =>
-            Ok("Successfully inserted")
+            Ok
         } recover {
           case e : Exception =>
             e.getMessage match {
@@ -56,11 +59,10 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
               case _ =>
                 InternalServerError
             }
-
         }
     }
 
-    def testKeystoreFetch() = UnauthorisedAction {
+    def testFetchEntryForSession() = UnauthorisedAction {
       implicit request =>
         cacheClient.fetchEntryForSession[String]("test").map {
           case Some(x) =>
@@ -79,59 +81,40 @@ class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with Mockito
     }
   }
 
-  val testController = new TestController with CBAuthConnector {
-    override val cacheClient = mock[ChildBenefitKeystoreService]
+  "cacheClient" should {
+
+    "be instance of ChildBenefitKeystoreService" in {
+      testKeystoreService.cacheClient shouldBe a[ChildBenefitKeystoreService]
+    }
   }
 
-  "KeystoreService " when {
+  "GET data should " should {
 
-
-    /**
-     *
-     * Adam: Example not going through the controller
-     * when(TestKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
-        val result = await(TestKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(), any(), any()))
-        result shouldBe Some("test")
-     */
-
-    "GET data should " should {
-
-      "(GET) return 200 when data is found for key" in {
-        implicit val request = FakeRequest()
-        val controller = testController
-        /// could return Some("") or None both but return Status.OK / None is where the object hasn't been saved to keystore yet
-        when(controller.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
-        val result = await(controller.testKeystoreFetch() (request))
-        status(result) shouldBe Status.OK
-      }
-
-      "(GET) throw an Exception when keystore is down" in {
-        implicit val request = FakeRequest()
-        val controller = testController
-        when(controller.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
-        val result = await(controller.testKeystoreFetch() (request))
-        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-      }
+    "(GET) return 200 when data is found for key" in {
+      when(testKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
+      val result = await(testKeystoreService.testFetchEntryForSession() (request))
+      status(result) shouldBe Status.OK
     }
 
-    "POST data" should {
+    "(GET) throw an Exception when keystore is down" in {
+      when(testKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
+      val result = await(testKeystoreService.testFetchEntryForSession() (request))
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
+    }
+  }
 
-      "(POST) Successfully insert the data to keystore" in {
-        implicit val request = FakeRequest()
-        val controller = testController
-        /// could return Some("") or None both but return Status.OK / None is where the object hasn't been saved to keystore yet
-        when(controller.cacheClient.cacheEntryForSession[String](any(), mockEq("calDetails"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
-        val result = await(controller.testKeystoreSave() (request))
-        status(result) shouldBe Status.OK
-      }
+  "POST data should" should {
 
-      "(POST) throw an Exception when keystore is down" in {
-        implicit val request = FakeRequest()
-        val controller = testController
-        when(controller.cacheClient.cacheEntryForSession[String](any(), mockEq("calDetails"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
-        val result = await(controller.testKeystoreSave() (request))
-        status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-      }
+    "(POST) Successfully insert the data to keystore" in {
+      when(testKeystoreService.cacheClient.cacheEntryForSession[String](any(), mockEq("childdetails"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
+      val result = await(testKeystoreService.testKeystoreSave() (request))
+      status(result) shouldBe Status.OK
+    }
+
+    "(POST) throw an Exception when keystore is down" in {
+      when(testKeystoreService.cacheClient.cacheEntryForSession[String](any(), mockEq("childdetails"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
+      val result = await(testKeystoreService.testKeystoreSave() (request))
+      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
   }
 }
