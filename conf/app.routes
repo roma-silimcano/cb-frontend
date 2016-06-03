@@ -10,4 +10,4 @@ GET        /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefi
 POST       /update-child-benefit    uk.gov.hmrc.cb.controllers.UpdateChildBenefitController.post
 
 GET        /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameController.get(id : Int)
-#POST       /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameController.post(id : Int)
+POST       /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameController.post(id : Int)

@@ -97,8 +97,10 @@ trait ChildNameController extends ChildBenefitController {
             saveToKeystore(r)
           } else {
             // add child
-            val r = createChild(id, model.firstName, model.lastName)
-            saveToKeystore(r)
+            val c = createChild(id, model.firstName, model.lastName).head
+            val amended = childrenService.modifyListOfChildren(id, x)
+            val amendedWithChild = childrenService.replaceChildInAList(amended, id, c)
+            saveToKeystore(amendedWithChild)
           }
         }
         case None =>

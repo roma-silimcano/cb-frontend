@@ -45,12 +45,11 @@ import scala.concurrent.Future
 class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
   implicit val getRequest = FakeRequest("GET", "/child-benefit/children/1/name")
-  def postRequest(form: Form[ChildNamePageModel]) = FakeRequest("POST", "/child-benefit/children/1/name").withFormUrlEncodedBody(form.data.toSeq: _*)
+  def postRequest(form: Form[ChildNamePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/name").withFormUrlEncodedBody(form.data.toSeq: _*)
   implicit val hc = HeaderCarrier()
 
   val childIndex = 1
-
-//  val mockSessionCache = mock[SessionCache]
+  val childIndex2 = 2
 
   val mockController = new ChildNameController {
     override val authConnector = mock[AuthConnector]
@@ -74,14 +73,13 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
     "calling /child-benefit/children/1/name" should {
 
       "respond to GET /child-benefit/children/1/name" in {
-        val result = route(FakeRequest("GET", "/child-benefit/children/1/name"))
+        val result = route(FakeRequest(GET, "/child-benefit/children/1/name"))
         status(result.get) should not be NOT_FOUND
       }
 
       "respond to POST /child-benefit/children/1/name" in {
-        val result = route(FakeRequest("POST", "/child-benefit/children/1/name"))
-        status(result.get) shouldBe SEE_OTHER
-        result.get.header.headers("Location") should include("/confirmation")
+        val result = route(FakeRequest(POST, "/child-benefit/children/1/name"))
+        status(result.get) should not be NOT_FOUND
       }
 
     }
@@ -89,11 +87,9 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
     "get" should {
 
       "redirect to technical difficulties when keystore is down" in {
-        val exception = Future.failed(new RuntimeException())
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(exception)
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
       }
 
       "respond 200 when no children in keystore" in {
@@ -141,7 +137,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         when(mockController.cacheClient.saveChildren(mockEq(children.get))(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
-        val request = postRequest(form)
+        val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
@@ -150,7 +146,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to technical difficulties when keystore is down when fetching children" in {
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
-        val request = postRequest(form)
+        val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
@@ -158,19 +154,19 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
 
       "respond BAD_REQUEST when POST is unsuccessful" in {
         val children = Some(List(Child(id = 1)))
-        when(mockController.cacheClient.loadChildren()).thenReturn(Future.successful(children))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val form = ChildNameForm.form.fill(ChildNamePageModel("", "@£%!@£@£"))
-        val request = postRequest(form)
+        val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe BAD_REQUEST
       }
 
       "redirect to confirmation - No children" in {
         val children = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
-        when(mockController.cacheClient.loadChildren()).thenReturn(Future.successful(None))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(None))
         when(mockController.cacheClient.saveChildren(mockEq(children.get))(any(), any())).thenReturn(Future.successful(children))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
-        val request = postRequest(form)
+        val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/confirmation"
@@ -179,23 +175,37 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to confirmation when changing a child" in {
         val load = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Fenwick"))))
-        when(mockController.cacheClient.loadChildren()).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
         when(mockController.cacheClient.saveChildren(mockEq(save.get))(any(), any())).thenReturn(Future.successful(save))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Fenwick"))
-        val request = postRequest(form)
+        val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/confirmation"
       }
 
       "redirect to confirmation when there is no change" in {
+        val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
+        val request = postRequest(form, childIndex)
+
         val load = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
-        when(mockController.cacheClient.loadChildren()).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
         when(mockController.cacheClient.saveChildren(mockEq(save.get))(any(), any())).thenReturn(Future.successful(save))
-        val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
-        val request = postRequest(form)
         val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe "/child-benefit/confirmation"
+      }
+
+      "redirect to confirmation when adding a new child to existing children" in {
+        val form = ChildNameForm.form.fill(ChildNamePageModel("David", "Conder"))
+        val request = postRequest(form, childIndex2)
+
+        val load = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
+        val save = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("David"), surname = Some("Conder"))))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.saveChildren(mockEq(save.get))(any(), any())).thenReturn(Future.successful(save))
+        val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/confirmation"
       }
