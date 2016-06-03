@@ -23,5 +23,4 @@ trait CBKeystoreKeys {
   val childrenKey : String = "cb-children"
 }
 
-object CBKeystoreKeys extends CBKeystoreKeys {
-}
+object CBKeystoreKeys extends CBKeystoreKeys

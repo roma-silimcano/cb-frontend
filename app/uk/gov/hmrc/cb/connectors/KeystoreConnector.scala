@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.connectors
 
+import uk.gov.hmrc.cb.config.WSHttp
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.cb.config.{KeystoreConnectorConfig, WSHttp}
 import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 
 /**
   * Created by chrisianson on 01/06/16.
   */
-object KeystoreConnector extends SessionCache with AppName with ServicesConfig {
+
+
+trait KeystoreConnector extends SessionCache with AppName with ServicesConfig {
   override lazy val http = WSHttp
   override lazy val defaultSource = appName
-  override lazy val baseUri = KeystoreConnectorConfig.baseUri
-  override lazy val domain = getConfString(KeystoreConnectorConfig.domain, throw new Exception("Could not find config 'cachable.session-cache.domain'"))
+  override lazy val baseUri = baseUrl("cachable.session-cache")
+  // $COVERAGE-OFF$Trivial and never going to be called by a test that uses it's own object implementation
+  override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+  // $COVERAGE-ON$
 }
+
+object KeystoreConnector extends KeystoreConnector

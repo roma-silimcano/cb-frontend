@@ -16,10 +16,11 @@
 
 package uk.gov.hmrc.cb.service.keystore
 
+import play.api.Logger
+import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.play.http.ws._
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.cb.models.{KeystoreConnector, Child}
+import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.http.logging.{LoggingDetails, MdcLoggingExecutionContext}
 import uk.gov.hmrc.play.http.{HeaderCarrier, SessionKeys}
 
@@ -28,44 +29,28 @@ import scala.concurrent.{ExecutionContext, Future}
   * Created by chrisianson on 01/06/16.
   */
 
-object KeystoreService extends CBKeystoreKeys {
+object KeystoreService  {
 
   val cacheClient = new ChildBenefitKeystoreService
 
-  class ChildBenefitKeystoreService {
+  class ChildBenefitKeystoreService extends CBKeystoreKeys {
 
-    private val keystoreConnector: SessionCache = KeystoreConnector
-    private val source = "cb-frontend"
-
+    def sessionCache: SessionCache = KeystoreConnector
     implicit def mdcExecutionContext(implicit loggingDetails: LoggingDetails): ExecutionContext = MdcLoggingExecutionContext.fromLoggingDetails
+
+    /**
+     * get particular key out of keystore
+     */
+    private def fetchEntryForSession[T](key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
+      sessionCache.fetchAndGetEntry[T](key)
+    }
 
     /**
       * Store data to Keystore using a key
       */
-    def cacheEntryForSession[T](data: T,key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
-      keystoreConnector.cache[T](source, buildId, key, data) map {
+    private def cacheEntryForSession[T](data: T,key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
+      sessionCache.cache[T](key, data) map {
         case x => x.getEntry[T](key)
-      }
-    }
-
-    /**
-      * get particular key out of keystore
-      */
-    def fetchEntryForSession[T](key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
-      keystoreConnector.fetchAndGetEntry[T](source, buildId, key)
-    }
-
-    //This will append a session id or similar to construct a unique id for this user
-    private def buildId(implicit request: Request[Any]) = {
-      val id = "cb_pages"
-      val sessionId = request.session.get(SessionKeys.sessionId)
-
-      sessionId match {
-        case Some(_) =>
-          val sSessionId = sessionId.get
-          s"$id:$sSessionId"
-        case _ =>
-          "noSessionIdFound"
       }
     }
 

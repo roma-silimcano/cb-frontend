@@ -16,107 +16,97 @@
 
 package uk.gov.hmrc.cb.service.keystore
 
-import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.play.frontend.auth.Actions
-import play.api.http.Status
+import play.api.test.Helpers._
+import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.config.WSHttp
+import uk.gov.hmrc.cb.connectors.KeystoreConnector
+import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import uk.gov.hmrc.play.frontend.controller.{FrontendController, UnauthorisedAction}
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
+import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.test.UnitSpec
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by chrisianson on 01/06/16.
   */
-class KeystoreServiceSpec extends UnitSpec with WithFakeApplication with MockitoSugar {
+class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  implicit val request = FakeRequest()
-
-  val keystoreService = KeystoreService
-
-  trait TestService extends FrontendController with Actions {
-    val cacheClient: ChildBenefitKeystoreService
+  val mockSessionCache = mock[SessionCache]
+  class MockChildBenefitService extends ChildBenefitKeystoreService {
+    override def sessionCache = mockSessionCache
   }
 
-  val testKeystoreService = new TestService {
+  val mockKeystoreService = new MockChildBenefitService
 
-    override val cacheClient = mock[ChildBenefitKeystoreService]
-
-    lazy val authConnector = FrontendAuthConnector
-
-    def testKeystoreSave() = UnauthorisedAction {
-      implicit request =>
-        cacheClient.cacheEntryForSession[String]("test", "childdetails").map {
-          res =>
-            Ok
-        } recover {
-          case e : Exception =>
-            e.getMessage match {
-              case s : String =>
-                InternalServerError(s)
-              case _ =>
-                InternalServerError
-            }
-        }
-    }
-
-    def testFetchEntryForSession() = UnauthorisedAction {
-      implicit request =>
-        cacheClient.fetchEntryForSession[String]("test").map {
-          case Some(x) =>
-            Ok("fetched object")
-          case None =>
-            Ok("cound not fetch object")
-        } recover {
-          case e : Exception =>
-            e.getMessage match {
-              case s : String =>
-                InternalServerError(s)
-              case _ =>
-                InternalServerError
-            }
-        }
-    }
+  object TestKeystoreService {
+    val cacheClient = mockKeystoreService
   }
+
+  val children : List[Child] = List(Child.apply(id = 1))
 
   "GET data should " should {
 
-    "(GET) return 200 when data is found for key" in {
-      when(testKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
-      val result = await(testKeystoreService.testFetchEntryForSession() (request))
-      status(result) shouldBe Status.OK
+    "fetch children" in {
+      implicit val request = FakeRequest()
+      val hc = HeaderCarrier()
+      when(mockSessionCache.fetchAndGetEntry[List[Child]](any())(any(), any())).thenReturn(Future.successful(Some(children)))
+      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
+      result shouldBe Some(children)
     }
 
-    "(GET) throw an Exception when keystore is down" in {
-      when(testKeystoreService.cacheClient.fetchEntryForSession[String](mockEq("test"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
-      val result = await(testKeystoreService.testFetchEntryForSession() (request))
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
   }
 
   "POST data should" should {
 
-    "(POST) Successfully insert the data to keystore" in {
-      when(testKeystoreService.cacheClient.cacheEntryForSession[String](any(), mockEq("childdetails"))(any(),any(),any())).thenReturn(Future.successful(Some("test")))
-      val result = await(testKeystoreService.testKeystoreSave() (request))
-      status(result) shouldBe Status.OK
+    "save children" in {
+      when(mockSessionCache.fetchAndGetEntry[List[Child]](any())(any(), any())).thenReturn(Future.successful(None))
+
+      implicit val request = FakeRequest()
+      val hc = HeaderCarrier()
+      val json = Json.toJson[List[Child]](children)
+
+      when(mockSessionCache.cache[List[Child]](any(), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-children" -> json))))
+      val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
+      result shouldBe Some(children)
     }
 
-    "(POST) throw an Exception when keystore is down" in {
-      when(testKeystoreService.cacheClient.cacheEntryForSession[String](any(), mockEq("childdetails"))(any(),any(),any())).thenReturn(Future.failed(new RuntimeException))
-      val result = await(testKeystoreService.testKeystoreSave() (request))
-      status(result) shouldBe Status.INTERNAL_SERVER_ERROR
-    }
   }
 
   "KeystoreService.cacheClient" should {
 
     "be instance of ChildBenefitKeystoreService" in {
-      keystoreService.cacheClient shouldBe a[ChildBenefitKeystoreService]
+      KeystoreService.cacheClient shouldBe a[ChildBenefitKeystoreService]
+      KeystoreService.cacheClient.sessionCache shouldBe a[SessionCache]
     }
+  }
+
+  "KeystoreConnector" should {
+
+    "initialise with dependencies" in {
+      KeystoreConnector.http shouldBe a[WSHttp.type]
+      KeystoreConnector.defaultSource shouldBe a[String]
+      KeystoreConnector.baseUri shouldBe a[String]
+      KeystoreConnector.domain shouldBe a[String]
+    }
+
+    "throw exception when config not available" in {
+      running(fakeApplication) {
+        val result = intercept[Exception] {
+          when(KeystoreConnector.domain).thenReturn(throw new RuntimeException)
+          val config = KeystoreConnector.domain
+          config
+        }
+        result shouldBe a[Exception]
+      }
+    }
+
   }
 }
