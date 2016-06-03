@@ -41,7 +41,7 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
   val mockSessionCache = mock[SessionCache]
   class MockChildBenefitService extends ChildBenefitKeystoreService {
-    override def sessionCache = mockSessionCache
+    override val sessionCache = mockSessionCache
   }
 
   val mockKeystoreService = new MockChildBenefitService

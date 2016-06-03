@@ -1,13 +1,33 @@
+/*
+ * Copyright 2016 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.cb.controllers.child
 
 import play.api.Logger
-import play.api.mvc.Action
+import play.api.mvc.{AnyContent, Request, Action}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.cb.controllers.{routes, ChildBenefitController}
+import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.forms.ChildNameForm
+import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.service.keystore.KeystoreService
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -30,44 +50,61 @@ trait ChildNameController extends ChildBenefitController {
     implicit request =>
       cacheClient.loadChildren().map {
         case Some(children) =>
-          Ok(children.toString)
+          Logger.debug(s"[ChildNameController][get] loaded children $children")
+          if (childrenService.childExistsAtIndex(id, children)) {
+            Logger.debug(s"[ChildNameController][get] child does exist at index")
+            Ok(children.toString)
+          } else {
+            Logger.debug(s"[ChildNameController][get] child does not exist at index")
+            Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
+          }
         case None =>
+          Logger.debug(s"[ChildNameController][get] loaded children None")
           Ok("")
       } recover {
         case e : Exception =>
           Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
-          Redirect(routes.TechnicalDifficultiesController.get())
+          Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
       }
   }
 
-  def post(id: Int) = Action.async {
+  def post(id: Int) = Action.async{
     implicit request =>
       ChildNameForm.form.bindFromRequest().fold(
         formWithErrors =>
-            BadRequest(formWithErrors.get.toString),
-        success =>
-            cacheClient.loadChildren().map {
-              case Some(children) =>
-                val result = if (childrenService.childExistsAtIndex(id, children)) {
-                  // modify child
-                  val originalChild = childrenService.getChildById(id, children).head
-                  val child = originalChild.copy(firstname = success.firstName, surname = success.lastName)
-                  childrenService.replaceChildInAList(children, id, child)
-                } else {
-                  // add child
-                  createChild(id, success.firstName, success.lastName)
-                }
-                saveToKeystore(children)
-              case None =>
-                val children = createChild(id, success.firstName, success.lastName)
-                saveToKeystore(children)
+            Future.successful(BadRequest("")),
+        model =>
+            cacheClient.loadChildren() flatMap {
+              children =>
+                handleChildren(children, id, model)
             } recover {
               case e : Exception =>
                 Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
-                Redirect(routes.TechnicalDifficultiesController.get())
+                Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
             }
       )
+    }
 
+  private def handleChildren(children: Option[List[Child]], id: Int, model : ChildNamePageModel)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+      Logger.debug(s"[ChildNameController][handleChildren] $children, model : $model")
+      children match {
+        case Some(x) => {
+          if (childrenService.childExistsAtIndex(id, x)) {
+            // modify child
+            val originalChild = childrenService.getChildById(id, x)
+            val child = originalChild.copy(firstname = Some(model.firstName), surname = Some(model.lastName))
+            val r = childrenService.replaceChildInAList(x, id, child)
+            saveToKeystore(r)
+          } else {
+            // add child
+            val r = createChild(id, model.firstName, model.lastName)
+            saveToKeystore(r)
+          }
+        }
+        case None =>
+          val children = createChild(id, model.firstName, model.lastName)
+          saveToKeystore(children)
+      }
   }
 
   private def createChild(id: Int, firstName: String, lastName : String) : List[Child] = {
@@ -76,13 +113,16 @@ trait ChildNameController extends ChildBenefitController {
     childrenService.replaceChildInAList(children, id, modifiedChild)
   }
 
-  private def saveToKeystore(children : List[Child]) = {
+  private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keytore : $children")
     cacheClient.saveChildren(children).map {
-      Redirect(routes.SubmissionConfirmationController.get())
+      children =>
+        Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
+        Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children")
-        Redirect(routes.TechnicalDifficultiesController.get())
+        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: $children")
+        Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
     }
   }
 

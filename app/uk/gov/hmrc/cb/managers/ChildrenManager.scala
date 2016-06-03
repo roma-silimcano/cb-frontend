@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.managers
 
+import play.api.Logger
 import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 
@@ -95,7 +96,9 @@ object ChildrenManager {
     }
 
     def childExistsAtIndex(index: Int, children : List[Child]) = {
-      children.exists(x => x.id == index.toShort)
+      val result = children.exists(x => x.id == index.toShort)
+      Logger.debug(s"[ChildrenManager][childExistsAtIndex] $result $index")
+      result
     }
 
   }
