@@ -28,6 +28,7 @@ private object AppDependencies {
   private val playConfigVersion = "2.0.1"
   private val hmrcTestVersion = "1.6.0"
   private val metricsPlayVersion = "0.2.1"
+  private val httpCachingClientVersion ="5.3.0"
   private val scalatest = "2.2.6"
   private val mockito = "1.9.5"
   private val scalacheck = "1.12.1"
@@ -45,7 +46,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "govuk-template" % govukTemplateVersion,
     "uk.gov.hmrc" %% "play-health" % playHealthVersion,
     "uk.gov.hmrc" %% "play-ui" % playUiVersion,
-    "com.kenshoo" %% "metrics-play" % metricsPlayVersion
+    "com.kenshoo" %% "metrics-play" % metricsPlayVersion,
+    "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion
   )
 
   trait TestDependencies {
@@ -56,6 +58,7 @@ private object AppDependencies {
   object Test {
     def apply() = new TestDependencies {
       override lazy val test = Seq(
+        "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatest % scope,
         "org.pegdown" % "pegdown" % pegdown % scope,
@@ -73,6 +76,7 @@ private object AppDependencies {
       override lazy val scope: String = "it"
 
       override lazy val test = Seq(
+        "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
         "uk.gov.hmrc" %% "hmrctest" % hmrcTestVersion % scope,
         "org.scalatest" %% "scalatest" % scalatest % scope,
         "org.pegdown" % "pegdown" % pegdown % scope,
