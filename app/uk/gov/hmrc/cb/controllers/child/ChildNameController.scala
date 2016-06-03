@@ -102,6 +102,7 @@ trait ChildNameController extends ChildBenefitController {
           }
         }
         case None =>
+          // create children
           val children = createChild(id, model.firstName, model.lastName)
           saveToKeystore(children)
       }
@@ -114,7 +115,7 @@ trait ChildNameController extends ChildBenefitController {
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keytore : $children")
+    Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keystore : $children")
     cacheClient.saveChildren(children).map {
       children =>
         Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
