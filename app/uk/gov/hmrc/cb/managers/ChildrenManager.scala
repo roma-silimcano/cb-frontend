@@ -42,6 +42,18 @@ object ChildrenManager {
       )
     }
 
+    def createChildWithName(index: Int, firstName: String, lastName: String) = {
+      Child(
+        id = index.toShort,
+        uniqueReferenceNumber = None,
+        firstname = Some(firstName),
+        surname = Some(lastName),
+        dob = None,
+        gender = Genders.None,
+        previousClaim = false
+      )
+    }
+
     def createListOfChildren(requiredNumberOfChildren: Int): List[Child] = {
       val children = for (i <- 1 to requiredNumberOfChildren) yield {
         val index = i

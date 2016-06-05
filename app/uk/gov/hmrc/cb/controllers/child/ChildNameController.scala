@@ -74,21 +74,21 @@ trait ChildNameController extends ChildBenefitController {
         formWithErrors =>
             Future.successful(BadRequest("")),
         model =>
-            cacheClient.loadChildren() flatMap {
-              children =>
-                handleChildren(children, id, model)
-            } recover {
-              case e : Exception =>
-                Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
-                Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
-            }
+          cacheClient.loadChildren() flatMap {
+            children =>
+              handleChildren(children, id, model)
+          } recover {
+            case e : Exception =>
+              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
+              Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
+          }
       )
     }
 
   private def handleChildren(children: Option[List[Child]], id: Int, model : ChildNamePageModel)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
       Logger.debug(s"[ChildNameController][handleChildren] $children, model : $model")
       children match {
-        case Some(x) => {
+        case Some(x) =>
           if (childrenService.childExistsAtIndex(id, x)) {
             // modify child
             val originalChild = childrenService.getChildById(id, x)
@@ -104,7 +104,6 @@ trait ChildNameController extends ChildBenefitController {
             Logger.debug(s"[ChildNameController][handleChildren] add child : $amendedWithChild children: $children")
             saveToKeystore(amendedWithChild)
           }
-        }
         case None =>
           // create children
           val children = List(createChild(id, model.firstName, model.lastName))
@@ -118,8 +117,7 @@ trait ChildNameController extends ChildBenefitController {
     refactor this into the children manager
    */
   private def createChild(id: Int, firstName: String, lastName : String) : Child = {
-    val child = childrenService.createChild(id)
-    child.copy(firstname = Some(firstName), surname = Some(lastName))
+    childrenService.createChildWithName(id, firstName, lastName)
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
