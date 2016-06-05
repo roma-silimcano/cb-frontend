@@ -30,7 +30,7 @@ object ChildrenManager {
 
   class ChildrenService {
 
-    private def createChild(index: Int) = {
+    def createChild(index: Int) = {
       Child(
         id = index.toShort,
         uniqueReferenceNumber = None,

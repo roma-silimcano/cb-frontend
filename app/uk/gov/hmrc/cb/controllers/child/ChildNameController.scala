@@ -97,23 +97,29 @@ trait ChildNameController extends ChildBenefitController {
             saveToKeystore(r)
           } else {
             // add child
-            val c = createChild(id, model.firstName, model.lastName).head
+            val c = createChild(id, model.firstName, model.lastName)
+            Logger.debug(s"[ChildNameController][handleChildren] new child $c")
             val amended = childrenService.modifyListOfChildren(id, x)
             val amendedWithChild = childrenService.replaceChildInAList(amended, id, c)
+            Logger.debug(s"[ChildNameController][handleChildren] add child : $amendedWithChild children: $children")
             saveToKeystore(amendedWithChild)
           }
         }
         case None =>
           // create children
-          val children = createChild(id, model.firstName, model.lastName)
+          val children = List(createChild(id, model.firstName, model.lastName))
           saveToKeystore(children)
       }
   }
 
-  private def createChild(id: Int, firstName: String, lastName : String) : List[Child] = {
-    val children = childrenService.createListOfChildren(requiredNumberOfChildren = id)
-    val modifiedChild = children.head.copy(firstname = Some(firstName), surname = Some(lastName))
-    childrenService.replaceChildInAList(children, id, modifiedChild)
+  /*
+    Incorrect logic for unit test was not replacing second child correctly,
+    this was replacing the first child always and leaving the second unchanged
+    refactor this into the children manager
+   */
+  private def createChild(id: Int, firstName: String, lastName : String) : Child = {
+    val child = childrenService.createChild(id)
+    child.copy(firstname = Some(firstName), surname = Some(lastName))
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
