@@ -31,7 +31,12 @@ case class Child (
                  dob: Option[LocalDate] = None,
                  gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
-                 )
+                 ) {
+
+  def editFullName(firstName: String, lastName: String) = {
+    this.copy(firstname = Some(firstName), surname = Some(lastName))
+  }
+}
 
 object Child {
   implicit val formats = Json.format[Child]

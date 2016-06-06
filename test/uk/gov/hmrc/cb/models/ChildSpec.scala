@@ -40,5 +40,14 @@ class ChildSpec extends UnitSpec {
       child.gender shouldBe Genders.Male
       child.previousClaim shouldBe false
     }
+
+    "return a new instance of a child when calling editFullName" in {
+      val child = Child(1, Some(123456), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
+      val modified = child.editFullName("Adam", "Conder")
+      modified should not be child
+      modified.firstname shouldBe Some("Adam")
+      modified.surname shouldBe Some("Conder")
+    }
+
   }
 }
