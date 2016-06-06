@@ -111,11 +111,6 @@ trait ChildNameController extends ChildBenefitController {
       }
   }
 
-  /*
-    Incorrect logic for unit test was not replacing second child correctly,
-    this was replacing the first child always and leaving the second unchanged
-    refactor this into the children manager
-   */
   private def createChild(id: Int, firstName: String, lastName : String) : Child = {
     childrenService.createChildWithName(id, firstName, lastName)
   }

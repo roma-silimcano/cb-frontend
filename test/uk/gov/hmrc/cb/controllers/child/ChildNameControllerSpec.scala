@@ -210,6 +210,19 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         redirectLocation(result) shouldBe "/child-benefit/confirmation"
       }
 
+      "redirect to technical difficulties when adding a new child to existing children when exception saving to keystore" in {
+        val form = ChildNameForm.form.fill(ChildNamePageModel("David", "Conder"))
+        val request = postRequest(form, childIndex2)
+
+        val load = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
+        val save = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("David"), surname = Some("Conder"))))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.saveChildren(mockEq(save.get))(any(), any())).thenReturn(Future.failed(new RuntimeException()))
+        val result = await(mockController.post(childIndex2).apply(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
+      }
+
     }
 
   }
