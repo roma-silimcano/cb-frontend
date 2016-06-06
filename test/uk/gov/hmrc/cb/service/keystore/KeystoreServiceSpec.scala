@@ -41,7 +41,7 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
   val mockSessionCache = mock[SessionCache]
   class MockChildBenefitService extends ChildBenefitKeystoreService {
-    override def sessionCache = mockSessionCache
+    override val sessionCache = mockSessionCache
   }
 
   val mockKeystoreService = new MockChildBenefitService
@@ -96,17 +96,5 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
       KeystoreConnector.baseUri shouldBe a[String]
       KeystoreConnector.domain shouldBe a[String]
     }
-
-    "throw exception when config not available" in {
-      running(fakeApplication) {
-        val result = intercept[Exception] {
-          when(KeystoreConnector.domain).thenReturn(throw new RuntimeException)
-          val config = KeystoreConnector.domain
-          config
-        }
-        result shouldBe a[Exception]
-      }
-    }
-
   }
 }

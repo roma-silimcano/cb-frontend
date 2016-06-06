@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.managers
 
+import play.api.Logger
 import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 
@@ -23,18 +24,30 @@ import uk.gov.hmrc.cb.models.Child
   * Created by chrisianson on 26/05/16.
   */
 
-trait ChildrenManager {
+object ChildrenManager {
 
   val childrenService = new ChildrenService
 
   class ChildrenService {
 
-    private def createChild(index: Int) = {
+    def createChild(index: Int) = {
       Child(
         id = index.toShort,
         uniqueReferenceNumber = None,
         firstname = None,
         surname = None,
+        dob = None,
+        gender = Genders.None,
+        previousClaim = false
+      )
+    }
+
+    def createChildWithName(index: Int, firstName: String, lastName: String) = {
+      Child(
+        id = index.toShort,
+        uniqueReferenceNumber = None,
+        firstname = Some(firstName),
+        surname = Some(lastName),
         dob = None,
         gender = Genders.None,
         previousClaim = false
@@ -93,5 +106,12 @@ trait ChildrenManager {
     def replaceChildInAList(children: List[Child], index: Int, newChild: Child): List[Child] = {
       children.patch(index-1, Seq(newChild), 1)
     }
+
+    def childExistsAtIndex(index: Int, children : List[Child]) = {
+      val result = children.exists(x => x.id == index.toShort)
+      Logger.debug(s"[ChildrenManager][childExistsAtIndex] $result $index")
+      result
+    }
+
   }
 }

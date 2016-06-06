@@ -35,13 +35,14 @@ object KeystoreService  {
 
   class ChildBenefitKeystoreService extends CBKeystoreKeys {
 
-    def sessionCache: SessionCache = KeystoreConnector
+    val sessionCache: SessionCache = KeystoreConnector
     implicit def mdcExecutionContext(implicit loggingDetails: LoggingDetails): ExecutionContext = MdcLoggingExecutionContext.fromLoggingDetails
 
     /**
      * get particular key out of keystore
      */
     private def fetchEntryForSession[T](key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
+      Logger.debug(s"[KeystoreService][fetchAndGetEntry] $key")
       sessionCache.fetchAndGetEntry[T](key)
     }
 
@@ -49,6 +50,7 @@ object KeystoreService  {
       * Store data to Keystore using a key
       */
     private def cacheEntryForSession[T](data: T,key :String)(implicit hc: HeaderCarrier, format: play.api.libs.json.Format[T], request: Request[Any]): Future[Option[T]] = {
+      Logger.debug(s"[KeystoreService][cacheEntryForSession] $data, $key")
       sessionCache.cache[T](key, data) map {
         case x => x.getEntry[T](key)
       }

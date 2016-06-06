@@ -16,9 +16,12 @@
 
 package uk.gov.hmrc.cb.controllers
 
+import play.api.mvc.Action
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+
+import scala.concurrent.Future
 
 /**
  * Created by andrew on 03/05/16.
