@@ -17,7 +17,8 @@
             '_error_id -> "firstNameError",
             '_label -> Messages("cb.child.first.name.label"),
             '_inputClass -> "form-control input--cleared",
-            '_labelClass -> "form-label"
+            '_labelClass -> "form-label",
+            '_labelDataAttributes -> "id=firstName"
     )
 
     @helpers.input(field = form("lastName"),
@@ -26,7 +27,8 @@
         '_error_id -> "LastNameError",
         '_label -> Messages("cb.child.last.name.label"),
         '_inputClass -> "form-control input--cleared",
-        '_labelClass -> "form-label"
+        '_labelClass -> "form-label",
+        '_labelDataAttributes -> "id=lastName"
     )
 </div>
 

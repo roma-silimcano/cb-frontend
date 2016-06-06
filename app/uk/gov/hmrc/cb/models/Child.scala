@@ -38,8 +38,6 @@ case class Child (
     this.copy(firstname = Some(firstName), surname = Some(lastName))
   }
 
-
-
 }
 
 object Child {
