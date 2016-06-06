@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cb.controllers.child
 
 import play.api.Logger
+import play.api.data.Form
 import play.api.mvc.{Result, AnyContent, Request, Action}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
@@ -46,6 +47,9 @@ trait ChildNameController extends ChildBenefitController {
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
+  private val form = ChildNameForm.form
+  private def view(form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = uk.gov.hmrc.cb.views.html.child.childname(form, id)
+
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
@@ -56,14 +60,14 @@ trait ChildNameController extends ChildBenefitController {
           Logger.debug(s"[ChildNameController][get] loaded children $children")
           if (childrenService.childExistsAtIndex(id, children)) {
             Logger.debug(s"[ChildNameController][get] child does exist at index")
-            Ok(children.toString)
+            Ok(view(form, id))
           } else {
             Logger.debug(s"[ChildNameController][get] child does not exist at index")
             redirectTechnicalDifficulties
           }
         case None =>
           Logger.debug(s"[ChildNameController][get] loaded children None")
-          Ok("")
+          Ok(view(form, id))
       } recover {
         case e : Exception =>
           Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
@@ -73,9 +77,11 @@ trait ChildNameController extends ChildBenefitController {
 
   def post(id: Int) = Action.async{
     implicit request =>
-      ChildNameForm.form.bindFromRequest().fold(
+      form.bindFromRequest().fold(
         formWithErrors =>
-            Future.successful(BadRequest("")),
+            Future.successful(BadRequest(
+              view(formWithErrors, id)
+            )),
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>

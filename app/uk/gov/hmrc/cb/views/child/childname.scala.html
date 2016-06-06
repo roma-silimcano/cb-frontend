@@ -1,0 +1,38 @@
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.cb.forms
+@import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+
+@(form: Form[ChildNamePageModel], index: Int)(implicit request: Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.child.name.title"), heading = Messages("cb.child.name.title")){
+
+@helpers.form(action = uk.gov.hmrc.cb.controllers.child.routes.ChildNameController.post(index)){
+
+@helpers.errorSummary(heading = Messages("error.message.title"), form = form)
+
+<div class="form-group">
+    @helpers.input(field = form("firstName"),
+        args =
+            '_divClass -> "form-field",
+            '_error_id -> "firstNameError",
+            '_label -> Messages("cb.child.first.name.label"),
+            '_inputClass -> "form-control input--cleared",
+            '_labelClass -> "form-label"
+    )
+
+    @helpers.input(field = form("lastName"),
+        args =
+        '_divClass -> "form-field",
+        '_error_id -> "LastNameError",
+        '_label -> Messages("cb.child.last.name.label"),
+        '_inputClass -> "form-control input--cleared",
+        '_labelClass -> "form-label"
+    )
+</div>
+
+<div class="form-field--submit">
+    <input id="continue-button" class="button" type="submit" value="@Messages("cb.common.continue")">
+</div>
+
+}
+}
