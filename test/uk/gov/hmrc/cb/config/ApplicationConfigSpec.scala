@@ -24,7 +24,7 @@ class ApplicationConfigSpec extends UnitSpec with WithFakeApplication {
 
     "load google analytics properties file" in {
       val appConfig = FrontendAppConfig
-      appConfig.analyticsToken shouldBe "N/A"
+      appConfig.analyticsToken shouldBe "Test-Token"
     }
 
     "load assets 2.209.0" in {

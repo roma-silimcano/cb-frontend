@@ -16,26 +16,27 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
+import java.util.UUID
+
+import org.mockito.Matchers.{eq => mockEq, _}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.data.Form
-import play.api.mvc.{Result, Action}
+import play.api.mvc.Result
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildNameForm
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import uk.gov.hmrc.http.cache.client.SessionCache
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.http.logging.SessionId
+import uk.gov.hmrc.play.http.{SessionKeys, HeaderCarrier}
 import uk.gov.hmrc.play.test.UnitSpec
-import play.api.test.Helpers._
-import org.mockito.Matchers.{eq => mockEq, _}
-import org.mockito.Mockito._
 
 import scala.concurrent.Future
 
@@ -44,9 +45,6 @@ import scala.concurrent.Future
  */
 class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  implicit val getRequest = FakeRequest("GET", "/child-benefit/children/1/name")
-  def postRequest(form: Form[ChildNamePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/name").withFormUrlEncodedBody(form.data.toSeq: _*)
-  implicit val hc = HeaderCarrier()
 
   val childIndex = 1
   val childIndex2 = 2
@@ -61,6 +59,14 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
 
   "ChildNameController" when {
 
+    val sessionId = s"session-${UUID.randomUUID}"
+
+    implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/children/1/name").withSession(CBSessionProvider.generateSessionId())
+    def postRequest(form: Form[ChildNamePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/name")
+      .withSession(CBSessionProvider.generateSessionId())
+      .withFormUrlEncodedBody(form.data.toSeq: _*)
+    implicit lazy val hc = HeaderCarrier()
+
     "initialising" should {
 
       "wire up the dependencies correctly" in {
@@ -73,7 +79,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
     "calling /child-benefit/children/1/name" should {
 
       "respond to GET /child-benefit/children/1/name" in {
-        val result = route(FakeRequest(GET, "/child-benefit/children/1/name"))
+        val result = route(getRequest)
         status(result.get) should not be NOT_FOUND
       }
 
@@ -99,17 +105,20 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       }
 
       "respond 200 when child in keystore" in {
-        val children = Some(List(Child(id = 1)))
+        val children = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
+        bodyOf(result) should include("Adam")
       }
 
       "respond 200 when multiple children in keystore" in {
-        val children = Some(List(Child(id = 1), Child(id = 2)))
+        val children = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("Chris"), surname = Some("I'anson"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
+        bodyOf(result) should include("Adam")
+        bodyOf(result) should not include "Chris"
       }
 
       "redirect to technical difficulties when out of bounds exception" in {
