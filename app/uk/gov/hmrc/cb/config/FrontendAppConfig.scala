@@ -29,6 +29,7 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
   private val contactHost = configuration.getString(s"contact-frontend.host").getOrElse("")
   private val contactFormServiceIdentifier = "child-benefit-frontend"
   override val navigationEnabled : Boolean = configuration.getBoolean(s"cb-frontend.navigation").getOrElse(true)
+  override val showHMRCBranding : Boolean = configuration.getBoolean(s"cb-frontend.hmrcBranding").getOrElse(false)
 
   override lazy val assetsPrefix = loadConfig(s"assets.url") + loadConfig(s"assets.version")
   override lazy val analyticsToken = loadConfig(s"google-analytics.token")

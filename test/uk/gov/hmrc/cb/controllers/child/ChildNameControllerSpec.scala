@@ -99,17 +99,20 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       }
 
       "respond 200 when child in keystore" in {
-        val children = Some(List(Child(id = 1)))
+        val children = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
+        bodyOf(result) should include("Adam")
       }
 
       "respond 200 when multiple children in keystore" in {
-        val children = Some(List(Child(id = 1), Child(id = 2)))
+        val children = Some(List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("Chris"), surname = Some("I'anson"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
+        bodyOf(result) should include("Adam")
+        bodyOf(result) should not include "Chris"
       }
 
       "redirect to technical difficulties when out of bounds exception" in {

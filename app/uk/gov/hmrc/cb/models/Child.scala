@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.models
 
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
+import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.mappings.Genders
 
 /**
@@ -36,6 +37,9 @@ case class Child (
   def editFullName(firstName: String, lastName: String) = {
     this.copy(firstname = Some(firstName), surname = Some(lastName))
   }
+
+
+
 }
 
 object Child {

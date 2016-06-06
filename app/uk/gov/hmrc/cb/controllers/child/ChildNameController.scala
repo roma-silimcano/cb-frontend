@@ -26,6 +26,7 @@ import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -60,7 +61,8 @@ trait ChildNameController extends ChildBenefitController {
           Logger.debug(s"[ChildNameController][get] loaded children $children")
           if (childrenService.childExistsAtIndex(id, children)) {
             Logger.debug(s"[ChildNameController][get] child does exist at index")
-            Ok(view(form, id))
+            val model : ChildNamePageModel = childrenService.getChildById(id, children)
+            Ok(view(form.fill(model), id))
           } else {
             Logger.debug(s"[ChildNameController][get] child does not exist at index")
             redirectTechnicalDifficulties
