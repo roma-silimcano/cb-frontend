@@ -139,6 +139,22 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         redirectLocation(result).get shouldBe "/child-benefit/confirmation"
       }
 
+      "Updating a child, does it need the load call? " ignore {
+
+      }
+
+      "redirect to confirmation when updating a child" in {
+        val load = Some(List(Child(id = 1, birthCertificateReference = Some("111111111"))))
+        val save = Some(List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.saveChildren(mockEq(save.get))(any(), any())).thenReturn(Future.successful(save))
+        val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+      }
+
       "respond with BAD_REQUEST when post is unsuccessful" in {
         val children = Some(List(Child(id = 1)))
         when(mockController.cacheClient.loadChildren()(any(),any())).thenReturn(Future.successful(children))
