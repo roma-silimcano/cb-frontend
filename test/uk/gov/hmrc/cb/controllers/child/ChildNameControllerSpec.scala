@@ -59,8 +59,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
 
   "ChildNameController" when {
 
-    val sessionId = s"session-${UUID.randomUUID}"
-
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/children/1/name").withSession(CBSessionProvider.generateSessionId())
     def postRequest(form: Form[ChildNamePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/name")
       .withSession(CBSessionProvider.generateSessionId())
