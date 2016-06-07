@@ -96,14 +96,14 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
       }
 
       "respond 200 when child in keystore" in {
-        val children = Some(List(Child(id = 1)))
+        val children = Some(List(Child(id = 1, birthCertificateReference = Some("12345"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
       }
 
       "respond 200 when multiple children in keystore" in {
-        val children = Some(List(Child(id = 1), Child(id = 2)))
+        val children = Some(List(Child(id = 1, birthCertificateReference = Some("12345")), Child(id = 2, birthCertificateReference = Some("12345"))))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK

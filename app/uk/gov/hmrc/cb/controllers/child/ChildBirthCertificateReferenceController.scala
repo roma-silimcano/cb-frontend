@@ -16,9 +16,8 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
-import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.cb.controllers.ChildBenefitController
-import uk.gov.hmrc.cb.service.keystore.KeystoreService
+import play.api.Logger
+import play.api.data.Form
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
@@ -32,6 +31,8 @@ import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertifi
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.http.HeaderCarrier
 
+import uk.gov.hmrc.cb.implicits.Implicits._
+
 import scala.concurrent.Future
 
 /**
@@ -39,7 +40,6 @@ import scala.concurrent.Future
   */
 
 object ChildBirthCertificateReferenceController extends ChildBirthCertificateReferenceController {
-
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
@@ -53,28 +53,45 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
+  private val form = ChildBirthCertificateReferenceForm.form
+  private def view(form : Form[ChildBirthCertificateReferencePageModel], id : Int)(implicit request: Request[AnyContent]) = uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id)
+
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren.map {
         case Some(children) =>
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
           if (childrenService.childExistsAtIndex(id, children)) {
-            Ok(children.toString)
+            Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
+            val child = childrenService.getChildById(id, children)
+            if (child.hasBirthCertificateReferenceNumber) {
+              val model : ChildBirthCertificateReferencePageModel = child
+              Ok(view(form.fill(model), id))
+            } else {
+              Ok(view(form, id))
+            }
           } else {
+            Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does not exist at index")
             redirectTechnicalDifficulties
           }
         case None =>
-          Ok
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children None")
+          Ok(view(form, id))
       } recover {
         case e: Exception =>
+          Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
          redirectTechnicalDifficulties
       }
   }
 
   def post(id: Int) = CBSessionProvider.withSession {
     implicit request =>
-      ChildBirthCertificateReferenceForm.form.bindFromRequest().fold(
-        formWithErrors =>
-          Future.successful(BadRequest("")),
+      form.bindFromRequest().fold(
+        formWithErrors => {
+          Logger.debug(s"[ChildBirthCertificateReferenceController][bindFromRequest] invalid form submission $formWithErrors")
+          Future.successful(BadRequest(
+            view(formWithErrors, id)
+          ))},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -84,6 +101,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
               }
           } recover {
             case e : Exception =>
+              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -120,9 +138,11 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     cacheClient.saveChildren(children).map {
       children =>
+        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation
     } recover {
       case e : Exception =>
+        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

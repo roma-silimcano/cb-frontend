@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.implicits
 
 import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.test.UnitSpec
@@ -45,6 +46,24 @@ class ImplicitsSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
       intercept[RuntimeException] {
         val pageModel: ChildNamePageModel = child
         pageModel.firstName
+      }
+    }
+
+    "covert Child to ChildBirthCertificatePageModel" in {
+      import uk.gov.hmrc.cb.implicits.Implicits._
+
+      val child = Child(id = 1, birthCertificateReference = Some("12345"))
+      val pageModel : ChildBirthCertificateReferencePageModel = child
+      pageModel shouldBe ChildBirthCertificateReferencePageModel("12345")
+    }
+
+    "throw an exception when converting to ChildBirthCertificatePageModel from Child" in {
+      import uk.gov.hmrc.cb.implicits.Implicits._
+
+      val child = Child(id = 1, birthCertificateReference = None)
+      intercept[RuntimeException] {
+        val pageModel : ChildBirthCertificateReferencePageModel = child
+        pageModel.birthCertificateReference
       }
     }
 

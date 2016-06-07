@@ -35,12 +35,15 @@ case class Child (
                  ) {
 
   def editFullName(firstName: String, lastName: String) = {
-    this.copy(firstname = Some(firstName), surname = Some(lastName))
+    copy(firstname = Some(firstName), surname = Some(lastName))
   }
 
   def editUniqueReferenceNumber(birthCertificateReference: String) = {
-    this.copy(birthCertificateReference = Some(birthCertificateReference))
+    copy(birthCertificateReference = Some(birthCertificateReference))
   }
+
+  def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
+
 }
 
 object Child {

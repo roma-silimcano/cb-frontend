@@ -84,10 +84,11 @@ trait ChildNameController extends ChildBenefitController {
   def post(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       form.bindFromRequest().fold(
-        formWithErrors =>
+        formWithErrors => {
+          Logger.debug(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
             Future.successful(BadRequest(
               view(formWithErrors, id)
-            )),
+            ))},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -97,7 +98,7 @@ trait ChildNameController extends ChildBenefitController {
               }
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
+              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
