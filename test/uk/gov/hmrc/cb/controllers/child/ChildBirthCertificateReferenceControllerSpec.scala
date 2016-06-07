@@ -16,25 +16,22 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
-import org.scalatest.mock.MockitoSugar
-import play.api.test.FakeRequest
-import uk.gov.hmrc.cb.CBFakeApplication
-import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.test.UnitSpec
-import play.api.test.Helpers._
-import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.data.Form
-import uk.gov.hmrc.play.http.HeaderCarrier
-import play.api.mvc.{Action, Result}
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future
 
@@ -149,6 +146,15 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe BAD_REQUEST
+      }
+
+      "redirect to technical difficulties when keystore is down" in {
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
       }
     }
   }
