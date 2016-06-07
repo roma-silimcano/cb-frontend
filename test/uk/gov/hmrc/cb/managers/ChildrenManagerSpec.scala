@@ -29,13 +29,13 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ChildrenManagerSpec extends UnitSpec {
 
   def fixture = new {
-    val child1 = Child(1, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child2 = Child(2, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child3 = Child(3, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child4 = Child(4, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child5 = Child(5, uniqueReferenceNumber = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val replacementChild1 = Child(2, uniqueReferenceNumber = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
-    val replacementChild2 = Child(2, uniqueReferenceNumber = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
+    val child1 = Child(1, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child2 = Child(2, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child3 = Child(3, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child4 = Child(4, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val child5 = Child(5, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
+    val replacementChild1 = Child(2, birthCertificateReference = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
+    val replacementChild2 = Child(2, birthCertificateReference = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
   }
 
   "ChildrenManager" when {

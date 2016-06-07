@@ -33,7 +33,7 @@ object ChildrenManager {
     def createChild(index: Int) = {
       Child(
         id = index.toShort,
-        uniqueReferenceNumber = None,
+        birthCertificateReference = None,
         firstname = None,
         surname = None,
         dob = None,
@@ -45,9 +45,21 @@ object ChildrenManager {
     def createChildWithName(index: Int, firstName: String, lastName: String) = {
       Child(
         id = index.toShort,
-        uniqueReferenceNumber = None,
+        birthCertificateReference = None,
         firstname = Some(firstName),
         surname = Some(lastName),
+        dob = None,
+        gender = Genders.None,
+        previousClaim = false
+      )
+    }
+
+    def createChildWithBirthCertificateReference(index: Int, birthCertificateReference: String) = {
+      Child(
+        id = index.toShort,
+        birthCertificateReference = Some(birthCertificateReference),
+        firstname = None,
+        surname = None,
         dob = None,
         gender = Genders.None,
         previousClaim = false
@@ -112,6 +124,5 @@ object ChildrenManager {
       Logger.debug(s"[ChildrenManager][childExistsAtIndex] $result $index")
       result
     }
-
   }
 }

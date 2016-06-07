@@ -22,3 +22,6 @@ error.message.title = Sorry
 # Child name page
 cb.error.child.last.name.invalid = Invalid
 cb.error.child.first.name.invalid = Invalid
+
+# Child birth certificate reference
+cb.error.child.birth-certificate-reference.invalid = Invalid

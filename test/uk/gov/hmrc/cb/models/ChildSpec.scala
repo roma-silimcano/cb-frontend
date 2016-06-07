@@ -29,11 +29,11 @@ class ChildSpec extends UnitSpec {
 
     "instantiate an instance of child" in {
 
-      val child = new Child(1, Some(123456), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
+      val child = new Child(1, Some("123456"), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
 
       child shouldBe a[Child]
       child.id shouldBe 1
-      child.uniqueReferenceNumber.get shouldBe 123456
+      child.birthCertificateReference.get shouldBe "123456"
       child.firstname.get shouldBe "Shane"
       child.surname.get shouldBe "Wilson"
       child.dob.get shouldBe LocalDate.now()
@@ -42,12 +42,11 @@ class ChildSpec extends UnitSpec {
     }
 
     "return a new instance of a child when calling editFullName" in {
-      val child = Child(1, Some(123456), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
+      val child = Child(1, Some("123456"), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
       val modified = child.editFullName("Adam", "Conder")
       modified should not be child
       modified.firstname shouldBe Some("Adam")
       modified.surname shouldBe Some("Conder")
     }
-
   }
 }

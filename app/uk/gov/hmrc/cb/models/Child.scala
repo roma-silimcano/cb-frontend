@@ -25,7 +25,7 @@ import uk.gov.hmrc.cb.mappings.Genders
   */
 case class Child (
                  id: Short,
-                 uniqueReferenceNumber: Option[Int] = None,
+                 birthCertificateReference: Option[String] = None,
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
                  dob: Option[LocalDate] = None,
@@ -35,6 +35,10 @@ case class Child (
 
   def editFullName(firstName: String, lastName: String) = {
     this.copy(firstname = Some(firstName), surname = Some(lastName))
+  }
+
+  def editUniqueReferenceNumber(birthCertificateReference: String) = {
+    this.copy(birthCertificateReference = Some(birthCertificateReference))
   }
 }
 

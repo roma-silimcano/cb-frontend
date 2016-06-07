@@ -33,5 +33,4 @@ object Constraints {
    * $                 end of string
    */
   val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
-
 }
