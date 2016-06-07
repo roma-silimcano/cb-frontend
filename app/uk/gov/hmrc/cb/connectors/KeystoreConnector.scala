@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.config.{AppName, ServicesConfig}
 trait KeystoreConnector extends SessionCache with AppName with ServicesConfig {
   override lazy val http = WSHttp
   override lazy val defaultSource = appName
-  override lazy val baseUri = baseUrl("cachable.session-cache")
+  override lazy val baseUri = baseUrl("keystore")
   // $COVERAGE-OFF$Trivial and never going to be called by a test that uses it's own object implementation
   override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
   // $COVERAGE-ON$
