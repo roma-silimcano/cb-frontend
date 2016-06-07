@@ -1,0 +1,32 @@
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.cb.forms
+@import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
+
+@(form: Form[ChildBirthCertificateReferencePageModel], index: Int)(implicit request: Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.child.birth.certificate.title"), heading = Messages("cb.child.birth.certificate.title")){
+
+@helpers.form(action = uk.gov.hmrc.cb.controllers.child.routes.ChildBirthCertificateReferenceController.post(index)){
+
+@helpers.errorSummary(heading = Messages("error.message.title"), form = form)
+
+<div class="form-group">
+    @helpers.input(field = form("birthCertificateReference"),
+    args =
+    '_divClass -> "form-field",
+    '_error_id -> "birthCertificateError",
+    '_label -> Messages("cb.child.birth.certificate.label"),
+    '_inputClass -> "form-control input--cleared",
+    '_labelClass -> "form-label",
+    '_labelDataAttributes -> "id=birthCertificate"
+    )
+
+</div>
+
+<div class="form-field--submit">
+    <input id="continue-button" class="button" type="submit" value="@Messages("cb.common.continue")">
+</div>
+
+
+    }
+}
