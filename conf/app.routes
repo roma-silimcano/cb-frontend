@@ -13,4 +13,4 @@ GET        /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameCo
 POST       /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameController.post(id : Int)
 
 GET        /children/:id/birth-certificate-reference       uk.gov.hmrc.cb.controllers.child.ChildBirthCertificateReferenceController.get(id : Int)
-#POST       /children/:id/birth-certificate-reference       uk.gov.hmrc.cb.controllers.child.ChildBirthCertificateReferenceController.post(id : Int)
+POST       /children/:id/birth-certificate-reference       uk.gov.hmrc.cb.controllers.child.ChildBirthCertificateReferenceController.post(id : Int)

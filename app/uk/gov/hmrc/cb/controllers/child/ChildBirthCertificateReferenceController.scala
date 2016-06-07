@@ -26,6 +26,7 @@ import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreServi
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.models.Child
@@ -52,7 +53,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
-  def get(id: Int) = Action.async {
+  def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren.map {
         case Some(children) =>
@@ -69,7 +70,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
       }
   }
 
-  def post(id: Int) = Action.async{
+  def post(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       ChildBirthCertificateReferenceForm.form.bindFromRequest().fold(
         formWithErrors =>
