@@ -14,17 +14,25 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.config
+package uk.gov.hmrc.cb.implicits
+
+import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.models.Child
 
 /**
- * Created by adamconder on 18/04/2016.
+ * Created by adamconder on 06/06/2016.
  */
-trait AppConfig {
-  val assetsPrefix: String
-  val analyticsToken: String
-  val analyticsHost: String
-  val reportAProblemPartialUrl: String
-  val reportAProblemNonJSUrl: String
-  val navigationEnabled : Boolean
-  val showHMRCBranding : Boolean
+object Implicits {
+
+  implicit def childToChildNamePageModel(child : Child) : ChildNamePageModel = {
+    val (firstName, lastName) = (child.firstname, child.surname)
+
+    (firstName, lastName) match {
+      case (Some(x), Some(y)) => ChildNamePageModel(firstName = x, lastName = y)
+      case (_, _) => throw new RuntimeException("[Implicits] child does not have first and last name")
+    }
+
+
+  }
+
 }

@@ -17,6 +17,11 @@ cb.confirmation.lede = Thank you {0} for updating your Child Benefit. Your refer
 
 cb.update.child.benefit=Do you want to update your child benefit?
 
+cb.child.name.title=What is the name of the child you are claiming for?
+cb.child.first.name.label= First Name
+cb.child.last.name.label= Last Name
+
+
 error.message.title = Sorry
 
 # Child name page

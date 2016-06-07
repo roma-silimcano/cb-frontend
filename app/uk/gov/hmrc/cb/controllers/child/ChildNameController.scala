@@ -16,18 +16,24 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
+import java.util.UUID
+
 import play.api.Logger
+import play.api.data.Form
 import play.api.mvc.{Result, AnyContent, Request, Action}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildNameForm
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.controller.UnauthorisedAction
+import uk.gov.hmrc.play.http.{SessionKeys, HeaderCarrier}
 
 import scala.concurrent.Future
 
@@ -46,36 +52,42 @@ trait ChildNameController extends ChildBenefitController {
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
+  private val form = ChildNameForm.form
+  private def view(form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = uk.gov.hmrc.cb.views.html.child.childname(form, id)
+
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
-  def get(id: Int) = Action.async {
+  def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren().map {
         case Some(children) =>
           Logger.debug(s"[ChildNameController][get] loaded children $children")
           if (childrenService.childExistsAtIndex(id, children)) {
             Logger.debug(s"[ChildNameController][get] child does exist at index")
-            Ok(children.toString)
+            val model: ChildNamePageModel = childrenService.getChildById(id, children)
+            Ok(view(form.fill(model), id))
           } else {
             Logger.debug(s"[ChildNameController][get] child does not exist at index")
             redirectTechnicalDifficulties
           }
         case None =>
           Logger.debug(s"[ChildNameController][get] loaded children None")
-          Ok("")
+          Ok(view(form, id))
       } recover {
-        case e : Exception =>
-          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children")
+        case e: Exception =>
+          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
 
-  def post(id: Int) = Action.async{
+  def post(id: Int) = CBSessionProvider.withSession {
     implicit request =>
-      ChildNameForm.form.bindFromRequest().fold(
+      form.bindFromRequest().fold(
         formWithErrors =>
-            Future.successful(BadRequest("")),
+            Future.successful(BadRequest(
+              view(formWithErrors, id)
+            )),
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>

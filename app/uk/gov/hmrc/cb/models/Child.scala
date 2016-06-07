@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.models
 
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
+import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.mappings.Genders
 
 /**
