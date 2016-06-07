@@ -19,6 +19,7 @@ package uk.gov.hmrc.cb.forms
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.Messages
 import uk.gov.hmrc.cb.config.FrontendAppConfig
 import uk.gov.hmrc.cb.forms.constraints.Constraints
 
@@ -45,7 +46,7 @@ object ChildBirthCertificateReferenceForm {
 
   val form : Form[ChildBirthCertificateReferencePageModel] = Form(
     mapping(
-      "birthCertificateReference" -> text.verifying("Invalid", validate _)
+      "birthCertificateReference" -> text.verifying(Messages("cb.error.child.birth-certificate-reference.invalid"), validate _)
     )(ChildBirthCertificateReferencePageModel.apply)(ChildBirthCertificateReferencePageModel.unapply)
   )
 }
