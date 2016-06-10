@@ -74,7 +74,7 @@ class ChildrenManagerSpec extends UnitSpec {
           fixture.child1,
           fixture.child2
         )
-        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 1, children = input)
+        val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 1, children = input)
         result shouldBe List(
           fixture.child1
         )
@@ -88,7 +88,7 @@ class ChildrenManagerSpec extends UnitSpec {
           fixture.child3,
           fixture.child4
         )
-        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
+        val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
           fixture.child1,
           fixture.child2
@@ -100,7 +100,7 @@ class ChildrenManagerSpec extends UnitSpec {
         val input = List(
           fixture.child1
         )
-        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 3, children = input)
+        val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 3, children = input)
         result shouldBe List(
           fixture.child1,
           fixture.child2,
@@ -114,7 +114,7 @@ class ChildrenManagerSpec extends UnitSpec {
           fixture.replacementChild1,
           fixture.replacementChild2
         )
-        val result = ChildrenManager.childrenService.modifyListOfChildren(requiredNumberOfChildren = 2, children = input)
+        val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
           fixture.replacementChild1,
           fixture.replacementChild2
@@ -184,7 +184,7 @@ class ChildrenManagerSpec extends UnitSpec {
         fixture.child2
       )
       val modifiedChild = fixture.replacementChild2
-      val result = ChildrenManager.childrenService.replaceChildInAList(childList, 2, modifiedChild)
+      val result = ChildrenManager.childrenService.replaceChild(childList, 2, modifiedChild)
       result shouldBe List(
         fixture.child1,
         fixture.replacementChild2

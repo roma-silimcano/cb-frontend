@@ -59,24 +59,17 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren.map {
-        case Some(children) =>
+        children =>
           Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          if (childrenService.childExistsAtIndex(id, children)) {
+
+          val child = childrenService.getChildById(id, children)
+          if (child.hasBirthCertificateReferenceNumber) {
             Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-            val child = childrenService.getChildById(id, children)
-            if (child.hasBirthCertificateReferenceNumber) {
-              val model : ChildBirthCertificateReferencePageModel = child
-              Ok(view(form.fill(model), id))
-            } else {
-              Ok(view(form, id))
-            }
+            val model : ChildBirthCertificateReferencePageModel = child
+            Ok(view(form.fill(model), id))
           } else {
-            Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does not exist at index")
-            redirectTechnicalDifficulties
+            Ok(view(form, id))
           }
-        case None =>
-          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children None")
-          Ok(view(form, id))
       } recover {
         case e: Exception =>
           Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
@@ -107,32 +100,18 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
       )
   }
 
-  /*
-    Make this generic in the model it accepts. Extend a ChildPageModel trait and pattern to determine operation
-    return list of modified children
-    Refactor this into childrenmanager
-   */
-  private def handleChildrenWithCallback(children: Option[List[Child]], id : Int, model : ChildBirthCertificateReferencePageModel)(block: (List[Child]) => Future[Result]) = {
-    children match {
-      case Some(x) =>
-        if (childrenService.childExistsAtIndex(id, x)) {
-          // modify child
-          val originalChild = childrenService.getChildById(id, x)
-          val child = originalChild.editUniqueReferenceNumber(birthCertificateReference = model.birthCertificateReference)
-          val amendedList = childrenService.replaceChildInAList(x, id, child)
-          block(amendedList)
-        } else {
-          // add child
-          val child = childrenService.createChildWithBirthCertificateReference(id, model.birthCertificateReference)
-          val amendedList = childrenService.modifyListOfChildren(id, x)
-          val amendedWithChild = childrenService.replaceChildInAList(amendedList, id, child)
-          block(amendedWithChild)
-        }
-      case None =>
-        // create children
-        val children = List(childrenService.createChildWithBirthCertificateReference(id, model.birthCertificateReference))
-        block(children)
+  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)(block: (List[Child]) => Future[Result]) = {
+    val modified = if (childrenService.childExistsAtIndex(id, children)) {
+      // modify child
+      val child = childrenService.getChildById(id, children).edit(birthCertificateReference = model.birthCertificateReference)
+      childrenService.replaceChild(children, id, child)
+    } else {
+      // add child
+      val child = Child(id = id, birthCertificateReference = Some(model.birthCertificateReference))
+      childrenService.addChild(id, children, child)
     }
+
+    block(modified)
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {

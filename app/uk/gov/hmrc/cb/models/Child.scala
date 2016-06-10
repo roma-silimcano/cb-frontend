@@ -17,13 +17,14 @@
 package uk.gov.hmrc.cb.models
 
 import org.joda.time.LocalDate
-import play.api.libs.json.Json
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import play.api.libs.json._
 import uk.gov.hmrc.cb.mappings.Genders
 
 /**
   * Created by chrisianson on 26/05/16.
   */
+
+
 case class Child (
                  id: Short,
                  birthCertificateReference: Option[String] = None,
@@ -34,18 +35,45 @@ case class Child (
                  previousClaim: Boolean = false
                  ) {
 
-  def editFullName(firstName: String, lastName: String) = {
-    copy(firstname = Some(firstName), surname = Some(lastName))
-  }
-
-  def editUniqueReferenceNumber(birthCertificateReference: String) = {
-    copy(birthCertificateReference = Some(birthCertificateReference))
-  }
+  def edit(birthCertificateReference: String) = copy(birthCertificateReference = Some(birthCertificateReference))
+  def edit(firstName : String, surname: String) =  copy(firstname = Some(firstName), surname = Some(surname))
 
   def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
 
 }
 
 object Child {
+
+//  type BirthNumber = String
+//  type Name = String
+
+//  import play.api.libs.functional.syntax._ // Combinator syntax
+
+//  implicit val birthNumberFormat : Format[BirthNumber] = Format.of[String]
+//  implicit val nameFormat : Format[Name] = Format.of[String]
   implicit val formats = Json.format[Child]
+
+//  val childReads: Reads[Child] = (
+//    (JsPath \ "id").read[Short] and
+//      (JsPath \ "birthCertificateReference").read[String] and
+//        (JsPath \ "firstname").read[Option[String]] and
+//          (JsPath \ "surname").read[Option[String]] and
+//            (JsPath \ "dob").read[Option[LocalDate]] and
+//              (JsPath \ "gender").read[Genders.Gender] and
+//                (JsPath \ "previousClaim").read[Boolean]
+//    )(Child.apply _)
+//
+//  val childWrites: Writes[Child] = (
+//    (JsPath \ "id").write[Short] and
+//      (JsPath \ "birthCertificateReference").write[String] and
+//      (JsPath \ "firstname").write[Option[String]] and
+//      (JsPath \ "surname").write[Option[String]] and
+//      (JsPath \ "dob").write[Option[LocalDate]] and
+//      (JsPath \ "gender").write[Genders.Gender] and
+//      (JsPath \ "previousClaim").write[Boolean]
+//    )(unlift(Child.unapply))
+//
+//  implicit val locationFormat: Format[Child] =
+//    Format(childReads, childWrites)
+
 }

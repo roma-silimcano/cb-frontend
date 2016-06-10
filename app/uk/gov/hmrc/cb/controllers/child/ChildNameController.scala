@@ -61,19 +61,15 @@ trait ChildNameController extends ChildBenefitController {
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren().map {
-        case Some(children) =>
-          Logger.debug(s"[ChildNameController][get] loaded children $children")
-          if (childrenService.childExistsAtIndex(id, children)) {
-            Logger.debug(s"[ChildNameController][get] child does exist at index")
-            val model: ChildNamePageModel = childrenService.getChildById(id, children)
+        children =>
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
+          val child = childrenService.getChildById(id, children)
+          if(child.firstname.isDefined && child.surname.isDefined) {
+            val model : ChildNamePageModel = child
             Ok(view(form.fill(model), id))
           } else {
-            Logger.debug(s"[ChildNameController][get] child does not exist at index")
-            redirectTechnicalDifficulties
+            Ok(view(form, id))
           }
-        case None =>
-          Logger.debug(s"[ChildNameController][get] loaded children None")
-          Ok(view(form, id))
       } recover {
         case e: Exception =>
           Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
@@ -104,35 +100,22 @@ trait ChildNameController extends ChildBenefitController {
       )
     }
 
-
   /*
     Make this generic in the model it accepts. Extend a ChildPageModel trait and pattern to determine operation
     return list of modified children
     Refactor this into childrenmanager
    */
-  private def handleChildrenWithCallback(children: Option[List[Child]], id : Int, model : ChildNamePageModel)(block: (List[Child]) => Future[Result]) = {
-    children match {
-      case Some(x) =>
-        if (childrenService.childExistsAtIndex(id, x)) {
-          // modify child
-          val originalChild = childrenService.getChildById(id, x)
-          val child = originalChild.editFullName(firstName = model.firstName, lastName = model.lastName)
-          val amendedList = childrenService.replaceChildInAList(x, id, child)
-          block(amendedList)
-        } else {
-          // add child
-          val child = childrenService.createChildWithName(id, model.firstName, model.lastName)
-          Logger.debug(s"[ChildNameController][handleChildren] new child $child")
-          val amendedList = childrenService.modifyListOfChildren(id, x)
-          val amendedWithChild = childrenService.replaceChildInAList(amendedList, id, child)
-          Logger.debug(s"[ChildNameController][handleChildren] add child : $amendedWithChild children: $children")
-          block(amendedWithChild)
-        }
-      case None =>
-        // create children
-        val children = List(childrenService.createChildWithName(id, model.firstName, model.lastName))
-        block(children)
+  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)(block: (List[Child]) => Future[Result]) = {
+    val modified = if (childrenService.childExistsAtIndex(id, children)) {
+      val child = childrenService.getChildById(id, children).edit(firstName = model.firstName, surname = model.lastName)
+      childrenService.replaceChild(children, id, child)
+    } else {
+      // add child
+      val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
+      childrenService.addChild(id, children, child)
     }
+
+    block(modified)
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {

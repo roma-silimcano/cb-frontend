@@ -41,4 +41,6 @@ object Implicits {
     }
   }
 
+  implicit def IntToShort(x: Int) : Short = x.toShort
+
 }

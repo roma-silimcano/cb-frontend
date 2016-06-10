@@ -43,7 +43,7 @@ class ChildSpec extends UnitSpec {
 
     "return a new instance of a child when calling editFullName" in {
       val child = Child(1, Some("123456"), Some("Shane"), Some("Wilson"), Some(LocalDate.now()), Genders.Male, false)
-      val modified = child.editFullName("Adam", "Conder")
+      val modified = child.edit("Adam", "Conder")
       modified should not be child
       modified.firstname shouldBe Some("Adam")
       modified.surname shouldBe Some("Conder")
@@ -51,7 +51,7 @@ class ChildSpec extends UnitSpec {
 
     "return a new instance of a child when calling unique reference number" in {
       val child = Child(1, Some("34543"), Some("Chris"), Some("Conder"), Some(LocalDate.now()), Genders.Male)
-      val modified = child.editUniqueReferenceNumber("434434434")
+      val modified = child.edit("434434434")
       modified should not be child
       modified.birthCertificateReference shouldBe Some("434434434")
     }
