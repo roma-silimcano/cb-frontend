@@ -16,11 +16,9 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
-import java.util.UUID
-
 import play.api.Logger
 import play.api.data.Form
-import play.api.mvc.{Result, AnyContent, Request, Action}
+import play.api.mvc.{Result, AnyContent, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
@@ -32,8 +30,7 @@ import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import uk.gov.hmrc.play.frontend.controller.UnauthorisedAction
-import uk.gov.hmrc.play.http.{SessionKeys, HeaderCarrier}
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -53,9 +50,8 @@ trait ChildNameController extends ChildBenefitController {
   val childrenService : ChildrenService
 
   private val form = ChildNameForm.form
-  private def view(form : Form[ChildNamePageModel], id : Int)
-                  (implicit request: Request[AnyContent]) = {
-    Ok(uk.gov.hmrc.cb.views.html.child.childname(form, id))
+  private def view(status: Status, form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = {
+    status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
   }
 
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
@@ -66,15 +62,15 @@ trait ChildNameController extends ChildBenefitController {
       cacheClient.loadChildren().map {
         children =>
           Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          val resultWithNoChild = view(form, id)
+          val resultWithNoChild = view(Ok, form, id)
           childrenService.getChildById(id, children).fold(resultWithNoChild){
             child =>
-              if(child.firstname.isDefined && child.surname.isDefined) {
+              if(child.hasName) {
                 Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
                 val model : ChildNamePageModel = child
-                Ok(view(form.fill(model), id))
+                view(Ok, form.fill(model), id)
               } else {
-                Ok(view(form, id))
+                resultWithNoChild
               }
           }
       } recover {
@@ -89,9 +85,9 @@ trait ChildNameController extends ChildBenefitController {
       form.bindFromRequest().fold(
         formWithErrors => {
           Logger.debug(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
-            Future.successful(BadRequest(
-              view(formWithErrors, id)
-            ))},
+            Future.successful(
+              view(BadRequest, formWithErrors, id)
+            )},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -108,38 +104,23 @@ trait ChildNameController extends ChildBenefitController {
     }
 
   private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
-    val child = Child(id = id, firstname = model.firstName, surname = model.lastName)
+    val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
     childrenService.addChild(id, children, child)
   }
 
   private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)(block: (List[Child]) => Future[Result]) = {
-    val modified = if (childrenService.childExistsAtIndex(id, children)) {
-      val child = childrenService.getChildById(id, children).fold(
-        addChild(id, model, children)
-      )
-      {
+    val child = childrenService.getChildById(id, children).fold {
+      Logger.debug(s"[ChildNameController][addChild] adding child")
+      addChild(id, model, children)
+    }{
         c =>
-          Logger.info(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] handleChildrenWithCallback ${model.firstName} ${model.lastName} ")
+          Logger.info(s"[ChildNameController][handleChildrenWithCallback] handleChildrenWithCallback ${model.firstName} ${model.lastName} ")
           val modified = c.edit(model.firstName, model.lastName)
           childrenService.replaceChild(children, id, modified)
       }
 
-    block(modified)
+    block(child)
   }
-
-//  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
-//                                        (block: (List[Child]) => Future[Result]) = {
-//    val child = childrenService.getChildById(id, children).fold(
-//      addChild(id, model, children)
-//    ){
-//      c =>
-//        Logger.debug(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] birthCertificateReference $model.birthCertificateReference")
-//        val modified = c.edit(birthCertificateReference = model.birthCertificateReference)
-//        childrenService.replaceChild(children, id, modified)
-//    }
-//
-//    block(child)
-//  }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keystore : $children")

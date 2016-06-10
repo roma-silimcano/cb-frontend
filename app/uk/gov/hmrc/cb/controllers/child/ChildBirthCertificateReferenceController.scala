@@ -54,9 +54,9 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
   private val form = ChildBirthCertificateReferenceForm.form
-  private def view(form : Form[ChildBirthCertificateReferencePageModel], id : Int)
+  private def view(status : Status, form : Form[ChildBirthCertificateReferencePageModel], id : Int)
                   (implicit request: Request[AnyContent]) = {
-    Ok(uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id))
+    status(uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id))
   }
 
   def get(id: Int) = CBSessionProvider.withSession {
@@ -64,13 +64,13 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
       cacheClient.loadChildren.map {
         children =>
           Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          val resultWithNoChild = view(form, id)
+          val resultWithNoChild = view(Ok, form, id)
           childrenService.getChildById(id, children).fold(resultWithNoChild){
             child =>
               if (child.hasBirthCertificateReferenceNumber) {
                 Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
                 val model : ChildBirthCertificateReferencePageModel = child
-                view(form.fill(model), id)
+                view(Ok, form.fill(model), id)
               } else {
                 resultWithNoChild
               }
@@ -87,9 +87,9 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
       form.bindFromRequest().fold(
         formWithErrors => {
           Logger.debug(s"[ChildBirthCertificateReferenceController][bindFromRequest] invalid form submission $formWithErrors")
-          Future.successful(BadRequest(
-            view(formWithErrors, id)
-          ))},
+          Future.successful(
+            view(BadRequest, formWithErrors, id)
+          )},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -112,9 +112,10 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
                                         (block: (List[Child]) => Future[Result]) = {
-      val child = childrenService.getChildById(id, children).fold(
+      val child = childrenService.getChildById(id, children).fold{
+        Logger.debug(s"[ChildBirthCertificateReferenceController][addChild] adding child")
         addChild(id, model, children)
-      ){
+      }{
         c =>
           Logger.info(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] birthCertificateReference")
           val modified = c.edit(birthCertificateReference = model.birthCertificateReference)

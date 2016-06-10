@@ -57,9 +57,9 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
     "fetch children" in {
       implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
       implicit val hc = HeaderCarrier()
-      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(children))
+      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(Some(children)))
       val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
-      result shouldBe Some(children)
+      result shouldBe children
     }
 
   }
@@ -75,7 +75,7 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
       when(mockSessionCache.cache[List[Child]](mockEq("cb-children"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-children" -> json))))
       val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
-      result shouldBe Some(children)
+      result shouldBe children
     }
 
   }

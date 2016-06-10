@@ -29,13 +29,13 @@ import uk.gov.hmrc.play.test.UnitSpec
 class ChildrenManagerSpec extends UnitSpec {
 
   def fixture = new {
-    val child1 = Child(1, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child2 = Child(2, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child3 = Child(3, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child4 = Child(4, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val child5 = Child(5, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false)
-    val replacementChild1 = Child(2, birthCertificateReference = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
-    val replacementChild2 = Child(2, birthCertificateReference = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false)
+    val child1 = Some(Child(1, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
+    val child2 = Some(Child(2, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
+    val child3 = Some(Child(3, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
+    val child4 = Some(Child(4, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
+    val child5 = Some(Child(5, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
+    val replacementChild1 = Some(Child(2, birthCertificateReference = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false))
+    val replacementChild2 = Some(Child(2, birthCertificateReference = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false))
   }
 
   "ChildrenManager" when {
@@ -45,7 +45,7 @@ class ChildrenManagerSpec extends UnitSpec {
       "create a list of children objects" in {
         val result = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 1)
         result shouldBe List(
-          fixture.child1
+          fixture.child1.get
         )
       }
 
@@ -57,11 +57,11 @@ class ChildrenManagerSpec extends UnitSpec {
       "create a list of 5 child objects when passed 5" in {
         val result = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 5)
         result shouldBe List(
-          fixture.child1,
-          fixture.child2,
-          fixture.child3,
-          fixture.child4,
-          fixture.child5
+          fixture.child1.get,
+          fixture.child2.get,
+          fixture.child3.get,
+          fixture.child4.get,
+          fixture.child5.get
         )
         result.length shouldBe 5
       }
@@ -71,53 +71,53 @@ class ChildrenManagerSpec extends UnitSpec {
 
       "(remove) a list of children objects" in {
         val input = List(
-          fixture.child1,
-          fixture.child2
+          fixture.child1.get,
+          fixture.child2.get
         )
         val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 1, children = input)
         result shouldBe List(
-          fixture.child1
+          fixture.child1.get
         )
         result.length shouldBe 1
       }
 
       "(remove) drop multiple children objects" in {
         val input = List(
-          fixture.child1,
-          fixture.child2,
-          fixture.child3,
-          fixture.child4
+          fixture.child1.get,
+          fixture.child2.get,
+          fixture.child3.get,
+          fixture.child4.get
         )
         val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
-          fixture.child1,
-          fixture.child2
+          fixture.child1.get,
+          fixture.child2.get
         )
         result.length shouldBe 2
       }
 
       "(add) modify existing list of children by adding 2 more children" in {
         val input = List(
-          fixture.child1
+          fixture.child1.get
         )
         val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 3, children = input)
         result shouldBe List(
-          fixture.child1,
-          fixture.child2,
-          fixture.child3
+          fixture.child1.get,
+          fixture.child2.get,
+          fixture.child3.get
         )
         result.length shouldBe 3
       }
 
       "(same) modify a list of children objects" in {
         val input = List(
-          fixture.replacementChild1,
-          fixture.replacementChild2
+          fixture.replacementChild1.get,
+          fixture.replacementChild2.get
         )
         val result = ChildrenManager.childrenService.modifyNumberOfChildren(requiredNumberOfChildren = 2, children = input)
         result shouldBe List(
-          fixture.replacementChild1,
-          fixture.replacementChild2
+          fixture.replacementChild1.get,
+          fixture.replacementChild2.get
         )
         result.length shouldBe 2
       }
@@ -138,27 +138,21 @@ class ChildrenManagerSpec extends UnitSpec {
         result shouldBe fixture.child5
       }
 
-      "return an exception when an id is greater than length of list" in {
-        val result = intercept[NoSuchElementException] {
-          val children = ChildrenManager.childrenService.createListOfChildren(2)
-          ChildrenManager.childrenService.getChildById(5, children)
-        }
-        result shouldBe a[NoSuchElementException]
+      "return None when an id is greater than length of list" in {
+        val children = ChildrenManager.childrenService.createListOfChildren(2)
+        val result = ChildrenManager.childrenService.getChildById(5, children)
+        result shouldBe None
       }
 
-      "return exception when id is 0" in {
-        val result = intercept[NoSuchElementException] {
-          val children = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 3)
-          ChildrenManager.childrenService.getChildById(0, children)
-        }
-        result shouldBe a[NoSuchElementException]
+      "return None when id is 0" in {
+        val children = ChildrenManager.childrenService.createListOfChildren(requiredNumberOfChildren = 3)
+        val result = ChildrenManager.childrenService.getChildById(0, children)
+        result shouldBe None
       }
 
-      "return exception when child list is empty" in {
-        val result = intercept[NoSuchElementException] {
-          ChildrenManager.childrenService.getChildById(1, List())
-        }
-        result shouldBe a[NoSuchElementException]
+      "return None when child list is empty" in {
+        val result = ChildrenManager.childrenService.getChildById(1, Nil)
+        result shouldBe None
       }
     }
 
@@ -180,14 +174,14 @@ class ChildrenManagerSpec extends UnitSpec {
 
     "replacing child in a list" in {
       val childList = List(
-        fixture.child1,
-        fixture.child2
+        fixture.child1.get,
+        fixture.child2.get
       )
-      val modifiedChild = fixture.replacementChild2
+      val modifiedChild = fixture.replacementChild2.get
       val result = ChildrenManager.childrenService.replaceChild(childList, 2, modifiedChild)
       result shouldBe List(
-        fixture.child1,
-        fixture.replacementChild2
+        fixture.child1.get,
+        fixture.replacementChild2.get
       )
       result.length shouldBe 2
     }

@@ -117,13 +117,6 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         status(result) shouldBe OK
       }
 
-    "redirect to technical difficulties when out of bounds exception" in {
-        val children = List(Child(id = 2))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
-        val result = await(mockController.get(childIndex)(getRequest))
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
-      }
     }
 
     "POST" should {

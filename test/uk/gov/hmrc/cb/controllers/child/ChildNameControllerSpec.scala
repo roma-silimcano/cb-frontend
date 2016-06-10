@@ -119,14 +119,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         bodyOf(result) should not include "Chris"
       }
 
-      "redirect to technical difficulties when out of bounds exception" in {
-        val children = List(Child(id = 2))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
-        val result = await(mockController.get(childIndex)(getRequest))
-        status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
-      }
-
     }
 
     "post" should {
