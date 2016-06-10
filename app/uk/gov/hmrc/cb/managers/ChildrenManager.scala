@@ -67,18 +67,10 @@ object ChildrenManager {
       }
     }
 
-    def getChildById(index: Int, children: List[Child]): Child = {
+    def getChildById(index: Int, children: List[Child]): Option[Child] = {
       import uk.gov.hmrc.cb.implicits.Implicits._
 
-      try {
-        val child = children.filter(c => c.id == index).head
-        child
-      }
-      catch {
-        case e : Exception =>
-          Logger.debug(s"[ChildrenManager][getChildById] child does not exist at index")
-          throw e
-      }
+      children.find(c => c.id == index)
     }
 
     def replaceChild(children: List[Child], index: Int, newChild: Child): List[Child] = {

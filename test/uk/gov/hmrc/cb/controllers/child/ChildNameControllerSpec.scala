@@ -134,7 +134,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to technical difficulties when keystore is down when saving" in {
         val children = List(Child(id = 1))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
-        when(mockController.cacheClient.saveChildren(mockEq(children.get))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
@@ -163,7 +163,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to confirmation - No children" in {
         val children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
-        when(mockController.cacheClient.saveChildren(mockEq(children.get))(any(), any())).thenReturn(Future.successful(children))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(children))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))

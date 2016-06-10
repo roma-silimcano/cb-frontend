@@ -53,7 +53,10 @@ trait ChildNameController extends ChildBenefitController {
   val childrenService : ChildrenService
 
   private val form = ChildNameForm.form
-  private def view(form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = uk.gov.hmrc.cb.views.html.child.childname(form, id)
+  private def view(form : Form[ChildNamePageModel], id : Int)
+                  (implicit request: Request[AnyContent]) = {
+    Ok(uk.gov.hmrc.cb.views.html.child.childname(form, id))
+  }
 
   private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
@@ -63,12 +66,16 @@ trait ChildNameController extends ChildBenefitController {
       cacheClient.loadChildren().map {
         children =>
           Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          val child = childrenService.getChildById(id, children)
-          if(child.firstname.isDefined && child.surname.isDefined) {
-            val model : ChildNamePageModel = child
-            Ok(view(form.fill(model), id))
-          } else {
-            Ok(view(form, id))
+          val resultWithNoChild = view(form, id)
+          childrenService.getChildById(id, children).fold(resultWithNoChild){
+            child =>
+              if(child.firstname.isDefined && child.surname.isDefined) {
+                Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
+                val model : ChildNamePageModel = child
+                Ok(view(form.fill(model), id))
+              } else {
+                Ok(view(form, id))
+              }
           }
       } recover {
         case e: Exception =>
@@ -100,23 +107,39 @@ trait ChildNameController extends ChildBenefitController {
       )
     }
 
-  /*
-    Make this generic in the model it accepts. Extend a ChildPageModel trait and pattern to determine operation
-    return list of modified children
-    Refactor this into childrenmanager
-   */
+  private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
+    val child = Child(id = id, firstname = model.firstName, surname = model.lastName)
+    childrenService.addChild(id, children, child)
+  }
+
   private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)(block: (List[Child]) => Future[Result]) = {
     val modified = if (childrenService.childExistsAtIndex(id, children)) {
-      val child = childrenService.getChildById(id, children).edit(firstName = model.firstName, surname = model.lastName)
-      childrenService.replaceChild(children, id, child)
-    } else {
-      // add child
-      val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
-      childrenService.addChild(id, children, child)
-    }
+      val child = childrenService.getChildById(id, children).fold(
+        addChild(id, model, children)
+      )
+      {
+        c =>
+          Logger.info(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] handleChildrenWithCallback ${model.firstName} ${model.lastName} ")
+          val modified = c.edit(model.firstName, model.lastName)
+          childrenService.replaceChild(children, id, modified)
+      }
 
     block(modified)
   }
+
+//  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
+//                                        (block: (List[Child]) => Future[Result]) = {
+//    val child = childrenService.getChildById(id, children).fold(
+//      addChild(id, model, children)
+//    ){
+//      c =>
+//        Logger.debug(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] birthCertificateReference $model.birthCertificateReference")
+//        val modified = c.edit(birthCertificateReference = model.birthCertificateReference)
+//        childrenService.replaceChild(children, id, modified)
+//    }
+//
+//    block(child)
+//  }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keystore : $children")
