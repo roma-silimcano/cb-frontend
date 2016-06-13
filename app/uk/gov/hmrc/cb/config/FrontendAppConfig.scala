@@ -22,7 +22,8 @@ import uk.gov.hmrc.play.config.ServicesConfig
 /**
  * Created by adamconder on 18/04/2016.
  */
-object FrontendAppConfig extends AppConfig with ServicesConfig {
+object
+FrontendAppConfig extends AppConfig with ServicesConfig {
 
   private def loadConfig(key: String) = configuration.getString(key).getOrElse(throw new Exception(s"Missing configuration key: $key"))
 
@@ -41,5 +42,7 @@ object FrontendAppConfig extends AppConfig with ServicesConfig {
 
   lazy val birthCertificateReferenceLengthMaxConstraint = configuration.getInt("cb-frontend.constraints.child.birth-certificate-reference").getOrElse(throw new Exception(s"[Configuration][Child birth certificate reference]"))
   lazy val birthCertificateReferenceLengthMinConstraint = configuration.getInt("cb-frontend.constraints.child.birth-certificate-reference").getOrElse(throw new Exception(s"[Configuration][Child birth certificate reference]"))
+
+  lazy val dateOfBirthAgeLimit = configuration.getInt("cb-frontend.constraints.child.date-of-birth.age.limit").getOrElse(throw new Exception(s"[Configuration][Child date of birth reference] missing configuration"))
 
 }

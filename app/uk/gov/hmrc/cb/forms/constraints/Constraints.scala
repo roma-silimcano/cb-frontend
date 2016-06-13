@@ -18,6 +18,8 @@ package uk.gov.hmrc.cb.forms.constraints
 
 import java.util.regex.Pattern
 
+import org.joda.time.format.DateTimeFormat
+
 /**
  * Created by adamconder on 27/05/2016.
  */
@@ -33,4 +35,5 @@ object Constraints {
    * $                 end of string
    */
   val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
+  val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd")
 }
