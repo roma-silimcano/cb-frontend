@@ -122,14 +122,13 @@ trait ChildNameController extends ChildBenefitController {
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    Logger.debug(s"[ChildNameController][saveToKeystore] saving children to keystore : $children")
     cacheClient.saveChildren(children).map {
       children =>
         Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: $children")
+        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

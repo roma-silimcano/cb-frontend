@@ -22,7 +22,7 @@ import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
-import play.api.mvc.{Action, AnyContent, Request, Result}
+import play.api.mvc._
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
@@ -95,7 +95,6 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
             cache =>
               handleChildrenWithCallback(cache, id, model) {
                 children =>
-                  Logger.debug(s"handleChildrenWithCallback block response: $children")
                   saveToKeystore(children)
               }
           } recover {
