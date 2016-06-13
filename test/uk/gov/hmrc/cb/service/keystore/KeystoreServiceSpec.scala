@@ -62,6 +62,14 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
       result shouldBe children
     }
 
+    "return Nil when no children exist" in {
+      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
+      implicit val hc = HeaderCarrier()
+      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(None))
+      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
+      result shouldBe Nil
+    }
+
   }
 
   "POST data should" should {
@@ -75,7 +83,7 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
       when(mockSessionCache.cache[List[Child]](mockEq("cb-children"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-children" -> json))))
       val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
-      result shouldBe children
+      result shouldBe Some(children)
     }
 
   }

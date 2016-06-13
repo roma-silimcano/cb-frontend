@@ -29,6 +29,9 @@ object ChildrenManager {
 
   class ChildrenService {
 
+    private val START_INDEX = 1
+    private val INCREMENT = 1
+
     def createListOfChildren(requiredNumberOfChildren: Int): List[Child] = {
       val children = for (i <- 1 to requiredNumberOfChildren) yield {
         val index = i
@@ -42,21 +45,29 @@ object ChildrenManager {
       val difference = requiredNumberOfChildren - numberOfChildren
 
       def modifyListOfChildrenHelper(children: List[Child], remaining: Int): List[Child] = {
-
         val sorted = children.sortBy(x => x.id)
 
         remaining match {
           case x if remaining == 0 =>
+            // children stay the same
             sorted
           case x if remaining > 0 =>
-            val index = sorted.last.id + 1
+            // add children
+            val index = sorted match {
+              case Nil =>
+                START_INDEX
+              case h :: t =>
+                sorted.last.id + INCREMENT
+            }
+
             val child = Child(id = index.toShort)
             val modified = child :: sorted
-            modifyListOfChildrenHelper(modified, x - 1)
+            modifyListOfChildrenHelper(modified, x - INCREMENT)
           case x if remaining < 0 =>
-            val lastId = sorted.last.id - 1
+            // remove children
+            val lastId = sorted.last.id - INCREMENT
             val modified = sorted.splitAt(lastId)._1
-            modifyListOfChildrenHelper(modified, x + 1)
+            modifyListOfChildrenHelper(modified, x + INCREMENT)
         }
       }
 
@@ -84,8 +95,9 @@ object ChildrenManager {
     }
 
     def addChild(id : Int, children : List[Child], newChild: Child) = {
-      val amendedList = childrenService.modifyNumberOfChildren(id, children)
-      childrenService.replaceChild(amendedList, id, newChild)
+      val amendedList = modifyNumberOfChildren(id, children)
+      val modified = replaceChild(amendedList, id, newChild)
+      modified
     }
 
   }

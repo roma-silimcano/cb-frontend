@@ -55,14 +55,13 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
 
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/children/1/birth-certificate-reference").withSession(CBSessionProvider.generateSessionId())
     def postRequest(form: Form[ChildBirthCertificateReferencePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/birth-certificate-reference")
-      .withSession(CBSessionProvider.generateSessionId())
       .withFormUrlEncodedBody(form.data.toSeq: _*)
+      .withSession(CBSessionProvider.generateSessionId())
+
     implicit lazy val hc = HeaderCarrier()
 
     "initialising" should {
-
       "wire up the dependencies correctly" in {
-
         ChildBirthCertificateReferenceController.authConnector shouldBe a[AuthConnector]
         ChildBirthCertificateReferenceController.cacheClient shouldBe a[ChildBenefitKeystoreService]
       }
@@ -128,7 +127,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         val load = List(Child(id = 1, birthCertificateReference = Some("123456789")))
         val save = List(Child(id = 1, birthCertificateReference = Some("123456789")), Child(id = 2, birthCertificateReference = Some("123456789")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(save))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result).get shouldBe "/child-benefit/confirmation"
@@ -138,7 +137,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         val load = List(Child(id = 1, birthCertificateReference = Some("111111111")))
         val save = List(Child(id = 1, birthCertificateReference = Some("123456789")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(save))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
@@ -148,8 +147,8 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
 
       "redirect to confirmation - No children" in {
         val children = List(Child(id = 1, birthCertificateReference = Some("123456789")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(Nil))
-        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(children))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(Some(children)))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))

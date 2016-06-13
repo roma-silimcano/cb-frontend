@@ -61,8 +61,9 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
 
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/children/1/name").withSession(CBSessionProvider.generateSessionId())
     def postRequest(form: Form[ChildNamePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/name")
-      .withSession(CBSessionProvider.generateSessionId())
       .withFormUrlEncodedBody(form.data.toSeq: _*)
+      .withSession(CBSessionProvider.generateSessionId())
+
     implicit lazy val hc = HeaderCarrier()
 
     "initialising" should {
@@ -155,7 +156,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to confirmation - No children" in {
         val children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
-        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(children))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(Some(children)))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
@@ -167,7 +168,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val load = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         val save = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Fenwick")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(save))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Fenwick"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
@@ -182,7 +183,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val load = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         val save = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(save))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/confirmation"
@@ -195,7 +196,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val load = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")))
         val save = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("David"), surname = Some("Conder")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(save))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
         redirectLocation(result) shouldBe "/child-benefit/confirmation"

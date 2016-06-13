@@ -95,11 +95,12 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
             cache =>
               handleChildrenWithCallback(cache, id, model) {
                 children =>
+                  Logger.debug(s"handleChildrenWithCallback block response: $children")
                   saveToKeystore(children)
               }
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}}")
               redirectTechnicalDifficulties
           }
       )
@@ -107,19 +108,20 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   private def addChild(id : Int, model : ChildBirthCertificateReferencePageModel, children : List[Child]) = {
     val child = Child(id = id, birthCertificateReference = Some(model.birthCertificateReference))
-    childrenService.addChild(id, children, child)
+    val modified = childrenService.addChild(id, children, child)
+    modified
   }
 
   private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
-                                        (block: (List[Child]) => Future[Result]) = {
-      val child = childrenService.getChildById(id, children).fold{
-        Logger.debug(s"[ChildBirthCertificateReferenceController][addChild] adding child")
-        addChild(id, model, children)
+                                        (block: => List[Child] => Future[Result]) = {
+      val child : List[Child] = childrenService.getChildById(id, children).fold {
+        val result = addChild(id, model, children)
+        result
       }{
         c =>
-          Logger.info(s"[ChildBirthCertificateReferenceController][handleChildrenWithCallback] birthCertificateReference")
           val modified = c.edit(birthCertificateReference = model.birthCertificateReference)
-          childrenService.replaceChild(children, id, modified)
+          val result = childrenService.replaceChild(children, id, modified)
+          result
       }
 
     block(child)
