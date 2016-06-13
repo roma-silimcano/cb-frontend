@@ -111,6 +111,13 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         bodyOf(result) should include("Adam")
       }
 
+      "respond 200 when child in keystore with no name" in {
+        val children = List(Child(id = 1))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
+        val result = await(mockController.get(childIndex)(getRequest))
+        status(result) shouldBe OK
+      }
+
       "respond 200 when multiple children in keystore" in {
         val children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("Chris"), surname = Some("I'anson")))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))

@@ -113,7 +113,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   }
 
   private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
-                                        (block: => List[Child] => Future[Result]) = {
+                                        (block: List[Child] => Future[Result]) = {
       val child : List[Child] = childrenService.getChildById(id, children).fold {
         val result = addChild(id, model, children)
         result

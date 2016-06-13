@@ -108,13 +108,12 @@ trait ChildNameController extends ChildBenefitController {
     childrenService.addChild(id, children, child)
   }
 
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)(block: (List[Child]) => Future[Result]) = {
+  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)
+                                        (block: (List[Child]) => Future[Result]) = {
     val child = childrenService.getChildById(id, children).fold {
-      Logger.debug(s"[ChildNameController][addChild] adding child")
       addChild(id, model, children)
     }{
         c =>
-          Logger.info(s"[ChildNameController][handleChildrenWithCallback] handleChildrenWithCallback ${model.firstName} ${model.lastName} ")
           val modified = c.edit(model.firstName, model.lastName)
           childrenService.replaceChild(children, id, modified)
       }
