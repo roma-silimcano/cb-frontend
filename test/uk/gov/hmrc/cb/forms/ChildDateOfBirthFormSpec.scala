@@ -1,9 +1,27 @@
+/*
+ * Copyright 2016 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.cb.forms
 
 import org.joda.time.DateTime
 import java.util.Calendar
 
 import org.joda.time.format.DateTimeFormat
+import play.api.Logger
+import play.api.i18n.Messages
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.play.test.UnitSpec
@@ -13,19 +31,27 @@ import uk.gov.hmrc.play.test.UnitSpec
  */
 class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
 
+  private def calendar() : Calendar = {
+    val cal = Calendar.getInstance()
+    cal.set(Calendar.HOUR_OF_DAY, 0)
+    cal.set(Calendar.MINUTE, 0)
+    cal.set(Calendar.SECOND, 0)
+    cal.set(Calendar.MILLISECOND, 0)
+    cal
+  }
+
   val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
   "ChildDateOfBirthForm" should {
 
-    "accept a valid date - today" in {
-      val today = DateTime.now()
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+    "accept a valid date - now" in {
+      val date = DateTime.now()
 
-      val day = dateOfBirth.getDayOfMonth
-      val month = dateOfBirth.getMonthOfYear
-      val year = dateOfBirth.getYear
+      val day = date.getDayOfMonth
+      val month = date.getMonthOfYear
+      val year = date.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = date)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -36,17 +62,19 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       ).fold(
         errors =>
           errors.errors shouldBe empty,
-        success =>
-          success shouldBe outputModel
+        success => {
+
+          val expected = formatter.print(outputModel.dateOfBirth)
+          val actual = formatter.print(success.dateOfBirth)
+
+          expected shouldBe actual
+        }
       )
     }
 
     "accept a valid date - 20 years in the past" in {
-      val calendar = Calendar.getInstance()
-      calendar.add(Calendar.YEAR, -20)
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val date = DateTime.now() // with timestamp and zone
+      val dateOfBirth = date.minusYears(20)
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
@@ -63,18 +91,18 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       ).fold(
           errors =>
             errors.errors shouldBe empty,
-          success =>
-            success shouldBe outputModel
+          success => {
+            val expected = formatter.print(outputModel.dateOfBirth)
+            val actual = formatter.print(success.dateOfBirth)
+
+            expected shouldBe actual
+          }
         )
     }
 
     "throw a ValidationError - 20 years and 1 day in the past" in {
-      val calendar = Calendar.getInstance()
-      calendar.add(Calendar.YEAR, -20)
-      calendar.add(Calendar.DAY_OF_MONTH, -1)
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val date = DateTime.now() // with timestamp and zone
+      val dateOfBirth = date.minusYears(20).minusDays(1)
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
@@ -90,18 +118,15 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            errors.errors.head.message shouldBe "Enter a date that is less than 20 years",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError - tomorrow" in {
-      val calendar = Calendar.getInstance()
-      calendar.add(Calendar.DAY_OF_MONTH, 1)
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val date = DateTime.now() // with timestamp and zone
+      val dateOfBirth = date.plusDays(1)
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
@@ -117,17 +142,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            errors.errors.head.message shouldBe "Enter a date that is not in the future",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError for an incorrect day" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
@@ -142,17 +164,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter a valid date",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError for an incorrect month" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val day = dateOfBirth.getDayOfMonth
       val year = dateOfBirth.getYear
@@ -167,17 +186,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter a valid date",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError for an incorrect year" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
@@ -192,17 +208,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter a date that is not in the future",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError for special characters" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
@@ -214,17 +227,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter numbers only",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError when value is negative" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
@@ -236,17 +246,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter numbers only",
           success =>
             success should not be outputModel
         )
     }
 
     "throw a ValidationError when empty" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
@@ -258,17 +265,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Invalid",
+            Messages(errors.errors.head.message) shouldBe "Enter a date of birth",
           success =>
             success should not be outputModel
         )
     }
 
     "pre-populate the form with a value" in {
-      val calendar = Calendar.getInstance()
-
-      val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
+      val dateOfBirth = DateTime.now() // with timestamp and zone
 
       val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
       val form = ChildDateOfBirthForm.form.fill(outputModel)

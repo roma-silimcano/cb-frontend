@@ -18,15 +18,15 @@ package uk.gov.hmrc.cb.forms.constraints
 
 import java.util.regex.Pattern
 
+import org.joda.time.{DateTime, DateTimeZone}
 import org.joda.time.format.DateTimeFormat
+import play.api.Logger
+import uk.gov.hmrc.cb.config.FrontendAppConfig
 
 /**
  * Created by adamconder on 27/05/2016.
  */
 object Constraints {
-
-//  val pattern = Pattern.compile("([a-zA-Z])\\w\\p{L}+", Pattern.UNICODE_CHARACTER_CLASS)
-
   /**
    * This will match:
    *  ^                beginning of string
@@ -35,5 +35,32 @@ object Constraints {
    * $                 end of string
    */
   val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
-  val dateFormat = DateTimeFormat.forPattern("yyyy-MM-dd")
+  val dateFormatWithoutTimestamp = DateTimeFormat.forPattern("yyyy-MM-dd")
+  val dateFormatWithTimestamp = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
+
+  private def removeTimeStamp(date : DateTime) : DateTime = {
+    val todayWithoutTimestamp = dateFormatWithoutTimestamp.print(date)
+    val todayDateWithoutTimestamp = DateTime.parse(todayWithoutTimestamp, dateFormatWithoutTimestamp)
+    todayDateWithoutTimestamp
+  }
+
+  def dateIsNotAFutureDate(date : DateTime, today : DateTime = DateTime.now()) = {
+    // remove timestamps and compare
+    val todayDateWithoutTimestamp = removeTimeStamp(today)
+    val dateOfBirthWithoutTimestamp = removeTimeStamp(date)
+
+    dateOfBirthWithoutTimestamp.isBefore(todayDateWithoutTimestamp) || dateOfBirthWithoutTimestamp.isEqual(todayDateWithoutTimestamp)
+  }
+
+  def dateOfBirthIsEqualToOrAfterChildAgeLimit(date : DateTime, today : DateTime = DateTime.now()) = {
+    val years = FrontendAppConfig.dateOfBirthAgeLimit
+    val todayMinusYears = today.minusYears(years)
+    // remove timestamps and compare
+    val todayDateWithoutTimestamp = removeTimeStamp(todayMinusYears)
+    val dateOfBirthWithoutTimestamp = removeTimeStamp(date)
+
+    dateOfBirthWithoutTimestamp.isAfter(todayDateWithoutTimestamp) || dateOfBirthWithoutTimestamp.isEqual(todayDateWithoutTimestamp)
+  }
+
+
 }

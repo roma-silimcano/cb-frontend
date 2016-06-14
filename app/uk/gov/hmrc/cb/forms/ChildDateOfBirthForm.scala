@@ -16,15 +16,13 @@
 
 package uk.gov.hmrc.cb.forms
 
-import java.util.Calendar
-
 import org.joda.time.DateTime
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.data.validation.{Invalid, Valid, Constraint}
 import play.api.i18n.Messages
 import uk.gov.hmrc.cb.config.FrontendAppConfig
-import uk.gov.hmrc.cb.forms.constraints.Constraints
+import uk.gov.hmrc.cb.forms.constraints._
 import uk.gov.hmrc.play.mappers.DateTuple._
 
 /**
@@ -34,31 +32,16 @@ object ChildDateOfBirthForm {
 
   case class ChildDateOfBirthPageModel(dateOfBirth : DateTime)
 
-  private def dateIsNotAFutureDate(date : DateTime) = {
-    val today = DateTime.now()
-    val todayDate = Constraints.dateFormat.parseDateTime(today.toString).toLocalDate
-    !(date.toDate.compareTo(todayDate.toDate) > 0) // date is not after today
-  }
-
-  private def dateOfBirthIsLessThanAgeLimit(date : DateTime) = {
-    val years = FrontendAppConfig.dateOfBirthAgeLimit
-    val calendar = Calendar.getInstance()
-    calendar.add(Calendar.YEAR, -years)
-    val limit = calendar.getTime
-
-    !(date.toDate.compareTo(limit) > 0) // date is not after limit
-  }
-
   private def futureDateConstraint : Constraint[ChildDateOfBirthPageModel] = Constraint("cc.child.date.of.birth.future"){
     model =>
-      if(dateIsNotAFutureDate(model.dateOfBirth)) Valid
+      if(Constraints.dateIsNotAFutureDate(model.dateOfBirth)) Valid
       else Invalid(Messages("cc.child.date.of.birth.future"))
   }
 
-  private def moreThan20YearsConstraint : Constraint[ChildDateOfBirthPageModel] = Constraint("cc.child.date.of.birth.more.than.age.limit"){
+  private def moreThanChildsAgeLimitConstraint : Constraint[ChildDateOfBirthPageModel] = Constraint("cc.child.date.of.birth.more.than.age.limit"){
     model =>
-      if (dateOfBirthIsLessThanAgeLimit(model.dateOfBirth)) Valid
-      else Invalid(Messages("cc.child.date.of.birth.more.than.age.limit"))
+      if (Constraints.dateOfBirthIsEqualToOrAfterChildAgeLimit(model.dateOfBirth)) Valid
+      else Invalid(Messages("cc.child.date.of.birth.more.than.age.limit", FrontendAppConfig.dateOfBirthAgeLimit))
   }
 
   val form : Form[ChildDateOfBirthPageModel] = Form(
@@ -66,7 +49,7 @@ object ChildDateOfBirthForm {
       "dateOfBirth" -> validDateTuple
     )(ChildDateOfBirthPageModel.apply)(ChildDateOfBirthPageModel.unapply)
       .verifying(futureDateConstraint)
-      .verifying(moreThan20YearsConstraint)
+      .verifying(moreThanChildsAgeLimitConstraint)
   )
 
 }
