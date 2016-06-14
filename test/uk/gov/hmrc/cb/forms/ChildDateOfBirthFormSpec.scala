@@ -1,10 +1,11 @@
 package uk.gov.hmrc.cb.forms
 
-import java.time.LocalDate
+import org.joda.time.DateTime
 import java.util.Calendar
 
 import org.joda.time.format.DateTimeFormat
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
@@ -17,14 +18,14 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
   "ChildDateOfBirthForm" should {
 
     "accept a valid date - today" in {
-      val today = LocalDate.now()
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val today = DateTime.now()
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -45,13 +46,13 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       calendar.add(Calendar.YEAR, -20)
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -73,13 +74,13 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       calendar.add(Calendar.DAY_OF_MONTH, -1)
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -100,13 +101,13 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       calendar.add(Calendar.DAY_OF_MONTH, 1)
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -126,12 +127,12 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val month = dateOfBirth.getMonthOfYear
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -151,12 +152,12 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val year = dateOfBirth.getYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -176,12 +177,12 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
       val day = dateOfBirth.getDayOfMonth
       val month = dateOfBirth.getMonthOfYear
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -201,9 +202,9 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -223,9 +224,9 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -245,9 +246,9 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
 
       ChildDateOfBirthForm.form.bind(
         Map(
@@ -267,9 +268,9 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
       val calendar = Calendar.getInstance()
 
       val today = calendar.getTime
-      val dateOfBirth = formatter.parseDateTime(today.toString).toLocalDate
+      val dateOfBirth = formatter.parseDateTime(today.toString).toDateTime
 
-      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = Some(dateOfBirth))
+      val outputModel = ChildDateOfBirthPageModel(dateOfBirth = dateOfBirth)
       val form = ChildDateOfBirthForm.form.fill(outputModel)
       form.get shouldBe outputModel
     }

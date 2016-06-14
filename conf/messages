@@ -13,7 +13,6 @@ cb.common.continue=Continue
 # Common errors
 error.message.title = Sorry
 
-
 #Child Birth Certificate
 cb.child.birth.certificate.title = Please enter the reference number from the birth certificate
 cb.child.birth.certificate.label = Birth Certificate Reference Number
@@ -27,14 +26,17 @@ cb.child.name.title=What is the name of the child you are claiming for?
 cb.child.first.name.label= First Name
 cb.child.last.name.label= Last Name
 
+# Child Date of Birth
+error.enter_a_date = Enter a date of birth
+error.enter_numbers = Enter numbers only
+error.enter_valid_date = Enter a valid date
+cc.child.date.of.birth.more.than.age.limit = Enter a date that is less than {0} years
+cc.child.date.of.birth.future = Enter a date that is not in the future
+
 # Technical difficulties
 
 cb.technical.difficulties.heading = We''re experiencing technical difficulties
 cb.technical.difficulties.text = We''re having difficulties with the child benefit service, please try again in a few minutes.
-
-# Child name page
-cb.error.child.last.name.invalid = Invalid
-cb.error.child.first.name.invalid = Invalid
 
 # Other
 cb.error.update.child.benefit.required=Please indicate yes or no to whether you want to update your Child Benefit
