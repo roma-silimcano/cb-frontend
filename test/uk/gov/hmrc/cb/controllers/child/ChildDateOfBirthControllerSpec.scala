@@ -17,13 +17,14 @@
 package uk.gov.hmrc.cb.controllers.child
 
 import org.joda.time.DateTime
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.data.Form
 import play.api.test.FakeRequest
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.models.Child
@@ -43,6 +44,7 @@ import scala.concurrent.Future
 class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
   val childIndex = 1
+  val childIndex2 = 2
 
   val mockController = new ChildDateOfBirthController {
     override val cacheClient  = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
@@ -121,6 +123,84 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
+      }
+
+    }
+
+    "POST" should {
+
+      "redirect to confirmation when adding a new child to existing children" in {
+        val date = DateTime.now
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val request = postRequest(form, childIndex2)
+
+        val load = List(Child(id = 1, dob = Some(date)))
+        val save = List(Child(id = 1, dob = Some(date)), Child(id = 2, dob = Some(date)))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
+        val result = await(mockController.post(childIndex2).apply(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+      }
+
+      "redirect to confirmation when updating a child" in {
+        val date = DateTime.now
+        val load = List(Child(id = 1, dob = Some(date)))
+        val save = List(Child(id = 1, dob = Some(date.plusDays(2))))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date.plusDays(2)))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+      }
+
+      "redirect to confirmation - No children" in {
+        val date = DateTime.now
+        val children = List(Child(id = 1, dob = Some(date)))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(Some(children)))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+      }
+
+      "respond with BAD_REQUEST when post is unsuccessful" in {
+        val children = List(Child(id = 1))
+        when(mockController.cacheClient.loadChildren()(any(),any())).thenReturn(Future.successful(children))
+        val form = ChildDateOfBirthForm.form.bind(Map(
+          "dateOfBirth.day" ->  s"32",
+          "dateOfBirth.month" -> s"13",
+          "dateOfBirth.year" -> s"20102"
+        ))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe BAD_REQUEST
+      }
+
+      "redirect to technical difficulties when keystore is down when fetching children" in {
+        val date = DateTime.now
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
+      }
+
+      "redirect to technical difficulties when keystore is down when saving" in {
+        val date = DateTime.now
+        val children = List(Child(id = 1, dob = Some(date)))
+        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
+        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
       }
 
     }
