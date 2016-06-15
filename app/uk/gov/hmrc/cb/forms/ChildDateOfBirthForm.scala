@@ -32,24 +32,24 @@ object ChildDateOfBirthForm {
 
   case class ChildDateOfBirthPageModel(dateOfBirth : DateTime)
 
-  private def futureDateConstraint : Constraint[ChildDateOfBirthPageModel] = Constraint("cb.child.date.of.birth.future"){
+  private def futureDateConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.future"){
     model =>
-      if(Constraints.dateIsNotAFutureDate(model.dateOfBirth)) Valid
+      if(Constraints.dateIsNotAFutureDate(model)) Valid
       else Invalid(Messages("cb.child.date.of.birth.future"))
   }
 
-  private def moreThanChildsAgeLimitConstraint : Constraint[ChildDateOfBirthPageModel] = Constraint("cb.child.date.of.birth.more.than.age.limit"){
+  private def moreThanChildsAgeLimitConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.more.than.age.limit"){
     model =>
-      if (Constraints.dateOfBirthIsEqualToOrAfterChildAgeLimit(model.dateOfBirth)) Valid
+      if (Constraints.dateOfBirthIsEqualToOrAfterChildAgeLimit(model)) Valid
       else Invalid(Messages("cb.child.date.of.birth.more.than.age.limit", FrontendAppConfig.dateOfBirthAgeLimit))
   }
 
   val form : Form[ChildDateOfBirthPageModel] = Form(
     mapping(
       "dateOfBirth" -> validDateTuple
+        .verifying(futureDateConstraint)
+        .verifying(moreThanChildsAgeLimitConstraint)
     )(ChildDateOfBirthPageModel.apply)(ChildDateOfBirthPageModel.unapply)
-      .verifying(futureDateConstraint)
-      .verifying(moreThanChildsAgeLimitConstraint)
   )
 
 }
