@@ -51,7 +51,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
     override val authConnector = mock[AuthConnector]
   }
 
-  "ChildBirthCertificateReference" when {
+  "ChildBirthCertificateReferenceController" when {
 
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/children/1/birth-certificate-reference").withSession(CBSessionProvider.generateSessionId())
     def postRequest(form: Form[ChildBirthCertificateReferencePageModel], index : Int) = FakeRequest("POST", s"/child-benefit/children/$index/birth-certificate-reference")
@@ -86,6 +86,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe SEE_OTHER
+        result.header.headers("Location") should include("/technical-difficulties")
       }
 
       "respond 200 when no children in keystore" in {

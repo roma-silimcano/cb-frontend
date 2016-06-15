@@ -17,10 +17,8 @@
 package uk.gov.hmrc.cb.forms
 
 import org.joda.time.DateTime
-import java.util.Calendar
 
 import org.joda.time.format.DateTimeFormat
-import play.api.Logger
 import play.api.i18n.Messages
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
@@ -30,15 +28,6 @@ import uk.gov.hmrc.play.test.UnitSpec
  * Created by adamconder on 13/06/2016.
  */
 class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
-
-  private def calendar() : Calendar = {
-    val cal = Calendar.getInstance()
-    cal.set(Calendar.HOUR_OF_DAY, 0)
-    cal.set(Calendar.MINUTE, 0)
-    cal.set(Calendar.SECOND, 0)
-    cal.set(Calendar.MILLISECOND, 0)
-    cal
-  }
 
   val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
