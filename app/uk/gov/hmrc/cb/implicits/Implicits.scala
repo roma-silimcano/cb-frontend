@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cb.implicits
 
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.models.Child
 
@@ -41,6 +42,14 @@ object Implicits {
     }
   }
 
-  implicit def IntToShort(x: Int) : Short = x.toShort
+  implicit def childToChildDateOfBirthPageModel(child : Child) : ChildDateOfBirthPageModel = {
+    val dateOfBirth = child.dob
+    dateOfBirth match {
+      case Some(x) => ChildDateOfBirthPageModel(x)
+      case _ => throw new RuntimeException("[Implicits] child does not have a date of birth")
+    }
+  }
+
+//  implicit def IntToShort(x: Int) : Short = x.toShort
 
 }

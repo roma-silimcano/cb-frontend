@@ -30,8 +30,9 @@ cb.child.last.name.label= Last Name
 error.enter_a_date = Enter a date of birth
 error.enter_numbers = Enter numbers only
 error.enter_valid_date = Enter a valid date
-cc.child.date.of.birth.more.than.age.limit = Enter a date that is less than {0} years
-cc.child.date.of.birth.future = Enter a date that is not in the future
+cb.child.date.of.birth.more.than.age.limit = Enter a date that is less than {0} years
+cb.child.date.of.birth.future = Enter a date that is not in the future
+cb.child.date.of.birth.title = What is the date of birth of the child you are claiming for?
 
 # Technical difficulties
 

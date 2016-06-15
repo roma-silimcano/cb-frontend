@@ -1,0 +1,19 @@
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.cb.forms
+@import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
+
+@(form: Form[ChildDateOfBirthPageModel], index: Int)(implicit request: Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.child.date.of.birth.title"), heading = Messages("cb.child.date.of.birth.title")){
+
+    @helpers.form(action = uk.gov.hmrc.cb.controllers.child.routes.ChildDateOfBirthController.post(index)){
+
+        @helpers.errorSummary(heading = Messages("error.message.title"), form = form)
+
+        @helpers.dateFieldsFreeInline(formItem = form, fieldName = "dateOfBirth")
+
+        <input id="continue-button" class="button" type="submit" value="@Messages("cb.common.continue")">
+
+    }
+
+}

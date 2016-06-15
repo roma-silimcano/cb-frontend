@@ -79,8 +79,6 @@ object ChildrenManager {
     }
 
     def getChildById(index: Int, children: List[Child]): Option[Child] = {
-      import uk.gov.hmrc.cb.implicits.Implicits._
-
       children.find(c => c.id == index)
     }
 

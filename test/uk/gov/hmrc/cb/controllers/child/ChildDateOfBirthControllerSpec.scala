@@ -1,6 +1,22 @@
+/*
+ * Copyright 2016 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package uk.gov.hmrc.cb.controllers.child
 
-import org.joda.time.{LocalDate, DateTime}
+import org.joda.time.DateTime
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -89,22 +105,22 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "respond 200 when child in keystore" in {
-        val dob = LocalDate.now
+        val dob = DateTime.now
         val children = List(Child(id = 1, dob = Some(dob)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
-        bodyOf(result) should include(dob.getDayOfMonth)
-        bodyOf(result) should include(dob.getMonthOfYear)
-        bodyOf(result) should include(dob.getYear)
+        bodyOf(result) should include(dob.getDayOfMonth.toString)
+        bodyOf(result) should include(dob.getMonthOfYear.toString)
+        bodyOf(result) should include(dob.getYear.toString)
       }
 
       "result 200 when multiple children in keystore" in {
-        val dob = LocalDate.now
+        val dob = DateTime.now
         val children = List(Child(id = 1, dob = Some(dob)), Child(id = 2, dob = Some(dob)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
-        statuts(result) shouldBe OK
+        status(result) shouldBe OK
       }
 
     }

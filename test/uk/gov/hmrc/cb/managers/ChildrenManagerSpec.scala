@@ -18,7 +18,7 @@ package uk.gov.hmrc.cb.managers
 
 import java.util.NoSuchElementException
 
-import org.joda.time.LocalDate
+import org.joda.time.DateTime
 import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.test.UnitSpec
@@ -34,8 +34,8 @@ class ChildrenManagerSpec extends UnitSpec {
     val child3 = Some(Child(3, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
     val child4 = Some(Child(4, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
     val child5 = Some(Child(5, birthCertificateReference = None, firstname = None, surname = None, dob = None, gender = Genders.None, previousClaim = false))
-    val replacementChild1 = Some(Child(2, birthCertificateReference = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false))
-    val replacementChild2 = Some(Child(2, birthCertificateReference = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(LocalDate.now()), gender = Genders.None, previousClaim = false))
+    val replacementChild1 = Some(Child(1, birthCertificateReference = None, firstname = Some("Ricky"), surname = Some("Hatton"), dob = Some(DateTime.now()), gender = Genders.None, previousClaim = false))
+    val replacementChild2 = Some(Child(2, birthCertificateReference = None, firstname = Some("Frank"), surname = Some("Bruno"), dob = Some(DateTime.now()), gender = Genders.None, previousClaim = false))
   }
 
   "ChildrenManager" when {

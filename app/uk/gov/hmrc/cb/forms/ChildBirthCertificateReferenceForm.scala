@@ -35,7 +35,6 @@ object ChildBirthCertificateReferenceForm {
     lazy val minLengthConstraint : Int = FrontendAppConfig.birthCertificateReferenceLengthMinConstraint
 
     try {
-      Some(x.toInt)
       val isValidNumber = x.toInt > 0
       val valid = x.nonEmpty && (x.length <= maxLengthConstraint && x.length >= minLengthConstraint) && isValidNumber
       valid

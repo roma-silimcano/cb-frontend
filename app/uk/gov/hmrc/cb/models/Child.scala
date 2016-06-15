@@ -16,7 +16,7 @@
 
 package uk.gov.hmrc.cb.models
 
-import org.joda.time.LocalDate
+import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json._
 import uk.gov.hmrc.cb.mappings.Genders
 
@@ -26,20 +26,23 @@ import uk.gov.hmrc.cb.mappings.Genders
 
 
 case class Child (
-                 id: Short,
+                 id: Int,
                  birthCertificateReference: Option[String] = None,
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
-                 dob: Option[LocalDate] = None,
+                 dob: Option[DateTime] = None, //TODO refactor
                  gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
                  ) {
 
   def edit(birthCertificateReference: String) = copy(birthCertificateReference = Some(birthCertificateReference))
   def edit(firstName : String, surname: String) =  copy(firstname = Some(firstName), surname = Some(surname))
+  def edit(dateOfBirth : DateTime) =  copy(dob = Some(dateOfBirth))
 
   def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
   def hasName : Boolean = firstname.isDefined && surname.isDefined
+
+  def hasDateOfBirth : Boolean = dob.isDefined
 }
 
 object Child {

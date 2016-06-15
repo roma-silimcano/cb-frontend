@@ -50,7 +50,6 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
-  private def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
   private val form = ChildBirthCertificateReferenceForm.form

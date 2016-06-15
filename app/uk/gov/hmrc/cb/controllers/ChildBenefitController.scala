@@ -31,4 +31,6 @@ trait ChildBenefitController extends FrontendController with Actions {
 
   val authConnector: AuthConnector
 
+  protected def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
+
 }
