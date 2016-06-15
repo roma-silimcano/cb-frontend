@@ -20,7 +20,7 @@ import play.api.Logger
 import play.api.data.Form
 import play.api.mvc.{Result, AnyContent, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.cb.controllers.ChildBenefitController
+import uk.gov.hmrc.cb.controllers.{ChildBenefitChildrenController, ChildBenefitController}
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
@@ -44,17 +44,17 @@ object ChildDateOfBirthController extends ChildDateOfBirthController {
   override val childrenService = ChildrenManager.childrenService
 }
 
-trait ChildDateOfBirthController extends ChildBenefitController {
+trait ChildDateOfBirthController extends ChildBenefitChildrenController {
 
-  val cacheClient : ChildBenefitKeystoreService
-  val childrenService : ChildrenService
+//  val cacheClient : ChildBenefitKeystoreService
+//  val childrenService : ChildrenService
 
   private val form = ChildDateOfBirthForm.form
   private def view(status: Status, form : Form[ChildDateOfBirthPageModel], id : Int)(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childdateofbirth(form, id))
   }
 
-  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def nextController = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
 //  case class KeystoreException(e : String) extends IllegalArgumentException(e)
 
@@ -94,7 +94,10 @@ trait ChildDateOfBirthController extends ChildBenefitController {
           cache =>
             handleChildrenWithCallback(cache, id, model) {
               children =>
-                saveToKeystore(children)
+                saveToKeystore(children){
+                  case Left(_) => nextController
+                  case Right(redirect) => redirect
+                }
             }
         } recover {
           case e: Exception =>
@@ -102,36 +105,6 @@ trait ChildDateOfBirthController extends ChildBenefitController {
             redirectTechnicalDifficulties
         }
       )
-  }
-
-  private def addChild(id : Int, model : ChildDateOfBirthPageModel, children : List[Child]) = {
-    val child = Child(id = id, dob = Some(model.dateOfBirth))
-    childrenService.addChild(id, children, child)
-  }
-
-  private def handleChildrenWithCallback(children : List[Child], id : Int, model : ChildDateOfBirthPageModel)
-                                        (block: List[Child] => Future[Result]) = {
-    val child = childrenService.getChildById(id, children).fold {
-      addChild(id, model, children)
-    }{
-      c =>
-        val modified = c.edit(model.dateOfBirth)
-        childrenService.replaceChild(children, id, modified)
-    }
-
-    block(child)
-  }
-
-  private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.saveChildren(children).map {
-      children =>
-        Logger.debug(s"[ChildDateOfBirthController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ChildDateOfBirthController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
-        redirectTechnicalDifficulties
-    }
   }
 
 }

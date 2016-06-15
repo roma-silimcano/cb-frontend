@@ -30,6 +30,11 @@ import uk.gov.hmrc.play.mappers.DateTuple._
  */
 object ChildDateOfBirthForm {
 
+//  trait ChildPageModel {
+//    val dateOfBirth : DateTime
+//    val name : Option[String] = None
+//  }
+
   case class ChildDateOfBirthPageModel(dateOfBirth : DateTime)
 
   private def futureDateConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.future"){
