@@ -10,7 +10,7 @@
 
     @helpers.form(action = uk.gov.hmrc.cb.controllers.child.routes.ChildDateOfBirthController.post(index)){
 
-        @helpers.errorSummary(heading = Messages("error.message.title"), form = form)
+        @helpers.errorSummary(heading = Messages("cb.child.date.of.birth.invalid.title"), form = form)
 
         <fieldset class="form-group form-date @fieldsetClasses" id="dateOfBirth">
 
