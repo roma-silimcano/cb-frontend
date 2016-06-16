@@ -30,6 +30,8 @@ import scala.concurrent.Future
 
 object CBSessionProvider {
 
+  private val INITIAL_CONTROLLER = uk.gov.hmrc.cb.controllers.child.routes.ChildNameController.get(1)
+
   /**
    * CBSessionProvider is used to generate a session for the users browser
    * so that we can retrieve the data from keystore
@@ -48,7 +50,7 @@ object CBSessionProvider {
 
   def getSessionId()(implicit request : Request[AnyContent]) = request.session.get(SessionKeys.sessionId)
 
-  def onUnauthorized(implicit request : Request[AnyContent]) = Results.Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildNameController.get(1)).withSession(CBSessionProvider.generateSession())
+  def callbackWithSession(implicit request : Request[AnyContent]) = Results.Redirect(INITIAL_CONTROLLER).withSession(generateSession())
 
   def futureRequest(result: Result) = Future.successful(result)
 
@@ -58,16 +60,16 @@ object CBSessionProvider {
    * @return redirect to required page
    */
 
-  def withSession(f: => Request[AnyContent]=> Future[Result]) : Action[AnyContent] = {
+  def withSession(f: => Request[AnyContent] => Future[Result]) : Action[AnyContent] = {
     UnauthorisedAction.async {
       implicit request : Request[AnyContent] =>
         getSessionId match {
           // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
           case Some(NO_SESSION) =>
-            futureRequest(onUnauthorized) // Go to the homepage
+            futureRequest(callbackWithSession) // Continue original request with new session
           // $COVERAGE-ON
           case None =>
-            futureRequest(onUnauthorized) // Go to the homepage
+            futureRequest(callbackWithSession)
           case _ =>
             f(request) // Carry on
         }

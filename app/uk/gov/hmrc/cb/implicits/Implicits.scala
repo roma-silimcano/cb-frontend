@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.cb.implicits
 
+import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.models.Child
 
@@ -26,13 +28,26 @@ object Implicits {
 
   implicit def childToChildNamePageModel(child : Child) : ChildNamePageModel = {
     val (firstName, lastName) = (child.firstname, child.surname)
-
     (firstName, lastName) match {
       case (Some(x), Some(y)) => ChildNamePageModel(firstName = x, lastName = y)
       case (_, _) => throw new RuntimeException("[Implicits] child does not have first and last name")
     }
+  }
 
+  implicit def childToChildBirthCertificatePageModel(child : Child) : ChildBirthCertificateReferencePageModel = {
+    val birthNumber = child.birthCertificateReference
+    birthNumber match {
+      case Some(x) => ChildBirthCertificateReferencePageModel(x)
+      case _ => throw new RuntimeException("[Implicits] child does not have birth certificate number")
+    }
+  }
 
+  implicit def childToChildDateOfBirthPageModel(child : Child) : ChildDateOfBirthPageModel = {
+    val dateOfBirth = child.dob
+    dateOfBirth match {
+      case Some(x) => ChildDateOfBirthPageModel(x)
+      case _ => throw new RuntimeException("[Implicits] child does not have a date of birth")
+    }
   }
 
 }

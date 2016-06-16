@@ -17,7 +17,6 @@
 package uk.gov.hmrc.cb.managers
 
 import play.api.Logger
-import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.cb.models.Child
 
 /**
@@ -30,59 +29,45 @@ object ChildrenManager {
 
   class ChildrenService {
 
-    def createChild(index: Int) = {
-      Child(
-        id = index.toShort,
-        uniqueReferenceNumber = None,
-        firstname = None,
-        surname = None,
-        dob = None,
-        gender = Genders.None,
-        previousClaim = false
-      )
-    }
-
-    def createChildWithName(index: Int, firstName: String, lastName: String) = {
-      Child(
-        id = index.toShort,
-        uniqueReferenceNumber = None,
-        firstname = Some(firstName),
-        surname = Some(lastName),
-        dob = None,
-        gender = Genders.None,
-        previousClaim = false
-      )
-    }
+    private val START_INDEX = 1
+    private val INCREMENT = 1
 
     def createListOfChildren(requiredNumberOfChildren: Int): List[Child] = {
       val children = for (i <- 1 to requiredNumberOfChildren) yield {
         val index = i
-        val child = createChild(index)
-        child
+        Child(id = index.toShort)
       }
       children.toList
     }
 
-    def modifyListOfChildren(requiredNumberOfChildren: Int, children: List[Child]): List[Child] = {
+    def modifyNumberOfChildren(requiredNumberOfChildren: Int, children: List[Child]): List[Child] = {
       val numberOfChildren = children.size
       val difference = requiredNumberOfChildren - numberOfChildren
 
       def modifyListOfChildrenHelper(children: List[Child], remaining: Int): List[Child] = {
-
         val sorted = children.sortBy(x => x.id)
 
         remaining match {
           case x if remaining == 0 =>
+            // children stay the same
             sorted
           case x if remaining > 0 =>
-            val index = sorted.last.id + 1
-            val child = createChild(index)
+            // add children
+            val index = sorted match {
+              case Nil =>
+                START_INDEX
+              case h :: t =>
+                sorted.last.id + INCREMENT
+            }
+
+            val child = Child(id = index.toShort)
             val modified = child :: sorted
-            modifyListOfChildrenHelper(modified, x - 1)
+            modifyListOfChildrenHelper(modified, x - INCREMENT)
           case x if remaining < 0 =>
-            val lastId = sorted.last.id - 1
+            // remove children
+            val lastId = sorted.last.id - INCREMENT
             val modified = sorted.splitAt(lastId)._1
-            modifyListOfChildrenHelper(modified, x + 1)
+            modifyListOfChildrenHelper(modified, x + INCREMENT)
         }
       }
 
@@ -93,17 +78,11 @@ object ChildrenManager {
       }
     }
 
-    def getChildById(index: Int, children: List[Child]): Child = {
-      try {
-        val child = children.filter(c => c.id == index.toShort).head
-        child
-      }
-      catch {
-        case e : Exception => throw e
-      }
+    def getChildById(index: Int, children: List[Child]): Option[Child] = {
+      children.find(c => c.id == index)
     }
 
-    def replaceChildInAList(children: List[Child], index: Int, newChild: Child): List[Child] = {
+    def replaceChild(children: List[Child], index: Int, newChild: Child): List[Child] = {
       children.patch(index-1, Seq(newChild), 1)
     }
 
@@ -111,6 +90,12 @@ object ChildrenManager {
       val result = children.exists(x => x.id == index.toShort)
       Logger.debug(s"[ChildrenManager][childExistsAtIndex] $result $index")
       result
+    }
+
+    def addChild(id : Int, children : List[Child], newChild: Child) = {
+      val amendedList = modifyNumberOfChildren(id, children)
+      val modified = replaceChild(amendedList, id, newChild)
+      modified
     }
 
   }

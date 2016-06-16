@@ -60,7 +60,7 @@ object KeystoreService  {
     def loadChildren()(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
       fetchEntryForSession[List[Child]](childrenKey).map {
         result =>
-          result
+          result.getOrElse(Nil)
       }
     }
 

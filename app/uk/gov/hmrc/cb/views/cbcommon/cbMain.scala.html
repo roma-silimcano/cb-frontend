@@ -11,7 +11,14 @@ mainClass : String = "main")(mainContent: Html)(implicit request:Request[_])
 }
 
 @contentHeader = {
-    <h1 id="page-title">@title</h1>
+
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <h1 id="page-title">@title</h1>
+    </div>
+    <div class="grid-layout__column grid-layout__column--1-3">
+
+    </div>
+
 }
 
 @cbTitle = {

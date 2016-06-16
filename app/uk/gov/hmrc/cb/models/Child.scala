@@ -16,30 +16,35 @@
 
 package uk.gov.hmrc.cb.models
 
-import org.joda.time.LocalDate
-import play.api.libs.json.Json
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import org.joda.time.{DateTime, LocalDate}
+import play.api.libs.json._
 import uk.gov.hmrc.cb.mappings.Genders
 
 /**
   * Created by chrisianson on 26/05/16.
   */
+
+
 case class Child (
-                 id: Short,
-                 uniqueReferenceNumber: Option[Int] = None,
+                 id: Int,
+                 birthCertificateReference: Option[String] = None,
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
-                 dob: Option[LocalDate] = None,
+                 dob: Option[DateTime] = None,
                  gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
                  ) {
 
-  def editFullName(firstName: String, lastName: String) = {
-    this.copy(firstname = Some(firstName), surname = Some(lastName))
-  }
+  def edit(birthCertificateReference: String) = copy(birthCertificateReference = Some(birthCertificateReference))
+  def edit(firstName : String, surname: String) =  copy(firstname = Some(firstName), surname = Some(surname))
+  def edit(dateOfBirth : DateTime) =  copy(dob = Some(dateOfBirth))
 
+  def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
+  def hasName : Boolean = firstname.isDefined && surname.isDefined
+  def hasDateOfBirth : Boolean = dob.isDefined
 }
 
 object Child {
+
   implicit val formats = Json.format[Child]
 }

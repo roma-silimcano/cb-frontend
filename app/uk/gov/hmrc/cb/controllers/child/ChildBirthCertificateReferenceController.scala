@@ -18,55 +18,57 @@ package uk.gov.hmrc.cb.controllers.child
 
 import play.api.Logger
 import play.api.data.Form
-import play.api.mvc.{Result, AnyContent, Request}
+import uk.gov.hmrc.cb.managers.ChildrenManager
+import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
+import uk.gov.hmrc.cb.service.keystore.KeystoreService
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
+import play.api.mvc._
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
-import uk.gov.hmrc.cb.forms.ChildNameForm
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
-import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
+import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
+import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.models.Child
-import uk.gov.hmrc.cb.implicits.Implicits._
-import uk.gov.hmrc.cb.service.keystore.KeystoreService
-import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.http.HeaderCarrier
+
+import uk.gov.hmrc.cb.implicits.Implicits._
 
 import scala.concurrent.Future
 
 /**
- * Created by adamconder on 01/06/2016.
- */
+  * Created by chrisianson on 06/06/16.
+  */
 
-object ChildNameController extends ChildNameController {
+object ChildBirthCertificateReferenceController extends ChildBirthCertificateReferenceController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
 }
 
-trait ChildNameController extends ChildBenefitController {
+trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
-  private val form = ChildNameForm.form
-  private def view(status: Status, form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = {
-    status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
-  }
-
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+
+  private val form = ChildBirthCertificateReferenceForm.form
+  private def view(status : Status, form : Form[ChildBirthCertificateReferencePageModel], id : Int)
+                  (implicit request: Request[AnyContent]) = {
+    status(uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id))
+  }
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
-      cacheClient.loadChildren().map {
+      cacheClient.loadChildren.map {
         children =>
           Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
           val resultWithNoChild = view(Ok, form, id)
           childrenService.getChildById(id, children).fold(resultWithNoChild){
             child =>
-              if(child.hasName) {
+              if (child.hasBirthCertificateReferenceNumber) {
                 Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-                val model : ChildNamePageModel = child
+                val model : ChildBirthCertificateReferencePageModel = child
                 view(Ok, form.fill(model), id)
               } else {
                 resultWithNoChild
@@ -74,8 +76,8 @@ trait ChildNameController extends ChildBenefitController {
           }
       } recover {
         case e: Exception =>
-          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
-          redirectTechnicalDifficulties
+          Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
+         redirectTechnicalDifficulties
       }
   }
 
@@ -83,10 +85,10 @@ trait ChildNameController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
-            Future.successful(
-              view(BadRequest, formWithErrors, id)
-            )},
+          Logger.debug(s"[ChildBirthCertificateReferenceController][bindFromRequest] invalid form submission $formWithErrors")
+          Future.successful(
+            view(BadRequest, formWithErrors, id)
+          )},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -96,25 +98,28 @@ trait ChildNameController extends ChildBenefitController {
               }
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}}")
               redirectTechnicalDifficulties
           }
       )
-    }
-
-  private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
-    val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
-    childrenService.addChild(id, children, child)
   }
 
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)
+  private def addChild(id : Int, model : ChildBirthCertificateReferencePageModel, children : List[Child]) = {
+    val child = Child(id = id, birthCertificateReference = Some(model.birthCertificateReference))
+    val modified = childrenService.addChild(id, children, child)
+    modified
+  }
+
+  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
                                         (block: List[Child] => Future[Result]) = {
-    val child = childrenService.getChildById(id, children).fold {
-      addChild(id, model, children)
-    }{
+      val child : List[Child] = childrenService.getChildById(id, children).fold {
+        val result = addChild(id, model, children)
+        result
+      }{
         c =>
-          val modified = c.edit(model.firstName, model.lastName)
-          childrenService.replaceChild(children, id, modified)
+          val modified = c.edit(birthCertificateReference = model.birthCertificateReference)
+          val result = childrenService.replaceChild(children, id, modified)
+          result
       }
 
     block(child)
@@ -123,13 +128,12 @@ trait ChildNameController extends ChildBenefitController {
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     cacheClient.saveChildren(children).map {
       children =>
-        Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
+        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }
-
 }
