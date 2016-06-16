@@ -30,7 +30,7 @@ case class Child (
                  birthCertificateReference: Option[String] = None,
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
-                 dob: Option[DateTime] = None, //TODO refactor
+                 dob: Option[DateTime] = None,
                  gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
                  ) {
@@ -41,7 +41,6 @@ case class Child (
 
   def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
   def hasName : Boolean = firstname.isDefined && surname.isDefined
-
   def hasDateOfBirth : Boolean = dob.isDefined
 }
 

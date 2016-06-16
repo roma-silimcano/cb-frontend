@@ -17,15 +17,19 @@
 package uk.gov.hmrc.cb.controllers.child
 
 import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.Logger
 import play.api.data.Form
 import play.api.test.FakeRequest
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
+import uk.gov.hmrc.cb.forms.constraints.Constraints
+import uk.gov.hmrc.cb.helpers.DateHelpers
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
@@ -107,7 +111,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "respond 200 when child in keystore" in {
-        val dob = DateTime.now
+        val dob = DateHelpers.dateWithoutTimeZone(DateTime.now)
         val children = List(Child(id = 1, dob = Some(dob)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
@@ -118,7 +122,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "result 200 when multiple children in keystore" in {
-        val dob = DateTime.now
+        val dob = DateHelpers.dateWithoutTimeZone(DateTime.now)
         val children = List(Child(id = 1, dob = Some(dob)), Child(id = 2, dob = Some(dob)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         val result = await(mockController.get(childIndex)(getRequest))
@@ -130,7 +134,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
     "POST" should {
 
       "redirect to confirmation when adding a new child to existing children" in {
-        val date = DateTime.now
+        val date = DateTime.parse("2010-08-27", Constraints.dateFormatWithoutTimestamp)
         val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
         val request = postRequest(form, childIndex2)
 
@@ -144,12 +148,18 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "redirect to confirmation when updating a child" in {
-        val date = DateTime.now
+        val date = DateHelpers.dateWithoutTimeZone(DateTime.now)
+        val amendedDate = date.minusDays(2)
+
         val load = List(Child(id = 1, dob = Some(date)))
-        val save = List(Child(id = 1, dob = Some(date.plusDays(2))))
+        val save = List(Child(id = 1, dob = Some(amendedDate)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
-        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date.plusDays(2)))
+        val form = ChildDateOfBirthForm.form.bind(Map(
+                  "dateOfBirth.day" ->  s"${amendedDate.getDayOfMonth}",
+                  "dateOfBirth.month" -> s"${amendedDate.getMonthOfYear}",
+                  "dateOfBirth.year" -> s"${amendedDate.getYear}"
+                ))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
@@ -157,7 +167,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "redirect to confirmation - No children" in {
-        val date = DateTime.now
+        val date = DateTime.parse("2010-08-27", Constraints.dateFormatWithoutTimestamp)
         val children = List(Child(id = 1, dob = Some(date)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
         when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(Some(children)))
@@ -182,9 +192,9 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "redirect to technical difficulties when keystore is down when fetching children" in {
-        val date = DateTime.now
+        val dob = DateHelpers.dateWithoutTimeZone(DateTime.now)
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
-        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(dob))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
@@ -192,7 +202,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       }
 
       "redirect to technical difficulties when keystore is down when saving" in {
-        val date = DateTime.now
+        val date = DateTime.parse("2010-08-27", Constraints.dateFormatWithoutTimestamp)
         val children = List(Child(id = 1, dob = Some(date)))
         when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
         when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.failed(new RuntimeException))

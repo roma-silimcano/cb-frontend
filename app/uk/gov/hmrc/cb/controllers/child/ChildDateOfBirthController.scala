@@ -98,7 +98,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
             }
         } recover {
           case e: Exception =>
-            Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.getMessage}")
+            Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.printStackTrace()}")
             redirectTechnicalDifficulties
         }
       )
@@ -115,21 +115,26 @@ trait ChildDateOfBirthController extends ChildBenefitController {
       addChild(id, model, children)
     }{
       c =>
+        Logger.debug(s"modifying child $c at index $id for model $model")
         val modified = c.edit(model.dateOfBirth)
-        childrenService.replaceChild(children, id, modified)
+        Logger.debug(s"modified child : $modified")
+        val replaced = childrenService.replaceChild(children, id, modified)
+        Logger.debug(s"replaced: $replaced")
+        replaced
     }
 
     block(child)
   }
 
   private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    Logger.debug(s"saveToKeystore: saving children $children")
     cacheClient.saveChildren(children).map {
       children =>
         Logger.debug(s"[ChildDateOfBirthController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildDateOfBirthController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.error(s"[ChildDateOfBirthController][saveToKeystore] keystore exception whilst saving children: $e ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }
