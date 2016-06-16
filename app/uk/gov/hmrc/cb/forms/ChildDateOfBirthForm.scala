@@ -41,7 +41,7 @@ object ChildDateOfBirthForm {
   private def moreThanChildsAgeLimitConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.more.than.age.limit"){
     model =>
       if (Constraints.dateOfBirthIsEqualToOrAfterChildAgeLimit(model)) Valid
-      else Invalid(Messages("cb.child.date.of.birth.more.than.age.limit", FrontendAppConfig.dateOfBirthAgeLimit))
+      else Invalid(Messages("cb.child.date.of.birth.more.than.age.limit"))
   }
 
   val form : Form[ChildDateOfBirthPageModel] = Form(

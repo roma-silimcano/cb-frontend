@@ -52,7 +52,7 @@ class ChildBirthCertificateReferenceFormSpec extends UnitSpec with WithFakeAppli
         )
       ).fold(
         hasErrors =>
-          hasErrors.errors.head.message shouldBe Messages("cb.error.child.birth-certificate-reference.invalid"),
+          hasErrors.errors.head.message shouldBe "Please check your Child Benefit reference number and re-enter it",
         success => {
           success should not be Some(ChildBirthCertificateReferencePageModel(_))
           success shouldBe None
@@ -67,7 +67,7 @@ class ChildBirthCertificateReferenceFormSpec extends UnitSpec with WithFakeAppli
         )
       ).fold(
         hasErrors =>
-          hasErrors.errors.head.message shouldBe Messages("cb.error.child.birth-certificate-reference.invalid"),
+          hasErrors.errors.head.message shouldBe "Please check your Child Benefit reference number and re-enter it",
         success => {
           success should not be Some(ChildBirthCertificateReferencePageModel(_))
           success shouldBe None
@@ -82,7 +82,7 @@ class ChildBirthCertificateReferenceFormSpec extends UnitSpec with WithFakeAppli
         )
       ).fold(
         hasErrors =>
-          hasErrors.errors.head.message shouldBe Messages("cb.error.child.birth-certificate-reference.invalid"),
+          hasErrors.errors.head.message shouldBe "Please check your Child Benefit reference number and re-enter it",
         success => {
           success should not be Some(ChildBirthCertificateReferencePageModel(_))
           success shouldBe None
@@ -97,7 +97,7 @@ class ChildBirthCertificateReferenceFormSpec extends UnitSpec with WithFakeAppli
         )
       ).fold(
         hasErrors =>
-          hasErrors.errors.head.message shouldBe Messages("cb.error.child.birth-certificate-reference.invalid"),
+          hasErrors.errors.head.message shouldBe "Please check your Child Benefit reference number and re-enter it",
         success => {
           success should not be Some(ChildBirthCertificateReferencePageModel(_))
           success shouldBe None

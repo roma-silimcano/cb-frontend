@@ -98,7 +98,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
             }
         } recover {
           case e: Exception =>
-            Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.printStackTrace()}")
+            Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.getMessage}")
             redirectTechnicalDifficulties
         }
       )
