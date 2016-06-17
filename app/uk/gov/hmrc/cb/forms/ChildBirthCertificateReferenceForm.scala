@@ -24,26 +24,28 @@ import uk.gov.hmrc.cb.config.FrontendAppConfig
 import uk.gov.hmrc.cb.forms.constraints.Constraints
 
 /**
- * Created by adamconder on 27/05/2016.
- */
-object ChildNameForm {
+  * Created by chrisianson on 06/06/16.
+  */
+object ChildBirthCertificateReferenceForm {
 
-  case class ChildNamePageModel(firstName : String, lastName : String)
+  case class ChildBirthCertificateReferencePageModel(birthCertificateReference : String)
 
   private def validate(x : String) : Boolean = {
-    lazy val lengthConstraint : Int = FrontendAppConfig.childLengthMaxConstraint
-    val valid = x.nonEmpty && x.length <= lengthConstraint && x.matches(Constraints.nameConstraint)
-    if (!valid) {
-      Logger.info(s"[ChildNameForm][Validate] invalid name specified: $x")
+    lazy val maxLengthConstraint : Int = FrontendAppConfig.birthCertificateReferenceLengthMaxConstraint
+    lazy val minLengthConstraint : Int = FrontendAppConfig.birthCertificateReferenceLengthMinConstraint
+
+    try {
+      val isValidNumber = x.toInt > 0
+      val valid = x.nonEmpty && (x.length <= maxLengthConstraint && x.length >= minLengthConstraint) && isValidNumber
+      valid
+    } catch {
+      case e: Exception => false
     }
-    valid
   }
 
-  val form : Form[ChildNamePageModel] = Form(
+  val form : Form[ChildBirthCertificateReferencePageModel] = Form(
     mapping(
-      "firstName" -> text.verifying(Messages("cb.child.name.invalid"), validate _),
-      "lastName" -> text.verifying(Messages("cb.child.name.invalid"), validate _)
-    )(ChildNamePageModel.apply)(ChildNamePageModel.unapply)
+      "birthCertificateReference" -> text.verifying(Messages("cb.child.birth.certificate.invalid"), validate _)
+    )(ChildBirthCertificateReferencePageModel.apply)(ChildBirthCertificateReferencePageModel.unapply)
   )
-
 }

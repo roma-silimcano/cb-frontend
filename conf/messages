@@ -3,27 +3,47 @@ cb.application.service.name = Child Benefit digital service
 cb.application.name = Child Benefit
 cb.application.title = Child Benefit
 
+
+# Common
 cb.common.no=No
 cb.common.yes=Yes
 cb.common.continue=Continue
 
-cb.error.update.child.benefit.required=Please indicate yes or no to whether you want to update your Child Benefit
+
+# Common errors
+error.message.title = Sorry
+
+#Child Birth Certificate
+cb.child.birth.certificate.title = Please enter the reference number from the birth certificate
+cb.child.birth.certificate.label = Birth Certificate Reference Number
+cb.child.birth.certificate.invalid = Please check your Child Benefit reference number and re-enter it
+cb.child.birth.certificate.invalid.title = There is a problem with the number you''ve entered
+
+# Child name page
+cb.child.name.title=What is the name of the child you are claiming for?
+cb.child.first.name.label= First Name
+cb.child.last.name.label= Last Name
+cb.child.name.invalid = Please re-enter the child''s name
+cb.child.name.invalid.title = There is a problem with the name you''ve entered
+
+# Child Date of Birth
+error.enter_a_date = Please enter the child’s date of birth
+error.enter_numbers = The child''s date of birth must only contain numbers, please re-enter the child''s date of birth
+error.enter_valid_date = You''ve told us a date that does not exist, please re-enter the child''s date of birth
+cb.child.date.of.birth.more.than.age.limit = You''ve told us a date that is too far in the past, please re-enter the child''s date of birth
+cb.child.date.of.birth.future = You''ve entered a date in the future, please re-enter the child''s date of birth
+cb.child.date.of.birth.title = What is the date of birth of the child you are claiming for?
+cb.child.date.of.birth.invalid.title = There is a problem with the child''s date of birth
+
+# Technical difficulties
 
 cb.technical.difficulties.heading = We''re experiencing technical difficulties
 cb.technical.difficulties.text = We''re having difficulties with the child benefit service, please try again in a few minutes.
+
+# Other
+cb.error.update.child.benefit.required=Please indicate yes or no to whether you want to update your Child Benefit
 
 cb.confirmation.title = Thank you {0} for updating your Child Benefit
 cb.confirmation.lede = Thank you {0} for updating your Child Benefit. Your reference number is {1}.
 
 cb.update.child.benefit=Do you want to update your child benefit?
-
-cb.child.name.title=What is the name of the child you are claiming for?
-cb.child.first.name.label= First Name
-cb.child.last.name.label= Last Name
-
-
-error.message.title = Sorry
-
-# Child name page
-cb.error.child.last.name.invalid = Invalid
-cb.error.child.first.name.invalid = Invalid

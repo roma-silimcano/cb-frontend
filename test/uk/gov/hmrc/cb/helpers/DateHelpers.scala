@@ -14,23 +14,22 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.controllers
+package uk.gov.hmrc.cb.helpers
 
-import play.api.mvc.Action
-import uk.gov.hmrc.play.frontend.auth.Actions
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import uk.gov.hmrc.play.frontend.controller.FrontendController
-
-import scala.concurrent.Future
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
 
 /**
- * Created by andrew on 03/05/16.
+ * Created by adamconder on 16/06/2016.
  */
+object DateHelpers {
 
-trait ChildBenefitController extends FrontendController with Actions {
+  val formatter = DateTimeFormat.forPattern("yyyy-MM-dd")
 
-  val authConnector: AuthConnector
+  def dateWithoutTimeZone(date : DateTime) = {
+    val withoutTimezone = formatter.print(date)
+    DateTime.parse(withoutTimezone, formatter)
+  }
 
-  protected def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
 
 }

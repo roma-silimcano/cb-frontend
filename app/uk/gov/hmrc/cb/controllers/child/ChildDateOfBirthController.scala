@@ -22,59 +22,58 @@ import play.api.mvc.{Result, AnyContent, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
-import uk.gov.hmrc.cb.forms.ChildNameForm
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.models.Child
-import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
+
+import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
 /**
- * Created by adamconder on 01/06/2016.
+ * Created by adamconder on 15/06/2016.
  */
-
-object ChildNameController extends ChildNameController {
+object ChildDateOfBirthController extends ChildDateOfBirthController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
 }
 
-trait ChildNameController extends ChildBenefitController {
+trait ChildDateOfBirthController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
-  private val form = ChildNameForm.form
-  private def view(status: Status, form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = {
-    status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
+  private val form = ChildDateOfBirthForm.form
+  private def view(status: Status, form : Form[ChildDateOfBirthPageModel], id : Int)(implicit request: Request[AnyContent]) = {
+    status(uk.gov.hmrc.cb.views.html.child.childdateofbirth(form, id))
   }
 
-  private def redirectConfirmation(id : Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildDateOfBirthController.get(id))
+  private def redirectConfirmation(id : Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildBirthCertificateReferenceController.get(id))
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
       cacheClient.loadChildren().map {
         children =>
-          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
+          Logger.debug(s"[ChildDateOfBirthController][get] loaded children $children")
           val resultWithNoChild = view(Ok, form, id)
           childrenService.getChildById(id, children).fold(resultWithNoChild){
             child =>
-              if(child.hasName) {
-                Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-                val model : ChildNamePageModel = child
+              if (child.hasDateOfBirth) {
+                val model : ChildDateOfBirthPageModel = child
                 view(Ok, form.fill(model), id)
               } else {
                 resultWithNoChild
               }
           }
       } recover {
-        case e: Exception =>
-          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
+        case e : Exception =>
+          Logger.error(s"[ChildDateOfBirthController][get] keystore exception whilst loading children ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -83,51 +82,57 @@ trait ChildNameController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
+          Logger.info(s"s[ChildDateOfBirthController][post] invalid form submission $formWithErrors")
             Future.successful(
               view(BadRequest, formWithErrors, id)
-            )},
-        model =>
-          cacheClient.loadChildren() flatMap {
-            cache =>
-              handleChildrenWithCallback(cache, id, model) {
-                children =>
-                  saveToKeystore(children, id)
-              }
-          } recover {
-            case e : Exception =>
-              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
-              redirectTechnicalDifficulties
-          }
+            )
+        },
+      model =>
+        cacheClient.loadChildren() flatMap {
+          cache =>
+            handleChildrenWithCallback(cache, id, model) {
+              children =>
+                saveToKeystore(children, id)
+            }
+        } recover {
+          case e: Exception =>
+            Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.getMessage}")
+            redirectTechnicalDifficulties
+        }
       )
-    }
+  }
 
-  private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
-    val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
+  private def addChild(id : Int, model : ChildDateOfBirthPageModel, children : List[Child]) = {
+    val child = Child(id = id, dob = Some(model.dateOfBirth))
     childrenService.addChild(id, children, child)
   }
 
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)
+  private def handleChildrenWithCallback(children : List[Child], id : Int, model : ChildDateOfBirthPageModel)
                                         (block: List[Child] => Future[Result]) = {
     val child = childrenService.getChildById(id, children).fold {
       addChild(id, model, children)
     }{
-        c =>
-          val modified = c.edit(model.firstName, model.lastName)
-          childrenService.replaceChild(children, id, modified)
-      }
+      c =>
+        Logger.debug(s"modifying child $c at index $id for model $model")
+        val modified = c.edit(model.dateOfBirth)
+        Logger.debug(s"modified child : $modified")
+        val replaced = childrenService.replaceChild(children, id, modified)
+        Logger.debug(s"replaced: $replaced")
+        replaced
+    }
 
     block(child)
   }
 
-  private def saveToKeystore(children : List[Child], id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+  private def saveToKeystore(children : List[Child], id : Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    Logger.debug(s"saveToKeystore: saving children $children")
     cacheClient.saveChildren(children).map {
       children =>
-        Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
+        Logger.debug(s"[ChildDateOfBirthController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation(id)
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.error(s"[ChildDateOfBirthController][saveToKeystore] keystore exception whilst saving children: $e ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }
