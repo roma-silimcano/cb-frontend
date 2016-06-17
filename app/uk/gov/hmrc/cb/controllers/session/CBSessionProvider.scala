@@ -30,7 +30,7 @@ import scala.concurrent.Future
 
 object CBSessionProvider {
 
-  private val INITIAL_CONTROLLER = uk.gov.hmrc.cb.controllers.child.routes.ChildNameController.get(1)
+  private val INITIAL_CONTROLLER = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.get()
 
   /**
    * CBSessionProvider is used to generate a session for the users browser
