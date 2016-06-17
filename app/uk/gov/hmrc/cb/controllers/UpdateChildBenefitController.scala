@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.controllers
 
 import play.api.mvc._
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.UpdateChildBenefitForm
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -32,13 +33,13 @@ object UpdateChildBenefitController extends UpdateChildBenefitController {
 
 trait UpdateChildBenefitController extends ChildBenefitController {
 
-  def get = Action.async {
+  def get = CBSessionProvider.withSession {
     implicit request =>
       val childBenefitForm = UpdateChildBenefitForm
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.update_child_benefit(childBenefitForm.form)))
   }
 
-  def post = Action.async {
+  def post = CBSessionProvider.withSession {
     implicit request =>
       UpdateChildBenefitForm.form.bindFromRequest().fold(
         formWithErrors => {
@@ -47,7 +48,7 @@ trait UpdateChildBenefitController extends ChildBenefitController {
         success => {
           val update = success.updateChildBenefit.get
           if (update) {
-            Future.successful(Redirect(routes.SubmissionConfirmationController.get()))
+            Future.successful(Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildNameController.get(1)))
           } else {
             Future.successful(Redirect(routes.TechnicalDifficultiesController.get()))
           }

@@ -54,7 +54,7 @@ trait ChildNameController extends ChildBenefitController {
     status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
   }
 
-  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def redirectConfirmation(id : Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildDateOfBirthController.get(id))
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
@@ -92,7 +92,7 @@ trait ChildNameController extends ChildBenefitController {
             cache =>
               handleChildrenWithCallback(cache, id, model) {
                 children =>
-                  saveToKeystore(children)
+                  saveToKeystore(children, id)
               }
           } recover {
             case e : Exception =>
@@ -120,11 +120,11 @@ trait ChildNameController extends ChildBenefitController {
     block(child)
   }
 
-  private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+  private def saveToKeystore(children : List[Child], id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     cacheClient.saveChildren(children).map {
       children =>
         Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation
+        redirectConfirmation(id)
     } recover {
       case e : Exception =>
         Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")

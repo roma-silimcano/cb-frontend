@@ -54,9 +54,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
     status(uk.gov.hmrc.cb.views.html.child.childdateofbirth(form, id))
   }
 
-  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
-
-//  case class KeystoreException(e : String) extends IllegalArgumentException(e)
+  private def redirectConfirmation(id : Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildBirthCertificateReferenceController.get(id))
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
@@ -94,7 +92,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
           cache =>
             handleChildrenWithCallback(cache, id, model) {
               children =>
-                saveToKeystore(children)
+                saveToKeystore(children, id)
             }
         } recover {
           case e: Exception =>
@@ -126,12 +124,12 @@ trait ChildDateOfBirthController extends ChildBenefitController {
     block(child)
   }
 
-  private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+  private def saveToKeystore(children : List[Child], id : Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
     Logger.debug(s"saveToKeystore: saving children $children")
     cacheClient.saveChildren(children).map {
       children =>
         Logger.debug(s"[ChildDateOfBirthController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation
+        redirectConfirmation(id)
     } recover {
       case e : Exception =>
         Logger.error(s"[ChildDateOfBirthController][saveToKeystore] keystore exception whilst saving children: $e ${e.getMessage}")

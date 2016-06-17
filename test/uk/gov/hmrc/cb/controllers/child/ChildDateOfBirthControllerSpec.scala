@@ -144,7 +144,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        redirectLocation(result).get shouldBe "/child-benefit/children/2/birth-certificate-reference"
       }
 
       "redirect to confirmation when updating a child" in {
@@ -163,7 +163,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        redirectLocation(result).get shouldBe "/child-benefit/children/1/birth-certificate-reference"
       }
 
       "redirect to confirmation - No children" in {
@@ -175,7 +175,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        redirectLocation(result).get shouldBe "/child-benefit/children/1/birth-certificate-reference"
       }
 
       "respond with BAD_REQUEST when post is unsuccessful" in {
