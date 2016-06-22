@@ -271,7 +271,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
          hasErrors =>
-           hasErrors.errors.head.message shouldBe Messages("cb.error.child.last.name.invalid"),
+           hasErrors.errors.head.message shouldBe "Please re-enter the child's name",
           success => {
             success should not be Some(ChildNamePageModel(_, _))
             success shouldBe None
@@ -287,7 +287,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
             hasErrors =>
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid"),
+              hasErrors.errors.head.message shouldBe "Please re-enter the child's name",
             success => {
               success should not be Some(ChildNamePageModel(_, _))
               success shouldBe None
@@ -303,8 +303,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
             hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-              hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+              hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
+              hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
             },
             success => {
               success should not be Some(ChildNamePageModel(_, _))
@@ -323,7 +323,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
             hasErrors => {
-              hasErrors.errors.head.message shouldBe Messages("cb.error.child.last.name.invalid")
+              hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
             },
             success => {
               success should not be Some(ChildNamePageModel(_, _))
@@ -340,7 +340,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -357,8 +357,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
+            hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -378,7 +378,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -395,7 +395,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
           hasErrors => {
-            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+            hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -413,8 +413,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
+            hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -432,7 +432,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
           "lastName" -> "conder"
         )).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -448,7 +448,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
           "lastName" -> {maxLength + "s"}
         )).fold(
           hasErrors => {
-            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+            hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))
@@ -464,8 +464,8 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
           "lastName" -> {maxLength + "s"}
         )).fold(
           hasErrors => {
-            hasErrors.errors.head.message shouldBe Messages("cb.error.child.first.name.invalid")
-            hasErrors.errors.last.message shouldBe Messages("cb.error.child.last.name.invalid")
+            hasErrors.errors.head.message shouldBe "Please re-enter the child's name"
+            hasErrors.errors.last.message shouldBe "Please re-enter the child's name"
           },
           success => {
             success should not be Some(ChildNamePageModel(_, _))

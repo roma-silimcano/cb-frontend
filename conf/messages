@@ -16,23 +16,24 @@ error.message.title = Sorry
 #Child Birth Certificate
 cb.child.birth.certificate.title = Please enter the reference number from the birth certificate
 cb.child.birth.certificate.label = Birth Certificate Reference Number
-cb.error.child.birth-certificate-reference.invalid = Invalid
+cb.child.birth.certificate.invalid = Please check your Child Benefit reference number and re-enter it
+cb.child.birth.certificate.invalid.title = There is a problem with the number you''ve entered
 
 # Child name page
-cb.error.child.last.name.invalid = Invalid
-cb.error.child.first.name.invalid = Invalid
-
 cb.child.name.title=What is the name of the child you are claiming for?
 cb.child.first.name.label= First Name
 cb.child.last.name.label= Last Name
+cb.child.name.invalid = Please re-enter the child''s name
+cb.child.name.invalid.title = There is a problem with the name you''ve entered
 
 # Child Date of Birth
-error.enter_a_date = Enter a date of birth
-error.enter_numbers = Enter numbers only
-error.enter_valid_date = Enter a valid date
-cb.child.date.of.birth.more.than.age.limit = Enter a date that is less than {0} years
-cb.child.date.of.birth.future = Enter a date that is not in the future
+error.enter_a_date = Please enter the child’s date of birth
+error.enter_numbers = The child''s date of birth must only contain numbers, please re-enter the child''s date of birth
+error.enter_valid_date = You''ve told us a date that does not exist, please re-enter the child''s date of birth
+cb.child.date.of.birth.more.than.age.limit = You''ve told us a date that is too far in the past, please re-enter the child''s date of birth
+cb.child.date.of.birth.future = You''ve entered a date in the future, please re-enter the child''s date of birth
 cb.child.date.of.birth.title = What is the date of birth of the child you are claiming for?
+cb.child.date.of.birth.invalid.title = There is a problem with the child''s date of birth
 
 # Technical difficulties
 

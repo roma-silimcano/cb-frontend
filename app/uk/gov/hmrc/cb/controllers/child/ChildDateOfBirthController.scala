@@ -46,17 +46,12 @@ object ChildDateOfBirthController extends ChildDateOfBirthController {
 
 trait ChildDateOfBirthController extends ChildBenefitChildrenController {
 
-//  val cacheClient : ChildBenefitKeystoreService
-//  val childrenService : ChildrenService
-
   private val form = ChildDateOfBirthForm.form
   private def view(status: Status, form : Form[ChildDateOfBirthPageModel], id : Int)(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childdateofbirth(form, id))
   }
 
-  private def nextController = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
-
-//  case class KeystoreException(e : String) extends IllegalArgumentException(e)
+  private def nextController(id: Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildBirthCertificateReferenceController.get(id))
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
@@ -92,13 +87,23 @@ trait ChildDateOfBirthController extends ChildBenefitChildrenController {
       model =>
         cacheClient.loadChildren() flatMap {
           cache =>
-            handleChildrenWithCallback(cache, id, model) {
-              children =>
-                saveToKeystore(children){
-                  case Left(_) => nextController
-                  case Right(redirect) => redirect
+            childrenService.getChildById(id, cache).fold {
+              addChildWithCallback(cache, model.dateOfBirth, id, childrenService.create) {
+                c =>
+                  saveToKeystore(c){
+                    case Left(_) => nextController(id)
+                    case Right(exception) => exception
+                  }
+              }
+            }{
+              edit =>
+                editChildWithCallback(edit, model.dateOfBirth, childrenService.edit) {
+                  c =>
+                    // TODO CHANGE THIS
+                    Future.successful(redirectTechnicalDifficulties)
                 }
             }
+
         } recover {
           case e: Exception =>
             Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children ${e.getMessage}")

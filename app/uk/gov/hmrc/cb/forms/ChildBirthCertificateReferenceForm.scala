@@ -45,7 +45,7 @@ object ChildBirthCertificateReferenceForm {
 
   val form : Form[ChildBirthCertificateReferencePageModel] = Form(
     mapping(
-      "birthCertificateReference" -> text.verifying(Messages("cb.error.child.birth-certificate-reference.invalid"), validate _)
+      "birthCertificateReference" -> text.verifying(Messages("cb.child.birth.certificate.invalid"), validate _)
     )(ChildBirthCertificateReferencePageModel.apply)(ChildBirthCertificateReferencePageModel.unapply)
   )
 }

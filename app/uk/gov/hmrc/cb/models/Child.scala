@@ -19,6 +19,7 @@ package uk.gov.hmrc.cb.models
 import org.joda.time.{DateTime, LocalDate}
 import play.api.libs.json._
 import uk.gov.hmrc.cb.mappings.Genders
+import uk.gov.hmrc.cb.models.Child.{DateOfBirth, Name, BirthCertificate}
 
 /**
   * Created by chrisianson on 26/05/16.
@@ -30,22 +31,34 @@ case class Child (
                  birthCertificateReference: Option[String] = None,
                  firstname: Option[String] = None,
                  surname: Option[String] = None,
-                 dob: Option[DateTime] = None, //TODO refactor
+                 dob: Option[DateTime] = None,
                  gender: Genders.Gender = Genders.None,
                  previousClaim: Boolean = false
                  ) {
 
-  def edit(birthCertificateReference: String) = copy(birthCertificateReference = Some(birthCertificateReference))
-  def edit(firstName : String, surname: String) =  copy(firstname = Some(firstName), surname = Some(surname))
-  def edit(dateOfBirth : DateTime) =  copy(dob = Some(dateOfBirth))
+//  def edit(birthCertificateReference: String) = copy(birthCertificateReference = Some(birthCertificateReference))
+//  def edit(firstName : String, surname: String) = copy(firstname = Some(firstName), surname = Some(surname))
+//  def edit(dateOfBirth : DateTime) = copy(dob = Some(dateOfBirth))
+
+  def edit[T](value : T) = value match {
+    case e : DateOfBirth =>
+      copy(dob = Some(e))
+    case e : Name =>
+      copy(firstname = Some(e._1), surname = Some(e._2))
+    case e : BirthCertificate =>
+      copy(birthCertificateReference = Some(e))
+  }
 
   def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
   def hasName : Boolean = firstname.isDefined && surname.isDefined
-
   def hasDateOfBirth : Boolean = dob.isDefined
 }
 
 object Child {
+
+  type DateOfBirth = DateTime
+  type Name = (String, String)
+  type BirthCertificate = String
 
   implicit val formats = Json.format[Child]
 }

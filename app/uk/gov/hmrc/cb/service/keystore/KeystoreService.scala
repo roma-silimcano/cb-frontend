@@ -65,7 +65,6 @@ object KeystoreService  {
     }
 
     def saveChildren(children : List[Child])(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
-      Logger.debug(s"[KeystoreService][saveChildren] $children")
       cacheEntryForSession[List[Child]](children, childrenKey).map {
         result =>
           result

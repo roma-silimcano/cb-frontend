@@ -16,8 +16,10 @@
 
 package uk.gov.hmrc.cb.managers
 
+import org.joda.time.DateTime
 import play.api.Logger
 import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.Child.{BirthCertificate, Name}
 
 /**
   * Created by chrisianson on 26/05/16.
@@ -97,6 +99,19 @@ object ChildrenManager {
       val modified = replaceChild(amendedList, id, newChild)
       modified
     }
+
+    def create[T](id : Int, value : T) : Child = value match {
+      case e : DateTime =>
+        Child(id = id, dob = Some(e))
+      case e : Name =>
+        Child(id = id, firstname = Some(e._1), surname = Some(e._2))
+      case e : BirthCertificate =>
+        Child(id = id, birthCertificateReference = Some(e))
+      case _ =>
+        throw new IllegalArgumentException("I cannot crate a child with that type")
+    }
+
+    def edit[T](child : Child, change : T) = child.edit(change)
 
   }
 }

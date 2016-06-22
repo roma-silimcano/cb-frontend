@@ -107,7 +107,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Enter a date that is less than 20 years",
+            errors.errors.head.message shouldBe "You've told us a date that is too far in the past, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -131,7 +131,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            errors.errors.head.message shouldBe "Enter a date that is not in the future",
+            errors.errors.head.message shouldBe "You've entered a date in the future, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -153,7 +153,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter a valid date",
+            Messages(errors.errors.head.message) shouldBe "You've told us a date that does not exist, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -175,7 +175,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter a valid date",
+            Messages(errors.errors.head.message) shouldBe "You've told us a date that does not exist, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -197,7 +197,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter a date that is not in the future",
+            Messages(errors.errors.head.message) shouldBe "You've entered a date in the future, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -216,7 +216,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter numbers only",
+            Messages(errors.errors.head.message) shouldBe "The child's date of birth must only contain numbers, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -235,7 +235,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter numbers only",
+            Messages(errors.errors.head.message) shouldBe "The child's date of birth must only contain numbers, please re-enter the child's date of birth",
           success =>
             success should not be outputModel
         )
@@ -254,7 +254,7 @@ class ChildDateOfBirthFormSpec extends UnitSpec with CBFakeApplication {
         )
       ).fold(
           errors =>
-            Messages(errors.errors.head.message) shouldBe "Enter a date of birth",
+            Messages(errors.errors.head.message) shouldBe "Please enter the child’s date of birth",
           success =>
             success should not be outputModel
         )

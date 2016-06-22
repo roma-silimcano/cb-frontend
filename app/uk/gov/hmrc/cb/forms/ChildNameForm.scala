@@ -19,6 +19,7 @@ package uk.gov.hmrc.cb.forms
 import play.api.Logger
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.i18n.Messages
 import uk.gov.hmrc.cb.config.FrontendAppConfig
 import uk.gov.hmrc.cb.forms.constraints.Constraints
 
@@ -40,8 +41,8 @@ object ChildNameForm {
 
   val form : Form[ChildNamePageModel] = Form(
     mapping(
-      "firstName" -> text.verifying("Invalid", validate _),
-      "lastName" -> text.verifying("Invalid", validate _)
+      "firstName" -> text.verifying(Messages("cb.child.name.invalid"), validate _),
+      "lastName" -> text.verifying(Messages("cb.child.name.invalid"), validate _)
     )(ChildNamePageModel.apply)(ChildNamePageModel.unapply)
   )
 

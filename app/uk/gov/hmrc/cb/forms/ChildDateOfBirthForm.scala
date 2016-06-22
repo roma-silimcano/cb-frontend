@@ -30,11 +30,6 @@ import uk.gov.hmrc.play.mappers.DateTuple._
  */
 object ChildDateOfBirthForm {
 
-//  trait ChildPageModel {
-//    val dateOfBirth : DateTime
-//    val name : Option[String] = None
-//  }
-
   case class ChildDateOfBirthPageModel(dateOfBirth : DateTime)
 
   private def futureDateConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.future"){
@@ -46,7 +41,7 @@ object ChildDateOfBirthForm {
   private def moreThanChildsAgeLimitConstraint : Constraint[DateTime] = Constraint("cb.child.date.of.birth.more.than.age.limit"){
     model =>
       if (Constraints.dateOfBirthIsEqualToOrAfterChildAgeLimit(model)) Valid
-      else Invalid(Messages("cb.child.date.of.birth.more.than.age.limit", FrontendAppConfig.dateOfBirthAgeLimit))
+      else Invalid(Messages("cb.child.date.of.birth.more.than.age.limit"))
   }
 
   val form : Form[ChildDateOfBirthPageModel] = Form(

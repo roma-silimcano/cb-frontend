@@ -16,10 +16,13 @@
 
 package uk.gov.hmrc.cb.implicits
 
+import org.joda.time.DateTime
 import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
+import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.helpers.DateHelpers
 import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -66,6 +69,27 @@ class ImplicitsSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
         pageModel.birthCertificateReference
       }
     }
+
+    "covert Child to ChildDateOfBirthPageModel" in {
+      import uk.gov.hmrc.cb.implicits.Implicits._
+
+      val date = DateHelpers.dateWithoutTimeZone(DateTime.now)
+
+      val child = Child(id = 1, dob = Some(date))
+      val pageModel : ChildDateOfBirthPageModel = child
+      pageModel shouldBe ChildDateOfBirthPageModel(date)
+    }
+
+    "throw an exception when converting to ChildDateOfBirthPageModel from Child" in {
+      import uk.gov.hmrc.cb.implicits.Implicits._
+
+      val child = Child(id = 1, dob = None)
+      intercept[RuntimeException] {
+        val pageModel : ChildDateOfBirthPageModel = child
+        pageModel.dateOfBirth
+      }
+    }
+
 
   }
 

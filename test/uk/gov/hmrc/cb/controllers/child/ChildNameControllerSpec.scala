@@ -168,7 +168,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/confirmation"
+        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
       }
 
       "redirect to confirmation when changing a child" in {
@@ -180,7 +180,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/confirmation"
+        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
       }
 
       "redirect to confirmation when there is no change" in {
@@ -193,7 +193,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/confirmation"
+        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
       }
 
       "redirect to confirmation when adding a new child to existing children" in {
@@ -206,7 +206,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/confirmation"
+        redirectLocation(result) shouldBe "/child-benefit/children/2/date-of-birth"
       }
 
       "redirect to technical difficulties when adding a new child to existing children when exception saving to keystore" in {

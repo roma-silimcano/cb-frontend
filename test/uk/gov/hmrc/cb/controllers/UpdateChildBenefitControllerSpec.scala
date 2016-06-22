@@ -23,6 +23,7 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -31,16 +32,15 @@ import uk.gov.hmrc.play.test.UnitSpec
   */
 class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  val endPoint: String = "/confirmation"
-  val techDiffEndpoint: String = "/technical-difficulties"
-
-  val mockUpdateChildBenefitController = new UpdateChildBenefitController {
-    override val authConnector: AuthConnector = mock[AuthConnector]
-  }
-
-  val fakeRequestGet = FakeRequest("GET", endPoint)
-
   "UpdateChildBenefitController" when {
+
+    val endPoint: String = "/update-child-benefit"
+    val resultEndpoint : String = "/children/1/name"
+    val techDiffEndpoint: String = "/technical-difficulties"
+
+    val mockUpdateChildBenefitController = new UpdateChildBenefitController {
+      override val authConnector: AuthConnector = mock[AuthConnector]
+    }
 
     "initialising" should {
 
@@ -53,11 +53,13 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
     s"GET $endPoint" should {
 
       "return 200" in {
+        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         status(result) shouldBe Status.OK
       }
 
       "be able to see the radio button elements" in {
+        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         val doc = Jsoup.parse(contentAsString(result))
         doc.getElementById("updateChildBenefit-true").attr("type") shouldBe "radio"
@@ -65,43 +67,47 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
       }
 
       "return html content type" in {
+        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         contentType(result) shouldBe Some("text/html")
         charset(result) shouldBe Some("utf-8")
       }
 
       "return valid string" in {
+        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = await(mockUpdateChildBenefitController.get(fakeRequestGet))
         bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.update.child.benefit"))
       }
     }
 
-    val fakeRequestPostTrue = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
-      ("updateChildBenefit", "true"))
-    val fakeRequestPostFalse = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
-      ("updateChildBenefit", "false"))
-    val fakeRequestPostInvalid = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
-      ("updateChildBenefit", ""))
-
     s"POST $endPoint" should {
+
       "Submit the form with YES and redirect to the same endpoint" in {
+        val fakeRequestPostTrue = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
+          ("updateChildBenefit", "true")).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostTrue)
         status(result) shouldBe Status.SEE_OTHER
-        result.header.headers("Location") should include(endPoint)
+        result.header.headers("Location") should include(resultEndpoint)
       }
 
       "post the form with NO and redirect to the technical difficulties endpoint" in {
+        val fakeRequestPostFalse = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
+          ("updateChildBenefit", "false")).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostFalse)
         status(result) shouldBe Status.SEE_OTHER
         result.header.headers("Location") should include(techDiffEndpoint)
       }
 
       "post the form with an invalid result and return a BAD REQUEST code" in {
+        val fakeRequestPostInvalid = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
+          ("updateChildBenefit", "")).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostInvalid)
         status(result) shouldBe Status.BAD_REQUEST
       }
 
       "post the form with an invalid result and return with an error message" in {
+        val fakeRequestPostInvalid = FakeRequest("POST", endPoint).withFormUrlEncodedBody(
+          ("updateChildBenefit", "")).withSession(CBSessionProvider.generateSessionId())
         val result = await(mockUpdateChildBenefitController.post.apply(fakeRequestPostInvalid))
         bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.error.update.child.benefit.required"))
       }

@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.controllers
 
+import org.joda.time.DateTime
 import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result, Action}
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
@@ -42,28 +43,27 @@ trait ChildBenefitController extends FrontendController with Actions {
 }
 
 trait ChildBenefitChildrenController extends ChildBenefitController {
-//  this: ChildrenService with ChildBenefitKeystoreService =>
 
   val childrenService : ChildrenService
   val cacheClient : ChildBenefitKeystoreService
 
-  private def addChild(id : Int, model : ChildDateOfBirthPageModel, children : List[Child]) = {
-    val child = Child(id = id, dob = Some(model.dateOfBirth))
-    childrenService.addChild(id, children, child)
-  }
-
-  protected def handleChildrenWithCallback(children : List[Child], id : Int, model : ChildDateOfBirthPageModel)
-                                        (block: List[Child] => Future[Result]) = {
-    val child = childrenService.getChildById(id, children).fold {
-     addChild(id, model, children)
-    }{
-      c =>
-        val modified = c.edit(model.dateOfBirth)
-        childrenService.replaceChild(children, id, modified)
-    }
-
-    block(child)
-  }
+//  private def addChild(id : Int, model : ChildDateOfBirthPageModel, children : List[Child]) = {
+//    val child = Child(id = id, dob = Some(model.dateOfBirth))
+//    childrenService.addChild(id, children, child)
+//  }
+//
+//  protected def handleChildrenWithCallback(children : List[Child], id : Int, model : ChildDateOfBirthPageModel)
+//                                        (block: List[Child] => Future[Result]) = {
+//    val modified = childrenService.getChildById(id, children).fold {
+//     addChild(id, model, children)
+//    }{
+//      c =>
+//        val editedChild = c.edit(model.dateOfBirth)
+//        childrenService.replaceChild(children, id, editedChild)
+//    }
+//
+//    block(modified)
+//  }
 
   protected def saveToKeystore(children : List[Child])
                               (block: Either[Option[List[Child]], Result] => Result)
@@ -77,6 +77,31 @@ trait ChildBenefitChildrenController extends ChildBenefitController {
         Logger.error(s"[ChildBenefitChildrenController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         block(Right(redirectTechnicalDifficulties))
     }
+  }
+
+
+
+
+
+
+
+
+
+//  type DateOfBirth = DateTime
+
+//  editChildWithCallback[DateOfBirth](Child(id = 0), DateTime.now, childrenService.edit)
+
+  protected def editChildWithCallback[T](child : Child, value : T, f : (Child, T)  => Child)
+                                          (block: Child => Future[Result]) = {
+    block(f(child, value))
+  }
+
+//  addChildWithCallback[DateTime](List(), DateTime.now, 1, childrenService.create)
+
+  protected def addChildWithCallback[T](children: List[Child], value : T, index : Int, f : (Int, T) => Child)(block : List[Child] => Future[Result]) = {
+    val child = f(index, value)
+    val newChildren = childrenService.addChild(index, children, child)
+    block(newChildren)
   }
 
 }
