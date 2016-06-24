@@ -48,7 +48,7 @@ class ChildNameFormSpec extends UnitSpec with WithFakeApplication {
         )
     }
 
-    "accept a valid value for first name and last name which have a space" in {
+    "accept a valid value for first name  and last name which have a space" in {
       val data = ChildNamePageModel(firstName = "Adam David", lastName = "Van Helsen")
       ChildNameForm.form.bind(
         Map(

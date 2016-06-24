@@ -17,7 +17,7 @@
 package uk.gov.hmrc.cb.managers
 
 import play.api.Logger
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 
 /**
   * Created by chrisianson on 26/05/16.

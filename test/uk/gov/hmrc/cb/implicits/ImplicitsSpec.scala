@@ -23,7 +23,7 @@ import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertifi
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.helpers.DateHelpers
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**

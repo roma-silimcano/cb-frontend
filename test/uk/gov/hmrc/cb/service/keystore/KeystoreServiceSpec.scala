@@ -25,7 +25,7 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.config.WSHttp
 import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.HeaderCarrier

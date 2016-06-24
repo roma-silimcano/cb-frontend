@@ -18,7 +18,7 @@ package uk.gov.hmrc.cb.controllers.child
 
 import play.api.Logger
 import play.api.data.Form
-import play.api.mvc.{Result, AnyContent, Request}
+import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
@@ -26,8 +26,8 @@ import uk.gov.hmrc.cb.forms.ChildNameForm
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
-import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.http.HeaderCarrier

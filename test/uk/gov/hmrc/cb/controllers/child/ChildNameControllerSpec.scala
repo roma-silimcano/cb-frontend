@@ -30,12 +30,12 @@ import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildNameForm
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.logging.SessionId
-import uk.gov.hmrc.play.http.{SessionKeys, HeaderCarrier}
+import uk.gov.hmrc.play.http.{HeaderCarrier, SessionKeys}
 import uk.gov.hmrc.play.test.UnitSpec
 
 import scala.concurrent.Future

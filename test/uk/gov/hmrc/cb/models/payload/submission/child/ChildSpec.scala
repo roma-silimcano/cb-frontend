@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.models.payload.submission.child
 
 import org.joda.time.DateTime
-import uk.gov.hmrc.cb.forms.constraints.Constraints
 import uk.gov.hmrc.cb.helpers.DateHelpers
 import uk.gov.hmrc.cb.mappings.Genders
 import uk.gov.hmrc.play.test.UnitSpec

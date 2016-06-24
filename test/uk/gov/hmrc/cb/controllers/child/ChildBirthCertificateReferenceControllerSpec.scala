@@ -28,7 +28,7 @@ import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
