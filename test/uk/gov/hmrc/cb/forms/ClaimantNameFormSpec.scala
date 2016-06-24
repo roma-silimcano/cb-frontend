@@ -16,7 +16,6 @@
 
 package uk.gov.hmrc.cb.forms
 
-import play.api.i18n.Messages
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
 import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
@@ -151,7 +150,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.character")
+          formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -169,7 +168,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.character")
+          formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -187,7 +186,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.character")
+          formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -205,7 +204,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.length")
+          formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -223,7 +222,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.length")
+          formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -241,7 +240,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.length")
+          formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -258,7 +257,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.excluded")
+          formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -275,7 +274,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.excluded")
+          formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -292,7 +291,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
         )
       ).fold(
         formWithErrors => {
-          formWithErrors.errors.head.message shouldBe Messages("cb.claimant.name.invalid.excluded")
+          formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
