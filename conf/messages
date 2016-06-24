@@ -9,7 +9,6 @@ cb.common.no=No
 cb.common.yes=Yes
 cb.common.continue=Continue
 
-
 # Common errors
 error.message.title = Sorry
 
@@ -34,6 +33,16 @@ cb.child.date.of.birth.more.than.age.limit = You''ve told us a date that is too 
 cb.child.date.of.birth.future = You''ve entered a date in the future, please re-enter the child''s date of birth
 cb.child.date.of.birth.title = What is the date of birth of the child you are claiming for?
 cb.child.date.of.birth.invalid.title = There is a problem with the child''s date of birth
+
+# Claimant name page
+cb.claimant.name.title= What is the your name?
+cb.claimant.first.name.label= First Name
+cb.claimant.last.name.label= Last Name
+cb.claimant.name.invalid = Please re-enter your name
+cb.claimant.name.invalid.excluded = Please enter the name of the person claiming
+cb.claimant.name.invalid.character = You''ve entered a character we don''t recognise, please re-enter the name
+cb.claimant.name.invalid.length = The name you''ve entered is too long, please re-enter it
+cb.claimant.name.invalid.title = There is a problem with the name you''ve entered
 
 # Technical difficulties
 

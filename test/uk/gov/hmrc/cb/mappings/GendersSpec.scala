@@ -17,8 +17,8 @@
 package uk.gov.hmrc.cb.mappings
 
 import play.api.libs.json.Json
-import uk.gov.hmrc.cb.models.Child
-import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 /**
  * Created by adamconder on 31/05/2016.

@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.models.payload.submission.claimant
 
-import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 
 /**
  * Created by adamconder on 06/05/2016.
@@ -26,9 +26,12 @@ class ClaimantSpec extends UnitSpec with WithFakeApplication {
   "Claimant" should {
 
     "instantiate an instance of Claimant" in {
-      val claimant = Claimant(name = "Louise", reference = 12345)
+      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = 12345)
       claimant shouldBe a[Claimant]
-      claimant.name shouldBe "Louise"
+      claimant.firstName shouldBe "Louise"
+      claimant.lastName shouldBe "Smith"
+      claimant.middleName shouldBe None
+      claimant.title shouldBe None
       claimant.reference shouldBe 12345
     }
   }

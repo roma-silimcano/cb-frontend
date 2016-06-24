@@ -18,17 +18,17 @@ package uk.gov.hmrc.cb.templates
 
 import org.jsoup.Jsoup
 import play.api.test.FakeRequest
-import uk.gov.hmrc.cb.models.Claimant
 import uk.gov.hmrc.cb.views
-import uk.gov.hmrc.play.test.{WithFakeApplication, UnitSpec}
+import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
 import play.api.test.Helpers._
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
 /**
  * Created by adamconder on 05/05/2016.
  */
 class SubmissionConfirmationTemplateSpec extends UnitSpec with WithFakeApplication {
 
-  val claimant = Claimant(name = "Louise", reference = 12345)
+  val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = 12345)
 
   "SubmissionConfirmation Template" should {
 

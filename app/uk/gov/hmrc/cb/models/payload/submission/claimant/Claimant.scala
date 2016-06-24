@@ -14,13 +14,15 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.models.payload.submission.claimant
 
 /**
- * Created by adamconder on 06/05/2016.
- */
-
+  * Created by chrisianson on 23/06/16.
+  */
 case class Claimant(
-                   name : String,
-                   reference : Int
+                     firstName: String,
+                     lastName: String,
+                     middleName: Option[String],
+                     title: Option[String],
+                     reference : Int
                    )

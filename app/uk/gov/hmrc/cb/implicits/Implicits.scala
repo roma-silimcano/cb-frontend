@@ -19,7 +19,7 @@ package uk.gov.hmrc.cb.implicits
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 
 /**
  * Created by adamconder on 06/06/2016.

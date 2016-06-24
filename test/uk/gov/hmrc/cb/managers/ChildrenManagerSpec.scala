@@ -19,7 +19,7 @@ package uk.gov.hmrc.cb.managers
 import org.joda.time.DateTime
 import uk.gov.hmrc.cb.forms.constraints.Constraints
 import uk.gov.hmrc.cb.mappings.Genders
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**

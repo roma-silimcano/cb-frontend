@@ -20,7 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.http.cache.client.SessionCache
 import play.api.mvc.{AnyContent, Request}
-import uk.gov.hmrc.cb.models.Child
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.play.http.logging.{LoggingDetails, MdcLoggingExecutionContext}
 import uk.gov.hmrc.play.http.{HeaderCarrier, SessionKeys}
 

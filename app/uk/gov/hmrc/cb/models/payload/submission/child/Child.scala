@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models
+package uk.gov.hmrc.cb.models.payload.submission.child
 
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.DateTime
 import play.api.libs.json._
 import uk.gov.hmrc.cb.mappings.Genders
 

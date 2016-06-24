@@ -31,13 +31,13 @@ import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.constraints.Constraints
 import uk.gov.hmrc.cb.helpers.DateHelpers
 import uk.gov.hmrc.cb.managers.ChildrenManager
-import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.play.test.UnitSpec
 import play.api.test.Helpers._
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 
 import scala.concurrent.Future
 

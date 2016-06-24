@@ -16,9 +16,9 @@
 
 package uk.gov.hmrc.cb.controllers
 
-import play.api.mvc.{Request, Action}
+import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
-import uk.gov.hmrc.cb.models.Claimant
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -36,7 +36,7 @@ trait SubmissionConfirmationController extends ChildBenefitController {
 
   def get = Action.async {
     implicit request =>
-      val claimant = Claimant(name = "Louise", reference = REFERENCE_NUMBER)
+      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = REFERENCE_NUMBER)
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
   }
 }

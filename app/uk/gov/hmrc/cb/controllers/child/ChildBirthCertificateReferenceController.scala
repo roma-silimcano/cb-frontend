@@ -28,10 +28,9 @@ import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
-import uk.gov.hmrc.cb.models.Child
 import uk.gov.hmrc.play.http.HeaderCarrier
-
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
 
 import scala.concurrent.Future
 
