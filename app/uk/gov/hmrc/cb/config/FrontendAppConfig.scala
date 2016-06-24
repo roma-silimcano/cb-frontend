@@ -40,7 +40,7 @@ FrontendAppConfig extends AppConfig with ServicesConfig {
 
   lazy val childLengthMaxConstraint = configuration.getInt("cb-frontend.constraints.child.name").getOrElse(throw new Exception(s"[Configuration][Child name]"))
 
-  lazy val claimaintLengthMaxContraint = configuration.getInt("cb-frontend.constraints.child.name").getOrElse(throw new Exception(s"[Configuration][Claimaint name]"))
+  lazy val claimaintLengthMaxContraint = configuration.getInt("cb-frontend.constraints.claimant.name").getOrElse(throw new Exception(s"[Configuration][Claimaint name]"))
 
   lazy val birthCertificateReferenceLengthMaxConstraint = configuration.getInt("cb-frontend.constraints.child.birth-certificate-reference").getOrElse(throw new Exception(s"[Configuration][Child birth certificate reference]"))
   lazy val birthCertificateReferenceLengthMinConstraint = configuration.getInt("cb-frontend.constraints.child.birth-certificate-reference").getOrElse(throw new Exception(s"[Configuration][Child birth certificate reference]"))
