@@ -26,7 +26,7 @@ trait Assertions {
 
   def verifyLocation(response : Result, endpoint: String) = {
     val location = response.header.headers.get("Location").get
-    location.splitAt(12)._2 should include(endpoint)
+    location should include(endpoint.stripPrefix("/"))
   }
 
 }
