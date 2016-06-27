@@ -27,10 +27,11 @@ import scala.concurrent.Future
  * Created by andrew on 03/05/16.
  */
 
-trait ChildBenefitController extends FrontendController with Actions {
+trait ChildBenefitController extends FrontendController with Actions with CBRoutes {
 
   val authConnector: AuthConnector
 
-  protected def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
+  protected def redirectTechnicalDifficulties = Redirect(technicalDifficulties)
+  protected def redirectInitialController = Redirect(initialController)
 
 }

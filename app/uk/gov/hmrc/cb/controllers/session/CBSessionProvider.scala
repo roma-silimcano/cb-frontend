@@ -23,14 +23,13 @@ package uk.gov.hmrc.cb.controllers.session
 import java.util.UUID
 
 import play.api.mvc._
+import uk.gov.hmrc.cb.controllers.CBRoutes
 import uk.gov.hmrc.play.frontend.controller.UnauthorisedAction
 import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
 
-object CBSessionProvider {
-
-  private val INITIAL_CONTROLLER = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.get()
+object CBSessionProvider extends CBRoutes {
 
   /**
    * CBSessionProvider is used to generate a session for the users browser
@@ -50,7 +49,7 @@ object CBSessionProvider {
 
   def getSessionId()(implicit request : Request[AnyContent]) = request.session.get(SessionKeys.sessionId)
 
-  def callbackWithSession(implicit request : Request[AnyContent]) = Results.Redirect(INITIAL_CONTROLLER).withSession(generateSession())
+  def callbackWithSession(implicit request : Request[AnyContent]) = Results.Redirect(initialController).withSession(generateSession())
 
   def futureRequest(result: Result) = Future.successful(result)
 

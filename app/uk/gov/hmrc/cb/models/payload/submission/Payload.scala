@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.service.keystore
+package uk.gov.hmrc.cb.models.payload.submission
+
+import play.api.libs.json.Json
+import uk.gov.hmrc.cb.models.payload.submission.child.Child
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
 /**
-  * Created by chrisianson on 01/06/16.
+  * Created by chrisianson on 24/06/16.
   */
-trait CBKeystoreKeys {
-  val childrenKey : String = "cb-children"
-  val payloadKey : String = "cb-payload"
-}
+case class Payload(children: List[Child],
+                   claimant: Option[Claimant])
 
-object CBKeystoreKeys extends CBKeystoreKeys
+object Payload {
+  implicit val formats = Json.format[Payload]
+}

@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.service.keystore
+package uk.gov.hmrc.cb.controllers
 
 /**
-  * Created by chrisianson on 01/06/16.
+  * Created by chrisianson on 24/06/16.
   */
-trait CBKeystoreKeys {
-  val childrenKey : String = "cb-children"
-  val payloadKey : String = "cb-payload"
+trait CBRoutes {
+  val initialController = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.get()
+  val technicalDifficulties = uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get()
 }
-
-object CBKeystoreKeys extends CBKeystoreKeys
