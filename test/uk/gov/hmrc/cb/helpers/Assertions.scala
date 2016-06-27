@@ -24,6 +24,9 @@ import play.api.mvc.Result
 trait Assertions {
   self: uk.gov.hmrc.play.test.UnitSpec =>
 
-  def verifyLocation(response : Result, endpoint: String) = response.header.headers.get("Location").get should include(endpoint)
+  def verifyLocation(response : Result, endpoint: String) = {
+    val location = response.header.headers.get("Location").get
+    location.splitAt(12)._2 should include(endpoint)
+  }
 
 }
