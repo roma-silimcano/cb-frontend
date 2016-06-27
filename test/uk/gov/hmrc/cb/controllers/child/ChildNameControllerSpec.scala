@@ -16,8 +16,6 @@
 
 package uk.gov.hmrc.cb.controllers.child
 
-import java.util.UUID
-
 import org.mockito.Matchers.{eq => mockEq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -29,6 +27,7 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildNameForm
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.helpers.Assertions
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
@@ -43,7 +42,7 @@ import scala.concurrent.Future
 /**
  * Created by adamconder on 31/05/2016.
  */
-class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
+class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar with Assertions {
 
 
   val childIndex = 1
@@ -54,8 +53,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
     override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
     override val childrenService = ChildrenManager.childrenService
   }
-
-  def redirectLocation(response : Result) = response.header.headers.get("Location").get
 
   "ChildNameController" when {
 
@@ -139,7 +136,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
+        verifyLocation(result, "/technical-difficulties")
       }
 
       "redirect to technical difficulties when keystore is down when fetching children" in {
@@ -148,7 +145,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
+        verifyLocation(result, "/technical-difficulties")
       }
 
       "respond BAD_REQUEST when POST is unsuccessful" in {
@@ -168,7 +165,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
+        verifyLocation(result, "/children/1/date-of-birth")
       }
 
       "redirect to confirmation when changing a child" in {
@@ -180,7 +177,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
+        verifyLocation(result, "/children/1/date-of-birth")
       }
 
       "redirect to confirmation when there is no change" in {
@@ -193,7 +190,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/children/1/date-of-birth"
+        verifyLocation(result, "/children/1/date-of-birth")
       }
 
       "redirect to confirmation when adding a new child to existing children" in {
@@ -206,7 +203,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/children/2/date-of-birth"
+        verifyLocation(result, "/children/2/date-of-birth")
       }
 
       "redirect to technical difficulties when adding a new child to existing children when exception saving to keystore" in {
@@ -219,7 +216,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.failed(new RuntimeException()))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result) shouldBe "/child-benefit/technical-difficulties"
+        verifyLocation(result, "/technical-difficulties")
       }
 
     }

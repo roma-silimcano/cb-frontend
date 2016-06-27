@@ -15,8 +15,8 @@ POST       /children/:id/name       uk.gov.hmrc.cb.controllers.child.ChildNameCo
 GET        /children/:id/birth-certificate-reference       uk.gov.hmrc.cb.controllers.child.ChildBirthCertificateReferenceController.get(id : Int)
 POST       /children/:id/birth-certificate-reference       uk.gov.hmrc.cb.controllers.child.ChildBirthCertificateReferenceController.post(id : Int)
 
-GET        /children/:id/date-of-birth      uk.gov.hmrc.cb.controllers.child.ChildDateOfBirthController.get(id : Int)
-POST       /children/:id/date-of-birth      uk.gov.hmrc.cb.controllers.child.ChildDateOfBirthController.post(id : Int)
+GET         /children/:id/date-of-birth      uk.gov.hmrc.cb.controllers.child.ChildDateOfBirthController.get(id : Int)
+POST        /children/:id/date-of-birth      uk.gov.hmrc.cb.controllers.child.ChildDateOfBirthController.post(id : Int)
 
-GET        /claimant/name    uk.gov.hmrc.cb.controllers.claimant.ClaimantNameController.get
-POST       /claimant/name    uk.gov.hmrc.cb.controllers.claimant.ClaimantNameController.post
+GET         /claimant/name    uk.gov.hmrc.cb.controllers.claimant.ClaimantNameController.get
+POST        /claimant/name    uk.gov.hmrc.cb.controllers.claimant.ClaimantNameController.post
