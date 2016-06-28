@@ -32,11 +32,9 @@ object SubmissionConfirmationController extends SubmissionConfirmationController
 
 trait SubmissionConfirmationController extends ChildBenefitController {
 
-  private val REFERENCE_NUMBER = 12345
-
   def get = Action.async {
     implicit request =>
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = REFERENCE_NUMBER)
+      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
   }
 }

@@ -49,9 +49,9 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
   val childIndex2 = 2
 
   val mockController = new ChildNameController {
-    override val authConnector = mock[AuthConnector]
-    override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
+    override val cacheClient  = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
     override val childrenService = ChildrenManager.childrenService
+    override val authConnector = mock[AuthConnector]
   }
 
   "ChildNameController" when {
@@ -76,12 +76,12 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
 
       "respond to GET /child-benefit/children/1/name" in {
         val result = route(getRequest)
-        status(result.get) should not be NOT_FOUND
+        result should not be NOT_FOUND
       }
 
       "respond to POST /child-benefit/children/1/name" in {
         val result = route(FakeRequest(POST, "/child-benefit/children/1/name"))
-        status(result.get) should not be NOT_FOUND
+        result should not be NOT_FOUND
       }
 
     }
@@ -218,9 +218,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         status(result) shouldBe SEE_OTHER
         verifyLocation(result, "/technical-difficulties")
       }
-
     }
-
   }
 
 }

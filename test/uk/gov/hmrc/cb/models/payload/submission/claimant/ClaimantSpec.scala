@@ -26,13 +26,12 @@ class ClaimantSpec extends UnitSpec with WithFakeApplication {
   "Claimant" should {
 
     "instantiate an instance of Claimant" in {
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = 12345)
+      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
       claimant shouldBe a[Claimant]
       claimant.firstName shouldBe "Louise"
       claimant.lastName shouldBe "Smith"
       claimant.middleName shouldBe None
       claimant.title shouldBe None
-      claimant.reference shouldBe 12345
     }
   }
 }

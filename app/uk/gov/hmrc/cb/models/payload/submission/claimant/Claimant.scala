@@ -25,8 +25,7 @@ case class Claimant(
                      firstName: String,
                      lastName: String,
                      middleName: Option[String],
-                     title: Option[String],
-                     reference : Int
+                     title: Option[String]
                    )
 
 object Claimant {

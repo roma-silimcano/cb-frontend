@@ -27,8 +27,12 @@ import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreServi
 import uk.gov.hmrc.cb.forms.ClaimantNameForm
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
-
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.models.payload.submission.Payload
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
+import uk.gov.hmrc.play.http.HeaderCarrier
+
+import scala.concurrent.Future
 
 /**
   * Created by chrisianson on 24/06/16.
@@ -48,17 +52,21 @@ trait ClaimantNameController extends ChildBenefitController {
     status(uk.gov.hmrc.cb.views.html.claimant.claimantname(form))
   }
 
+  private def redirectConfirmation() = Redirect(uk.gov.hmrc.cb.controllers.claimant.routes.ClaimantNameController.get())
+
   def get() = CBSessionProvider.withSession {
     implicit request =>
       val resultWithNoClaimant = view(Ok, form)
       cacheClient.loadPayload().map {
         payload =>
+          Logger.error(s"[ClaimantNameController][get] loaded payload")
           payload.fold(
             redirectInitialController
           )(
             cache => {
               cache.claimant match {
                 case Some(x) =>
+                  Logger.error(s"[ClaimantNameController][get] loaded claimant")
                   val pageModel : ClaimantNamePageModel = x
                   view(Ok, form.fill(pageModel))
                 case _ =>
@@ -68,19 +76,43 @@ trait ClaimantNameController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
+          Logger.error(s"[ClaimantNameController][get] keystore exception whilst loading payload: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
 
   def post() = CBSessionProvider.withSession {
     implicit request =>
-      val resultWithNoClaimant = view(Ok, form)
-      cacheClient.loadPayload().map {
-        payload =>
-          resultWithNoClaimant
-      } recover {
-        case e: Exception =>
-          redirectTechnicalDifficulties
-      }
+      form.bindFromRequest().fold(
+        formWithErrors => {
+          Logger.info(s"[ClaimantNameController][post] invalid form submission $formWithErrors")
+          Future.successful(
+            view(BadRequest, formWithErrors)
+          )
+        },
+        model =>
+          cacheClient.loadPayload() flatMap {
+            cache =>
+              saveToKeystore(modifyClaimant(cache.get, model))
+          }
+      )
   }
+
+  private def modifyClaimant(payload: Payload, model: ClaimantNamePageModel): Payload = {
+    val claimant = Claimant(firstName = model.firstName, lastName = model.lastName, None, None)
+    Payload(children = payload.children, claimant = Some(claimant))
+  }
+
+  private def saveToKeystore(payload : Payload)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    cacheClient.savePayload(payload).map {
+      claimant =>
+        Logger.debug(s"[ClaimantNameController][saveToKeystore] saved claimant redirecting to submission")
+        redirectConfirmation()
+    } recover {
+      case e : Exception =>
+        Logger.error(s"[ClaimantNameController][saveToKeystore] keystore exception whilst saving claimant: ${e.getMessage}")
+        redirectTechnicalDifficulties
+    }
+  }
+
 }
