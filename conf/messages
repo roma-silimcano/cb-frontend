@@ -53,6 +53,6 @@ cb.technical.difficulties.text = We''re having difficulties with the child benef
 cb.error.update.child.benefit.required=Please indicate yes or no to whether you want to update your Child Benefit
 
 cb.confirmation.title = Thank you {0} for updating your Child Benefit
-cb.confirmation.lede = Thank you {0} for updating your Child Benefit. Your reference number is {1}.
+cb.confirmation.lede = Thank you {0} for updating your Child Benefit
 
 cb.update.child.benefit=Do you want to update your child benefit?
