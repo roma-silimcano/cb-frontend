@@ -28,6 +28,8 @@ import uk.gov.hmrc.cb.forms.ClaimantNameForm
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.managers.ClaimantManager
+import uk.gov.hmrc.cb.managers.ClaimantManager.ClaimantService
 import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -41,11 +43,13 @@ import scala.concurrent.Future
 object ClaimantNameController extends ClaimantNameController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
+  override val claimantService = ClaimantManager.claimantService
 }
 
 trait ClaimantNameController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
+  val claimantService : ClaimantService
 
   private val form = ClaimantNameForm.form
   private def view(status: Status, form : Form[ClaimantNamePageModel])(implicit request: Request[AnyContent]) = {
@@ -99,7 +103,7 @@ trait ClaimantNameController extends ChildBenefitController {
   }
 
   private def modifyClaimant(payload: Payload, model: ClaimantNamePageModel): Payload = {
-    val claimant = Claimant(firstName = model.firstName, lastName = model.lastName, None, None)
+    val claimant = claimantService.insertUpdate(Claimant(firstName = model.firstName, lastName = model.lastName, None, None), payload.claimant)
     Payload(children = payload.children, claimant = Some(claimant))
   }
 

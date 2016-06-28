@@ -29,9 +29,9 @@ import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreServi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 import play.api.data.Form
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.forms.ClaimantNameForm
 import uk.gov.hmrc.cb.helpers.Assertions
+import uk.gov.hmrc.cb.managers.ClaimantManager
 import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
@@ -47,6 +47,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
     val mockController = new ClaimantNameController {
       override val authConnector = mock[AuthConnector]
       override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
+      override val claimantService = ClaimantManager.claimantService
     }
 
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/claimant/name").withSession(CBSessionProvider.generateSessionId())
@@ -61,8 +62,6 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
       }
     }
 
-    /* GET */
-
     "calling /claimant/name" should {
 
       "respond to GET request /child-benefit/claimant/name" in {
@@ -76,12 +75,28 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
       }
     }
 
+    /* GET */
     "get" should {
 
       "redirect to technical difficulties when keystore is down" in {
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val result = await(mockController.get()(getRequest))
         status(result) shouldBe SEE_OTHER
+      }
+
+      "respond 200 when no claimant in keystore" in {
+        val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+        val result = await(mockController.get()(getRequest))
+        status(result) shouldBe OK
+      }
+
+      "respond 200 when child in keystore" in {
+        val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+        val result = await(mockController.get()(getRequest))
+        status(result) shouldBe OK
+        bodyOf(result) should include("Chris")
       }
     }
 
@@ -155,5 +170,4 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
       }
     }
   }
-
 }
