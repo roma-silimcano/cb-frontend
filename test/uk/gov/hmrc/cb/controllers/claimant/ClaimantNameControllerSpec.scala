@@ -90,7 +90,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
       }
 
       "respond 200 when no claimant in keystore" in {
-        val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
+        val payload = Some(Payload(children = Nil))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get()(getRequest))
         status(result) shouldBe OK
@@ -102,7 +102,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         status(result) shouldBe OK
       }
 
-      "respond 200 when child in keystore" in {
+      "respond 200 when claimant in keystore" in {
         val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get()(getRequest))
