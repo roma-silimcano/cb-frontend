@@ -142,7 +142,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     /* invalid */
 
     "throw a ValidationError when first name has invalid characters" in {
-      val data = ClaimantNamePageModel(firstName = "@£$^%&&&&", lastName = "Scott")
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> "@£$^%&&&&",
@@ -151,6 +150,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -160,7 +160,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "throw a ValidationError when last name has invalid characters" in {
-      val data = ClaimantNamePageModel(firstName = "Chris", lastName = "@£$^%&&&&")
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> "Chris",
@@ -169,6 +168,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -178,7 +178,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "throw a ValidationError when first name and last name has invalid characters" in {
-      val data = ClaimantNamePageModel(firstName = "@£$^%&&&&", lastName = "@£$^%&&&&")
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> "@£$^%&&&&",
@@ -187,6 +186,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "You've entered a character we don't recognise, please re-enter the name"
+          formWithErrors.errors.length shouldBe 2
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -196,7 +196,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "throw a ValidationError when the first name character count exceeds allowed length" in {
-      val data = ClaimantNamePageModel(firstName = invalidLength, lastName = "Jones")
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> invalidLength,
@@ -205,6 +204,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -214,7 +214,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "throw a ValidationError when the last name character count exceeds allowed length" in {
-      val data = ClaimantNamePageModel(firstName = "Chris", lastName = invalidLength)
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> "Chris",
@@ -223,6 +222,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -232,7 +232,6 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
     }
 
     "throw a ValidationError when the first name and last name character count exceeds allowed length" in {
-      val data = ClaimantNamePageModel(firstName = invalidLength, lastName = invalidLength)
       ClaimantNameForm.form.bind(
         Map(
           "firstName" -> invalidLength,
@@ -241,6 +240,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "The name you've entered is too long, please re-enter it"
+          formWithErrors.errors.length shouldBe 2
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -258,6 +258,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -275,6 +276,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
+          formWithErrors.errors.length shouldBe 1
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))
@@ -292,6 +294,7 @@ class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
       ).fold(
         formWithErrors => {
           formWithErrors.errors.head.message shouldBe "Please enter the name of the person claiming"
+          formWithErrors.errors.length shouldBe 2
         },
         success => {
           success should not be Some(ClaimantNamePageModel(_, _))

@@ -18,6 +18,7 @@ package uk.gov.hmrc.cb.forms
 
 import play.api.data.Form
 import play.api.data.Forms._
+import play.api.data.validation.{Invalid, Valid, Constraint}
 import play.api.i18n.Messages
 import uk.gov.hmrc.cb.config.FrontendAppConfig
 import uk.gov.hmrc.cb.forms.constraints.Constraints
@@ -31,16 +32,28 @@ object ClaimantNameForm {
 
   lazy val lengthConstraint : Int = FrontendAppConfig.claimaintLengthMaxContraint
 
-  private def validate(t: play.api.data.Mapping[scala.Predef.String]) : play.api.data.Mapping[scala.Predef.String] = {
-    t.verifying(Messages("cb.claimant.name.invalid.excluded"), x => x.nonEmpty)
-      .verifying(Messages("cb.claimant.name.invalid.length"), x => x.length <= lengthConstraint)
-        .verifying(Messages("cb.claimant.name.invalid.character"), x => x.matches(Constraints.nameConstraint))
+  private def existsConstraint : Constraint[String] = Constraint("cb.claimant.name.invalid.excluded"){
+    model =>
+      if(model.nonEmpty) Valid
+      else Invalid(Messages("cb.claimant.name.invalid.excluded"))
+  }
+
+  private def validLength : Constraint[String] = Constraint("cb.claimant.name.invalid.length"){
+    model =>
+      if(model.length <= lengthConstraint)  Valid
+      else Invalid(Messages("cb.claimant.name.invalid.length"))
+  }
+
+  private def validCharacters : Constraint[String] = Constraint("cb.claimant.name.invalid.character"){
+    model =>
+      if(model.matches(Constraints.nameConstraint) || model.isEmpty)  Valid
+      else Invalid(Messages("cb.claimant.name.invalid.character"))
   }
 
   val form : Form[ClaimantNamePageModel] = Form(
     mapping(
-      "firstName" -> validate(text),
-      "lastName" -> validate(text)
+      "firstName" -> text.verifying(existsConstraint).verifying(validLength).verifying(validCharacters),
+      "lastName" -> text.verifying(existsConstraint).verifying(validLength).verifying(validCharacters)
     )(ClaimantNamePageModel.apply)(ClaimantNamePageModel.unapply)
   )
 

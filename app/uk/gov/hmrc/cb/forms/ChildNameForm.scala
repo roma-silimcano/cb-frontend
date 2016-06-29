@@ -41,7 +41,7 @@ object ChildNameForm {
 
   val form : Form[ChildNamePageModel] = Form(
     mapping(
-      "firstName" -> text.verifying(Messages("cb.child.name.invalid"), validate _),
+        "firstName" -> text.verifying(Messages("cb.child.name.invalid"), validate _),
       "lastName" -> text.verifying(Messages("cb.child.name.invalid"), validate _)
     )(ChildNamePageModel.apply)(ChildNamePageModel.unapply)
   )
