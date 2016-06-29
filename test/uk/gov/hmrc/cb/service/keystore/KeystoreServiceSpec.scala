@@ -25,7 +25,9 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.config.WSHttp
 import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -52,6 +54,8 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
   val children : List[Child] = List(Child.apply(id = 1))
 
+  val payload : Option[Payload] = Some(Payload(children = children, claimant = Some(Claimant("John", "Smith", None, None))))
+
   "GET data should " should {
 
     "fetch children" in {
@@ -70,6 +74,14 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
       result shouldBe Nil
     }
 
+    "fetch payload" in {
+      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
+      implicit val hc = HeaderCarrier()
+      when(mockSessionCache.fetchAndGetEntry[Payload](mockEq("cb-payload"))(any(), any())).thenReturn(Future.successful(payload))
+      val result = Await.result(TestKeystoreService.cacheClient.loadPayload()(hc, request), 10 seconds)
+      result shouldBe payload
+    }
+
   }
 
   "POST data should" should {
@@ -86,6 +98,16 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
       result shouldBe Some(children)
     }
 
+    /*"save payload" in {
+      when(mockSessionCache.fetchAndGetEntry[Payload](mock("cb-payload"))(any(), any())).thenReturn(Future.successful(None))
+      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
+      implicit val hc = HeaderCarrier()
+      val json = Json.toJson[Payload](payload)
+
+      when(mockSessionCache.cache[Payload](mockEq("cb-payload"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-payload" -> json))))
+      val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
+      result shouldBe Some(children)
+    }*/
   }
 
   "KeystoreService.cacheClient" should {
