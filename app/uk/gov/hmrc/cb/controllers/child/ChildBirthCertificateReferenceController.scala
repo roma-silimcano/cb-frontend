@@ -49,7 +49,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
 
-  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.claimant.routes.ClaimantNameController.get())
 
   private val form = ChildBirthCertificateReferenceForm.form
   private def view(status : Status, form : Form[ChildBirthCertificateReferencePageModel], id : Int)

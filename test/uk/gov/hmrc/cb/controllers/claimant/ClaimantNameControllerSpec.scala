@@ -122,7 +122,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         val request = postRequest(form)
         val result = await(mockController.post()(request))
         status(result) shouldBe SEE_OTHER
-        verifyLocation(result, "/claimant/name")
+        verifyLocation(result, "/confirmation")
       }
 
       "redirect to confirmation when adding a claimant name" in {
@@ -134,7 +134,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         val request = postRequest(form)
         val result = await(mockController.post()(request))
         status(result) shouldBe SEE_OTHER
-        verifyLocation(result, "/claimant/name")
+        verifyLocation(result, "/confirmation")
       }
 
       "redirect to confirmation when changing a claimant name" in {
@@ -146,7 +146,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         val request = postRequest(form)
         val result = await(mockController.post()(request))
         status(result) shouldBe SEE_OTHER
-        verifyLocation(result, "/claimant/name")
+        verifyLocation(result, "/confirmation")
       }
 
       "redirect to confirmation when there is no change" in {
@@ -158,7 +158,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         val request = postRequest(form)
         val result = await(mockController.post()(request))
         status(result) shouldBe SEE_OTHER
-        verifyLocation(result, "/claimant/name")
+        verifyLocation(result, "/confirmation")
       }
 
       "redirect to technical difficulties when retrieving claimant and keystore is down" in {

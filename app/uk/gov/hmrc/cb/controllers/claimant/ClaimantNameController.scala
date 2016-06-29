@@ -57,7 +57,7 @@ trait ClaimantNameController extends ChildBenefitController {
     status(uk.gov.hmrc.cb.views.html.claimant.claimantname(form))
   }
 
-  private def redirectConfirmation() = Redirect(uk.gov.hmrc.cb.controllers.claimant.routes.ClaimantNameController.get())
+  private def redirectConfirmation() = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
 
   def get() = CBSessionProvider.withSession {
     implicit request =>
