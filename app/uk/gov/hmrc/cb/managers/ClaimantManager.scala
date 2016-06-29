@@ -16,6 +16,7 @@
 
 package uk.gov.hmrc.cb.managers
 
+import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
 /**
@@ -27,9 +28,9 @@ object ClaimantManager {
 
   class ClaimantService {
 
-    def insertUpdate(updatedClaimant: Claimant, storedClaimant: Option[Claimant]): Claimant = storedClaimant match {
-      case Some(storedClaimant) => storedClaimant.copy(updatedClaimant.firstName, updatedClaimant.lastName)
-      case _ => updatedClaimant
+    def editClaimantName(model: ClaimantNamePageModel, storedClaimant: Option[Claimant]): Claimant = storedClaimant match {
+      case Some(x) => x.copy(model.firstName, model.lastName)
+      case _ => Claimant(firstName = model.firstName, lastName = model.lastName)
     }
   }
 

@@ -32,6 +32,5 @@ trait ChildBenefitController extends FrontendController with Actions with CBRout
   val authConnector: AuthConnector
 
   protected def redirectTechnicalDifficulties = Redirect(technicalDifficulties)
-  protected def redirectInitialController = Redirect(initialController)
 
 }

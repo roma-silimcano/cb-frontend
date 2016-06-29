@@ -16,22 +16,31 @@
 
 package uk.gov.hmrc.cb.controllers
 
+import org.scalatest.mock.MockitoSugar
+import play.api.mvc.Call
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
-  * Created by chrisianson on 28/06/16.
-  */
-class CBRoutesSpec extends UnitSpec with CBFakeApplication with CBRoutes {
+ * Created by adamconder on 29/06/2016.
+ */
+class ChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  "CBRoutes" should {
+  "ChildBenefitController" should {
 
-    "should have an initialController route" in {
-      initialController.toString() shouldBe "/update-child-benefit"
+    object MockController extends ChildBenefitController {
+      override val authConnector = mock[AuthConnector]
     }
 
-    "should have a technicalDifficulties route" in {
-      technicalDifficulties.toString() shouldBe "/technical-difficulties"
+    "redirect to the initial controller" in {
+      MockController.initialController shouldBe Call("GET", "/child-benefit/update-child-benefit")
     }
+
+    "redirect to technical difficulties" in {
+      MockController.technicalDifficulties shouldBe Call("GET", "/child-benefit/technical-difficulties")
+    }
+
   }
+
 }

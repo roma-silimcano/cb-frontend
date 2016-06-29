@@ -24,8 +24,8 @@ import play.api.libs.json._
 case class Claimant(
                      firstName: String,
                      lastName: String,
-                     middleName: Option[String],
-                     title: Option[String]
+                     middleName: Option[String] = None,
+                     title: Option[String] = None
                    )
 
 object Claimant {

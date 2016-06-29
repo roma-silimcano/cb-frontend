@@ -44,14 +44,15 @@ object ClaimantNameController extends ClaimantNameController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val claimantService = ClaimantManager.claimantService
+  override val form = ClaimantNameForm.form
 }
 
 trait ClaimantNameController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val claimantService : ClaimantService
+  val form : Form[ClaimantNamePageModel]
 
-  private val form = ClaimantNameForm.form
   private def view(status: Status, form : Form[ClaimantNamePageModel])(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.claimant.claimantname(form))
   }
@@ -65,7 +66,7 @@ trait ClaimantNameController extends ChildBenefitController {
         payload =>
           Logger.error(s"[ClaimantNameController][get] loaded payload")
           payload.fold(
-            redirectInitialController
+            resultWithNoClaimant
           )(
             cache => {
               cache.claimant match {
@@ -94,17 +95,25 @@ trait ClaimantNameController extends ChildBenefitController {
             view(BadRequest, formWithErrors)
           )
         },
-        model =>
+        pageModel =>
           cacheClient.loadPayload() flatMap {
             cache =>
-              saveToKeystore(modifyClaimant(cache.get, model))
+              val modifiedPayload = cache match {
+                case Some(x) =>
+                  val claimant = claimantService.editClaimantName(storedClaimant = x.claimant, model = pageModel)
+                  x.copy(claimant = Some(claimant))
+                case None =>
+                  val claimant = claimantService.editClaimantName(storedClaimant = None, model = pageModel)
+                  Payload(claimant = Some(claimant))
+              }
+
+              saveToKeystore(modifiedPayload)
+          } recover {
+            case e: Exception =>
+              Logger.error(s"[ClaimantNameController][post] keystore exception whilst loading payload: ${e.getMessage}")
+              redirectTechnicalDifficulties
           }
       )
-  }
-
-  private def modifyClaimant(payload: Payload, model: ClaimantNamePageModel): Payload = {
-    val claimant = claimantService.insertUpdate(Claimant(firstName = model.firstName, lastName = model.lastName, None, None), payload.claimant)
-    Payload(children = payload.children, claimant = Some(claimant))
   }
 
   private def saveToKeystore(payload : Payload)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {

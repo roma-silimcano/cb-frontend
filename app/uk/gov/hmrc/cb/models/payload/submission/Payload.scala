@@ -23,8 +23,8 @@ import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 /**
   * Created by chrisianson on 24/06/16.
   */
-case class Payload(children: List[Child],
-                   claimant: Option[Claimant])
+case class Payload(children: List[Child] = List(),
+                   claimant: Option[Claimant] = None)
 
 object Payload {
   implicit val formats = Json.format[Payload]

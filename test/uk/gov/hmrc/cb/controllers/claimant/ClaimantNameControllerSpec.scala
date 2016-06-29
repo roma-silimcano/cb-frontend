@@ -24,6 +24,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
+import uk.gov.hmrc.cb.managers.ClaimantManager.ClaimantService
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -48,6 +49,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
       override val authConnector = mock[AuthConnector]
       override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
       override val claimantService = ClaimantManager.claimantService
+      override val form = ClaimantNameForm.form
     }
 
     implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/claimant/name").withSession(CBSessionProvider.generateSessionId())
@@ -59,6 +61,9 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
     "initialising" should {
       "wire up dependencies correctly" in {
         ClaimantNameController.authConnector shouldBe a[AuthConnector]
+        ClaimantNameController.cacheClient shouldBe a[ChildBenefitKeystoreService]
+        ClaimantNameController.claimantService shouldBe a[ClaimantService]
+        ClaimantNameController.form shouldBe a[Form[ClaimantNamePageModel]]
       }
     }
 
@@ -91,6 +96,12 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         status(result) shouldBe OK
       }
 
+      "respond 200 when no payload in keystore" in {
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(None))
+        val result = await(mockController.get()(getRequest))
+        status(result) shouldBe OK
+      }
+
       "respond 200 when child in keystore" in {
         val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
@@ -102,6 +113,17 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
 
     /* POST */
     "post" should {
+
+      "redirect to confirmation when adding a claimant name when there is no payload" in {
+        val save = Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None)))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(None))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
+        val form = ClaimantNameForm.form.fill(ClaimantNamePageModel("Chris", "Smith"))
+        val request = postRequest(form)
+        val result = await(mockController.post()(request))
+        status(result) shouldBe SEE_OTHER
+        verifyLocation(result, "/claimant/name")
+      }
 
       "redirect to confirmation when adding a claimant name" in {
         val load = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
@@ -139,14 +161,14 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         verifyLocation(result, "/claimant/name")
       }
 
-      /*"redirect to technical difficulties when retrieving claimant and keystore is down" in {
+      "redirect to technical difficulties when retrieving claimant and keystore is down" in {
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ClaimantNameForm.form.fill(ClaimantNamePageModel("Chris", "Smith"))
         val request = postRequest(form)
         val result = await(mockController.post()(request))
         status(result) shouldBe SEE_OTHER
         verifyLocation(result, "/technical-difficulties")
-      }*/
+      }
 
       "redirect to technical difficulties when adding a claimant name and keystore is down" in {
         val load = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith", None, None))))
