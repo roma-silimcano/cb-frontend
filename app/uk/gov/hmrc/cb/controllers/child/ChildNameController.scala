@@ -27,6 +27,7 @@ import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
@@ -58,20 +59,26 @@ trait ChildNameController extends ChildBenefitController {
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
-      cacheClient.loadChildren().map {
-        children =>
-          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          val resultWithNoChild = view(Ok, form, id)
-          childrenService.getChildById(id, children).fold(resultWithNoChild){
-            child =>
-              if(child.hasName) {
-                Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-                val model : ChildNamePageModel = child
-                view(Ok, form.fill(model), id)
-              } else {
-                resultWithNoChild
+      val resultWithNoChild = view(Ok, form, id)
+      cacheClient.loadPayload().map {
+        payload =>
+          Logger.error(s"[ClaimantNameController][get] loaded payload")
+          payload.fold(
+            resultWithNoChild
+          )(
+            cache => {
+              childrenService.getChildById(id, cache.children).fold(resultWithNoChild){
+                child =>
+                  if(child.hasName) {
+                    Logger.debug(s"[ClaimantNameController][get] child does exist at index")
+                    val model : ChildNamePageModel = child
+                    view(Ok, form.fill(model), id)
+                  } else {
+                    resultWithNoChild
+                  }
               }
-          }
+            }
+          )
       } recover {
         case e: Exception =>
           Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
@@ -88,12 +95,18 @@ trait ChildNameController extends ChildBenefitController {
               view(BadRequest, formWithErrors, id)
             )},
         model =>
-          cacheClient.loadChildren() flatMap {
+          cacheClient.loadPayload() flatMap {
             cache =>
-              handleChildrenWithCallback(cache, id, model) {
-                children =>
-                  saveToKeystore(children, id)
+              val modifiedPayload = cache match {
+                case Some(x) =>
+                  val children = addChild(id, model, x.children)
+                  x.copy(children = children)
+                case None =>
+                  val children = addChild(id, model, List())
+                  Payload(children = children)
               }
+
+              saveToKeystore(modifiedPayload, id)
           } recover {
             case e : Exception =>
               Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
@@ -107,21 +120,8 @@ trait ChildNameController extends ChildBenefitController {
     childrenService.addChild(id, children, child)
   }
 
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)
-                                        (block: List[Child] => Future[Result]) = {
-    val child = childrenService.getChildById(id, children).fold {
-      addChild(id, model, children)
-    }{
-        c =>
-          val modified = c.edit(model.firstName, model.lastName)
-          childrenService.replaceChild(children, id, modified)
-      }
-
-    block(child)
-  }
-
-  private def saveToKeystore(children : List[Child], id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.saveChildren(children).map {
+  private def saveToKeystore(payload : Payload, id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    cacheClient.savePayload(payload).map {
       children =>
         Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
         redirectConfirmation(id)
