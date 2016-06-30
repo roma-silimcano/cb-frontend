@@ -35,6 +35,9 @@ object Constraints {
    * $                 end of string
    */
   val nameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
+  // for hellotest page
+  val helloTestNameConstraint = "^[A-Za-z'-]+( [A-Za-z'-]+)*$"
+
   val dateFormatWithoutTimestamp = DateTimeFormat.forPattern("yyyy-MM-dd")
   val dateFormatWithTimestamp = DateTimeFormat.forPattern("yyyy-MM-dd'T'HH:mm:ssZ")
 

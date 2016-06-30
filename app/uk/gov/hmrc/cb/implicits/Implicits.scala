@@ -16,10 +16,12 @@
 
 package uk.gov.hmrc.cb.implicits
 
+import play.api.Logger
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
+import uk.gov.hmrc.cb.forms.HelloTestForm.HelloTestPageModel
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
@@ -33,6 +35,14 @@ object Implicits {
     (firstName, lastName) match {
       case (Some(x), Some(y)) => ChildNamePageModel(firstName = x, lastName = y)
       case (_, _) => throw new RuntimeException("[Implicits] child does not have first and last name")
+    }
+  }
+
+  implicit def childToHelloTestPageModel(child : Child) : HelloTestPageModel = {
+    val firstName = child.firstname
+    (firstName) match {
+      case (Some(x)) => HelloTestPageModel(firstName = x)
+      case _ => throw new RuntimeException("[Implicits] child does not have first ")
     }
   }
 
@@ -57,3 +67,5 @@ object Implicits {
   }
 
 }
+
+

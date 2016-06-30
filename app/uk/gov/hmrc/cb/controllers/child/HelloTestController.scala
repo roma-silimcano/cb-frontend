@@ -19,39 +19,40 @@ package uk.gov.hmrc.cb.controllers.child
 import play.api.Logger
 import play.api.data.Form
 import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.Results.Status
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
-import uk.gov.hmrc.cb.forms.ChildNameForm
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.forms.HelloTestForm
+import uk.gov.hmrc.cb.forms.HelloTestForm.HelloTestPageModel
 import uk.gov.hmrc.cb.managers.ChildrenManager
 import uk.gov.hmrc.cb.managers.ChildrenManager.ChildrenService
-import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.http.HeaderCarrier
+import uk.gov.hmrc.cb.implicits.Implicits._
 
 import scala.concurrent.Future
 
 /**
- * Created by adamconder on 01/06/2016.
- */
-
-object ChildNameController extends ChildNameController {
+  * Created by anuja on 28/06/16.
+  */
+object HelloTestController  extends HelloTestController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
 }
 
-trait ChildNameController extends ChildBenefitController {
+trait HelloTestController extends ChildBenefitController {
+  //
+  val cacheClient: ChildBenefitKeystoreService
+  val childrenService: ChildrenService
 
-  val cacheClient : ChildBenefitKeystoreService
-  val childrenService : ChildrenService
 
-  private val form = ChildNameForm.form
-  private def view(status: Status, form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = {
-    status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
+  private val form = HelloTestForm.form
+  private def view(status: Status, form : Form[HelloTestPageModel], id : Int)(implicit request: Request[AnyContent]) = {
+    status(uk.gov.hmrc.cb.views.html.child.helloTest(form,id))
   }
 
   private def redirectConfirmation(id : Int) = Redirect(uk.gov.hmrc.cb.controllers.child.routes.ChildDateOfBirthController.get(id))
@@ -64,9 +65,9 @@ trait ChildNameController extends ChildBenefitController {
           val resultWithNoChild = view(Ok, form, id)
           childrenService.getChildById(id, children).fold(resultWithNoChild){
             child =>
-              if(child.hasName) {
+              if(child.hasName1) {
                 Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-                val model : ChildNamePageModel = child
+                val model : HelloTestPageModel = child
                 view(Ok, form.fill(model), id)
               } else {
                 resultWithNoChild
@@ -84,9 +85,9 @@ trait ChildNameController extends ChildBenefitController {
       form.bindFromRequest().fold(
         formWithErrors => {
           Logger.info(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
-            Future.successful(
-              view(BadRequest, formWithErrors, id)
-            )},
+          Future.successful(
+            view(BadRequest, formWithErrors, id)
+          )},
         model =>
           cacheClient.loadChildren() flatMap {
             cache =>
@@ -100,23 +101,22 @@ trait ChildNameController extends ChildBenefitController {
               redirectTechnicalDifficulties
           }
       )
-    }
+  }
 
-  private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
-    val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
+  private def addChild(id : Int, model : HelloTestPageModel, children : List[Child]) = {
+    val child = Child(id = id, firstname = Some(model.firstName))
     childrenService.addChild(id, children, child)
   }
 
-
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildNamePageModel)
+  private def handleChildrenWithCallback(children: List[Child], id : Int, model : HelloTestPageModel)
                                         (block: List[Child] => Future[Result]) = {
     val child = childrenService.getChildById(id, children).fold {
       addChild(id, model, children)
     }{
-        c =>
-          val modified = c.edit(model.firstName, model.lastName)
-          childrenService.replaceChild(children, id, modified)
-      }
+      c =>
+        val modified = c.edit(model.firstName)
+        childrenService.replaceChild(children, id, modified)
+    }
 
     block(child)
   }

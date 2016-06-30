@@ -41,6 +41,8 @@ case class Child (
 
   def hasBirthCertificateReferenceNumber : Boolean = birthCertificateReference.isDefined
   def hasName : Boolean = firstname.isDefined && surname.isDefined
+  //hellotest
+  def hasName1 : Boolean = firstname.isDefined
   def hasDateOfBirth : Boolean = dob.isDefined
 }
 

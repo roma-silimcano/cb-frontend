@@ -54,7 +54,7 @@ trait ClaimantNameController extends ChildBenefitController {
       cacheClient.loadPayload().map {
         payload =>
           payload.fold(
-            redirectInitialController
+            resultWithNoClaimant
           )(
             cache => {
               cache.claimant match {

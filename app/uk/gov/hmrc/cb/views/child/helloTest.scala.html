@@ -1,0 +1,31 @@
+@import uk.gov.hmrc.play.views.html._
+@import uk.gov.hmrc.cb.forms
+@import uk.gov.hmrc.cb.forms.HelloTestForm.HelloTestPageModel
+
+@(form: Form[HelloTestPageModel], index: Int)(implicit request: Request[_])
+
+@uk.gov.hmrc.cb.views.html.cbcommon.cbMain(title = Messages("cb.hello.test.child.name.title"), heading = Messages("cb.hello.test.child.name.title")) {
+
+@helpers.form(action = uk.gov.hmrc.cb.controllers.child.routes.HelloTestController.post(index)){
+
+@helpers.errorSummary(heading = Messages("cb.hello.test.child.name.invalid.title"), form = form)
+
+<div class="form-group">
+    @helpers.input(field = form("firstName"),
+    args =
+    '_divClass -> "form-field",
+    '_error_id -> "firstNameError",
+    '_label -> Messages("cb.hello.test.child.first.name.label"),
+    '_inputClass -> "form-control input--cleared",
+    '_labelClass -> "form-label",
+    '_labelDataAttributes -> "id=firstName"
+    )
+
+</div>
+
+<div class="form-field--submit">
+    <input id="continue-button" class="button" type="submit" value="@Messages("cb.common.continue")">
+</div>
+
+}
+}

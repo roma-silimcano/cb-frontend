@@ -12,6 +12,11 @@ cb.common.continue=Continue
 # Common errors
 error.message.title = Sorry
 
+#Hello Test Page
+cb.hello.test.child.name.title= Hello Test
+cb.hello.test.child.name.invalid.title=problem with the name you''ve entered
+cb.hello.test.child.first.name.label=HelloTest FirstName
+
 #Child Birth Certificate
 cb.child.birth.certificate.title = Please enter the reference number from the birth certificate
 cb.child.birth.certificate.label = Birth Certificate Reference Number
