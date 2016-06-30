@@ -58,20 +58,6 @@ object KeystoreService  {
       }
     }
 
-//    def loadChildren()(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
-//      fetchEntryForSession[List[Child]](childrenKey).map {
-//        result =>
-//          result.getOrElse(Nil)
-//      }
-//    }
-//
-//    def saveChildren(children : List[Child])(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
-//      cacheEntryForSession[List[Child]](children, childrenKey).map {
-//        result =>
-//          result
-//      }
-//    }
-
     def loadPayload()(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
       fetchEntryForSession[Payload](payloadKey).map {
         result =>
@@ -85,6 +71,5 @@ object KeystoreService  {
           result
       }
     }
-
   }
 }

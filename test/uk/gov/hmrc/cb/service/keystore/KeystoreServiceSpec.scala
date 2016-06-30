@@ -58,22 +58,6 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
   "GET data should " should {
 
-//    "fetch children" in {
-//      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
-//      implicit val hc = HeaderCarrier()
-//      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(Some(children)))
-//      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
-//      result shouldBe children
-//    }
-//
-//    "return Nil when no children exist" in {
-//      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
-//      implicit val hc = HeaderCarrier()
-//      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(None))
-//      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
-//      result shouldBe Nil
-//    }
-
     "fetch payload" in {
       implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
       implicit val hc = HeaderCarrier()
@@ -85,18 +69,6 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
   }
 
   "POST data should" should {
-
-//    "save children" in {
-//      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(None))
-//
-//      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
-//      implicit val hc = HeaderCarrier()
-//      val json = Json.toJson[List[Child]](children)
-//
-//      when(mockSessionCache.cache[List[Child]](mockEq("cb-children"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-children" -> json))))
-//      val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
-//      result shouldBe Some(children)
-//    }
 
     "save payload" in {
       when(mockSessionCache.fetchAndGetEntry[Payload](mockEq("cb-payload"))(any(), any())).thenReturn(Future.successful(None))
