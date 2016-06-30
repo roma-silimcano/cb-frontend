@@ -35,7 +35,7 @@ cb.child.date.of.birth.title = What is the date of birth of the child you are cl
 cb.child.date.of.birth.invalid.title = There is a problem with the child''s date of birth
 
 # Claimant name page
-cb.claimant.name.title= What is the your name?
+cb.claimant.name.title= What''s your name?
 cb.claimant.first.name.label= First Name
 cb.claimant.last.name.label= Last Name
 cb.claimant.name.invalid = Please re-enter your name
