@@ -141,14 +141,14 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         verifyLocation(result, "/technical-difficulties")
       }
 
-      /*"redirect to technical difficulties when keystore is down when fetching children" in {
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+      "redirect to technical difficulties when keystore is down when fetching children" in {
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
         verifyLocation(result, "/technical-difficulties")
-      }*/
+      }
 
       "respond BAD_REQUEST when POST is unsuccessful" in {
         val payload = Some(Payload(children = List(Child(id = 1))))
