@@ -24,8 +24,7 @@ import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
   */
 class ClaimantNameFormSpec extends UnitSpec with WithFakeApplication {
 
-  val invalidLength = "tZWfHEhJlSIdAuSnaSjGgWTWeYWrPXYrMPmycvLyJXfSmrIcqrvgrDtISXsdhaOPKAKzHAfzUOiKzIIVkyEbEeCSrVtwFYcyUHQAzFfAFMaFckTtycGiGQrEbIsPsuMWE"
-
+  val invalidLength = "tZWfHEhJlSIdAuSnaSjGgWTWeYWrPXYrrtyy"
 
   "ClaimantNameForm" should {
 
