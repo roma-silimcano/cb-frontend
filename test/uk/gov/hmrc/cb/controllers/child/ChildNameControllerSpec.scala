@@ -159,7 +159,7 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         status(result) shouldBe BAD_REQUEST
       }
 
-      "redirect to confirmation - No children" in {
+      "redirect to confirmation after adding a child" in {
         val payload = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(Some(payload)))
         when(mockController.cacheClient.savePayload(mockEq(payload))(any(), any())).thenReturn(Future.successful(Some(payload)))

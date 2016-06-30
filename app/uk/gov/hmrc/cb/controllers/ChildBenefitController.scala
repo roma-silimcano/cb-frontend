@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.cb.controllers
 
-import play.api.mvc.Action
+import play.api.Logger
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import uk.gov.hmrc.cb.models.payload.submission.Payload
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -32,5 +36,4 @@ trait ChildBenefitController extends FrontendController with Actions with CBRout
   val authConnector: AuthConnector
 
   protected def redirectTechnicalDifficulties = Redirect(technicalDifficulties)
-
 }
