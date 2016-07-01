@@ -160,6 +160,18 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         verifyLocation(result, "/claimant/name")
       }
 
+      "redirect to confirmation after creating a new Payload and adding a new child" in {
+        val load = None
+        val save = Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(load))
+        val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        verifyLocation(result, "/claimant/name")
+      }
+
       "respond with BAD_REQUEST when post is unsuccessful" in {
         val load = Some(Payload(children = List(Child(id = 1))))
         when(mockController.cacheClient.loadPayload()(any(),any())).thenReturn(Future.successful(load))
@@ -189,7 +201,6 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
         status(result) shouldBe SEE_OTHER
         verifyLocation(result, "/technical-difficulties")
       }
-
     }
   }
 }

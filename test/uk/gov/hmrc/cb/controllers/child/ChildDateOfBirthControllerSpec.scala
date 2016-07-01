@@ -180,6 +180,19 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         verifyLocation(result, "/children/1/birth-certificate-reference")
       }
 
+      "redirect to confirmation after creating a new Payload and adding a new child" in {
+        val date = DateTime.parse("2010-08-27", Constraints.dateFormatWithoutTimestamp)
+        val load = None
+        val save = Payload(children = List(Child(id = 1, dob = Some(date))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(load))
+        val form = ChildDateOfBirthForm.form.fill(ChildDateOfBirthPageModel(date))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        verifyLocation(result, "/children/1/birth-certificate-reference")
+      }
+
       "respond with BAD_REQUEST when post is unsuccessful" in {
         val load = Some(Payload(children = List(Child(id = 1))))
         when(mockController.cacheClient.loadPayload()(any(),any())).thenReturn(Future.successful(load))
@@ -215,9 +228,6 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         status(result) shouldBe SEE_OTHER
         verifyLocation(result, "/technical-difficulties")
       }
-
     }
-
   }
-
 }

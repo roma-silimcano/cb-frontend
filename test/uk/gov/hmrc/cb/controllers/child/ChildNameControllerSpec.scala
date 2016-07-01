@@ -170,6 +170,18 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
         verifyLocation(result, "/children/1/date-of-birth")
       }
 
+      "redirect to confirmation after creating a new Payload and adding a new child" in {
+        val load = None
+        val save = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(load))
+        val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        verifyLocation(result, "/children/1/date-of-birth")
+      }
+
       "redirect to confirmation when changing a child" in {
         val load = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Fenwick"))))
@@ -185,7 +197,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to confirmation when there is no change" in {
         val form = ChildNameForm.form.fill(ChildNamePageModel("Adam", "Conder"))
         val request = postRequest(form, childIndex)
-
         val load = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(Some(load)))
@@ -198,7 +209,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to confirmation when adding a new child to existing children" in {
         val form = ChildNameForm.form.fill(ChildNamePageModel("David", "Conder"))
         val request = postRequest(form, childIndex2)
-
         val load = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("David"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(Some(load)))
@@ -211,7 +221,6 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       "redirect to technical difficulties when adding a new child to existing children when exception saving to keystore" in {
         val form = ChildNameForm.form.fill(ChildNamePageModel("David", "Conder"))
         val request = postRequest(form, childIndex2)
-
         val load = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder"))))
         val save = Payload(children = List(Child(id = 1, firstname = Some("Adam"), surname = Some("Conder")), Child(id = 2, firstname = Some("David"), surname = Some("Conder"))))
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(Some(load)))
@@ -222,5 +231,4 @@ class ChildNameControllerSpec extends UnitSpec with CBFakeApplication with Mocki
       }
     }
   }
-
 }
