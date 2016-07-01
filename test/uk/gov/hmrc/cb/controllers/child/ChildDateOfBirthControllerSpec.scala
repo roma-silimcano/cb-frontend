@@ -95,7 +95,6 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
         when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe SEE_OTHER
-        result.header.headers("LOCATION") should include("/technical-difficulties")
         verifyLocation(result, "/technical-difficulties")
       }
 

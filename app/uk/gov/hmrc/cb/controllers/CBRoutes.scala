@@ -22,4 +22,7 @@ package uk.gov.hmrc.cb.controllers
 trait CBRoutes {
   val initialController = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.get()
   val technicalDifficulties = uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get()
+  //val initialController = "/child-benefit/update-child-benefit"
+ // val technicalDifficulties = "/child-benefit/technical-difficulties"
 }
+

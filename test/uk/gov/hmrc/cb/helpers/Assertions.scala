@@ -17,6 +17,7 @@
 package uk.gov.hmrc.cb.helpers
 
 import play.api.mvc.Result
+import play.api.mvc.Call
 
 /**
  * Created by adamconder on 27/06/2016.
@@ -27,6 +28,10 @@ trait Assertions {
   def verifyLocation(response : Result, endpoint: String) = {
     val location = response.header.headers.get("Location").get
     location should include(endpoint.stripPrefix("/"))
+  }
+
+  def verifyEndpoint(call : Call, endpoint : String) = {
+    call.url should include(endpoint.stripPrefix("/"))
   }
 
 }

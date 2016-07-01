@@ -19,13 +19,14 @@ package uk.gov.hmrc.cb.controllers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.helpers.Assertions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
  * Created by adamconder on 29/06/2016.
  */
-class ChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
+class ChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar with Assertions {
 
   "ChildBenefitController" should {
 
@@ -34,11 +35,11 @@ class ChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with Mo
     }
 
     "redirect to the initial controller" in {
-      MockController.initialController shouldBe Call("GET", "/child-benefit/update-child-benefit")
+      verifyEndpoint(MockController.initialController, "update-child-benefit")
     }
 
     "redirect to technical difficulties" in {
-      MockController.technicalDifficulties shouldBe Call("GET", "/child-benefit/technical-difficulties")
+      verifyEndpoint(MockController.technicalDifficulties, "technical-difficulties")
     }
 
   }
