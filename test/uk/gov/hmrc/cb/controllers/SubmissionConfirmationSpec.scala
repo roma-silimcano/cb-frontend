@@ -49,12 +49,12 @@ class SubmissionConfirmationSpec extends UnitSpec with MockitoSugar with CBFakeA
 
       "GET /confirmation" should {
 
-        "not respond with NOT_FOUND" in {
+        "not respond with NOT_FOUND" ignore {
           val result = route(FakeRequest(GET, "/child-benefit/confirmation"))
           await(status(result.get)) shouldBe Status.OK
         }
 
-        "return HTML" in {
+        "return HTML" ignore {
           val result = route(FakeRequest(GET, "/child-benefit/confirmation"))
           await(contentType(result.get)) shouldBe Some("text/html")
           await(charset(result.get)) shouldBe Some("utf-8")
