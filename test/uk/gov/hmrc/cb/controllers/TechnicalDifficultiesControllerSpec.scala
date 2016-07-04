@@ -27,26 +27,22 @@ import uk.gov.hmrc.play.test.UnitSpec
  * Created by andrew on 03/05/16.
  */
 class TechnicalDifficultiesControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
-  val fakeRequest = FakeRequest("GET","/technical-difficulties")
-
-  object testChildBenefitController extends TechnicalDifficultiesController {
-
-  }
+  val fakeRequest = FakeRequest(GET, "/technical-difficulties")
 
   "GET /technical-difficulties" should {
     "return an InternalServerError" in {
-      val result = testChildBenefitController.get(fakeRequest)
+      val result = TechnicalDifficultiesController.get(fakeRequest)
       status(result) shouldBe Status.INTERNAL_SERVER_ERROR
     }
 
     "return html content type" in {
-      val result = testChildBenefitController.get(fakeRequest)
+      val result = TechnicalDifficultiesController.get(fakeRequest)
       contentType(result) shouldBe Some("text/html")
       charset(result) shouldBe Some("utf-8")
     }
 
     "return valid string" in {
-      val result = await(testChildBenefitController.get(fakeRequest))
+      val result = await(TechnicalDifficultiesController.get(fakeRequest))
       bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.technical.difficulties.heading"))
     }
   }

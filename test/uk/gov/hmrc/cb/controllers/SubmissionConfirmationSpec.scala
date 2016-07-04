@@ -38,9 +38,6 @@ class SubmissionConfirmationSpec extends UnitSpec with MockitoSugar with CBFakeA
 
   "SubmissionController" when {
 
-    implicit lazy val request = FakeRequest("GET", "/child-benefit/confirmation")
-    implicit lazy val hc = HeaderCarrier()
-
       "initialising" should {
 
         "wire up the dependencies correctly" in {
@@ -53,18 +50,18 @@ class SubmissionConfirmationSpec extends UnitSpec with MockitoSugar with CBFakeA
       "GET /confirmation" should {
 
         "not respond with NOT_FOUND" in {
-          val result = route(request)
+          val result = await(route(FakeRequest(GET, "/child-benefit/confirmation")))
           status(result.get) shouldBe OK
         }
 
         "return HTML" in {
-          val result = route(request)
+          val result = await(route(FakeRequest(GET, "/child-benefit/confirmation")))
           contentType(result.get) shouldBe Some("text/html")
           charset(result.get) shouldBe Some("utf-8")
         }
 
         "return confirmation template" in {
-          val result = mockSubmissionConfirmationController.get()(request)
+          val result = mockSubmissionConfirmationController.get()(FakeRequest(GET, "/child-benefit/confirmation"))
           await(status(result)) shouldBe Status.OK
         }
       }

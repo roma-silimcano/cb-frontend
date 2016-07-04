@@ -56,13 +56,13 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
     s"GET $endPoint" should {
 
       "return 200" in {
-        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
+        val fakeRequestGet = FakeRequest(GET, endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         status(result) shouldBe Status.OK
       }
 
       "be able to see the radio button elements" in {
-        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
+        val fakeRequestGet = FakeRequest(GET, endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         val doc = Jsoup.parse(contentAsString(result))
         doc.getElementById("updateChildBenefit-true").attr("type") shouldBe "radio"
@@ -70,14 +70,14 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
       }
 
       "return html content type" in {
-        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
+        val fakeRequestGet = FakeRequest(GET, endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.get(fakeRequestGet)
         contentType(result) shouldBe Some("text/html")
         charset(result) shouldBe Some("utf-8")
       }
 
       "return valid string" in {
-        val fakeRequestGet = FakeRequest("GET", endPoint).withSession(CBSessionProvider.generateSessionId())
+        val fakeRequestGet = FakeRequest(GET, endPoint).withSession(CBSessionProvider.generateSessionId())
         val result = await(mockUpdateChildBenefitController.get(fakeRequestGet))
         bodyOf(result).toString.replaceAll("&#x27;", "\'") should include(Messages("cb.update.child.benefit"))
       }
