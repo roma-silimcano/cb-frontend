@@ -82,7 +82,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.debug(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
+          Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -110,7 +110,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
               saveToKeystore(modifiedPayload, id)
           } recover {
             case e : Exception =>
-              Logger.debug(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -129,7 +129,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
         redirectConfirmation
     } recover {
       case e : Exception =>
-        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

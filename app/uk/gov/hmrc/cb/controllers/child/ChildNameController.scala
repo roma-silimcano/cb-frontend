@@ -81,7 +81,7 @@ trait ChildNameController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.debug(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
+          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -109,7 +109,7 @@ trait ChildNameController extends ChildBenefitController {
               saveToKeystore(modifiedPayload, id)
           } recover {
             case e : Exception =>
-              Logger.debug(s"[ChildNameController][post] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.error(s"[ChildNameController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -127,7 +127,7 @@ trait ChildNameController extends ChildBenefitController {
         redirectConfirmation(id)
     } recover {
       case e : Exception =>
-        Logger.debug(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }
