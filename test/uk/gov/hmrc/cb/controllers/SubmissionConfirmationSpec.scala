@@ -43,22 +43,23 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
           SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
           SubmissionConfirmationController.cacheClient shouldBe a[ChildBenefitKeystoreService]
         }
+
       }
 
       "GET /confirmation" should {
 
-        "not respond with NOT_FOUND" in {
+        "not respond with NOT_FOUND" in running(fakeApplication) {
           val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
           status(result.get) shouldBe OK
         }
 
-        "return HTML" in {
+        "return HTML" in running(fakeApplication) {
           val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
           contentType(result.get) shouldBe Some("text/html")
           charset(result.get) shouldBe Some("utf-8")
         }
 
-        "return confirmation template" in {
+        "return confirmation template" in running(fakeApplication) {
           val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", "/child-benefit/confirmation"))
           await(status(result)) shouldBe Status.OK
         }
