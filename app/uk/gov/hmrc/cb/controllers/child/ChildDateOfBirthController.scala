@@ -42,14 +42,15 @@ object ChildDateOfBirthController extends ChildDateOfBirthController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
+  override val form = ChildDateOfBirthForm.form
 }
 
 trait ChildDateOfBirthController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
+  val form : Form[ChildDateOfBirthPageModel]
 
-  private val form = ChildDateOfBirthForm.form
   private def view(status: Status, form : Form[ChildDateOfBirthPageModel], id : Int)(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childdateofbirth(form, id))
   }
@@ -105,7 +106,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
                   Payload(children = children)
               }
 
-              saveToKeystore(modifiedPayload, id, redirectConfirmation(id))
+              saveToKeystore(modifiedPayload, redirectConfirmation(id), redirectTechnicalDifficulties)
           } recover {
             case e : Exception =>
               Logger.error(s"[ChildDateOfBirthController][post] keystore exception whilst loading children: ${e.getMessage}")
@@ -119,15 +120,4 @@ trait ChildDateOfBirthController extends ChildBenefitController {
     childrenService.addChild(id, children, child)
   }
 
-  private def saveToKeystore(payload : Payload, id: Int, success : Result)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.savePayload(payload).map {
-      children =>
-        Logger.debug(s"[ChildBenefitController][saveToKeystore] saved to keystore")
-        success
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ChildBenefitController][saveToKeystore] keystore exception whilst saving: ${e.getMessage}")
-        redirectTechnicalDifficulties
-    }
-  }
 }

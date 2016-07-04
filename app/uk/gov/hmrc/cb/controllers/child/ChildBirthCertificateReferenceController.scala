@@ -43,16 +43,17 @@ object ChildBirthCertificateReferenceController extends ChildBirthCertificateRef
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
+  override val form = ChildBirthCertificateReferenceForm.form
 }
 
 trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
+  val form : Form[ChildBirthCertificateReferencePageModel]
 
   private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.claimant.routes.ClaimantNameController.get())
 
-  private val form = ChildBirthCertificateReferenceForm.form
   private def view(status : Status, form : Form[ChildBirthCertificateReferencePageModel], id : Int)
                   (implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id))
@@ -107,7 +108,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
                   Payload(children = children)
               }
 
-              saveToKeystore(modifiedPayload, id)
+              saveToKeystore(modifiedPayload, redirectConfirmation, redirectTechnicalDifficulties)
           } recover {
             case e : Exception =>
               Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
@@ -122,15 +123,4 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
     modified
   }
 
-  private def saveToKeystore(payload : Payload, id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.savePayload(payload).map {
-      children =>
-        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
-        redirectTechnicalDifficulties
-    }
-  }
 }

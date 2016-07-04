@@ -20,6 +20,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.helpers.Assertions
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -32,6 +33,7 @@ class ChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with Mo
 
     object MockController extends ChildBenefitController {
       override val authConnector = mock[AuthConnector]
+      override val cacheClient = mock[ChildBenefitKeystoreService]
     }
 
     "redirect to the initial controller" in {

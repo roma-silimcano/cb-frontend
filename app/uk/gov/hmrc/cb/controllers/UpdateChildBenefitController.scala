@@ -20,6 +20,7 @@ import play.api.mvc._
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.UpdateChildBenefitForm
+import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -29,6 +30,7 @@ import scala.concurrent.Future
   */
 object UpdateChildBenefitController extends UpdateChildBenefitController {
   override val authConnector = FrontendAuthConnector
+  override val cacheClient = KeystoreService.cacheClient
 }
 
 trait UpdateChildBenefitController extends ChildBenefitController {

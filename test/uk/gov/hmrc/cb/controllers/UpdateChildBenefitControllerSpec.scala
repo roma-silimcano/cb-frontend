@@ -25,6 +25,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.helpers.Assertions
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -41,6 +42,7 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
 
     val mockUpdateChildBenefitController = new UpdateChildBenefitController {
       override val authConnector: AuthConnector = mock[AuthConnector]
+      override val cacheClient = mock[ChildBenefitKeystoreService]
     }
 
     "initialising" should {

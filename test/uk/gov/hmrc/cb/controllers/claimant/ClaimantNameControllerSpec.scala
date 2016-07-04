@@ -63,7 +63,7 @@ class ClaimantNameControllerSpec extends UnitSpec with CBFakeApplication with Mo
         ClaimantNameController.authConnector shouldBe a[AuthConnector]
         ClaimantNameController.cacheClient shouldBe a[ChildBenefitKeystoreService]
         ClaimantNameController.claimantService shouldBe a[ClaimantService]
-        ClaimantNameController.form shouldBe a[Form[ClaimantNamePageModel]]
+        ClaimantNameController.form shouldBe a[Form[_]]
       }
     }
 

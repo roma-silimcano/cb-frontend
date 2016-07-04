@@ -43,14 +43,15 @@ object ChildNameController extends ChildNameController {
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
+  override val form = ChildNameForm.form
 }
 
 trait ChildNameController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
+  val form : Form[ChildNamePageModel]
 
-  private val form = ChildNameForm.form
   private def view(status: Status, form : Form[ChildNamePageModel], id : Int)(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childname(form, id))
   }
@@ -67,7 +68,9 @@ trait ChildNameController extends ChildBenefitController {
             resultWithNoChild
           )(
             cache => {
-              childrenService.getChildById(id, cache.children).fold(resultWithNoChild){
+              childrenService.getChildById(id, cache.children).fold(
+                resultWithNoChild
+              ){
                 child =>
                   if(child.hasName) {
                     Logger.debug(s"[ChildNameController][get] child does exist at index")
@@ -106,7 +109,7 @@ trait ChildNameController extends ChildBenefitController {
                   Payload(children = children)
               }
 
-              saveToKeystore(modifiedPayload, id)
+              saveToKeystore(modifiedPayload, redirectConfirmation(id), redirectTechnicalDifficulties)
           } recover {
             case e : Exception =>
               Logger.error(s"[ChildNameController][post] keystore exception whilst loading children: ${e.getMessage}")
@@ -118,18 +121,6 @@ trait ChildNameController extends ChildBenefitController {
   private def addChild(id : Int, model : ChildNamePageModel, children : List[Child]) = {
     val child = Child(id = id, firstname = Some(model.firstName), surname = Some(model.lastName))
     childrenService.addChild(id, children, child)
-  }
-
-  private def saveToKeystore(payload : Payload, id: Int)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.savePayload(payload).map {
-      children =>
-        Logger.debug(s"[ChildNameController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation(id)
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
-        redirectTechnicalDifficulties
-    }
   }
 
 }

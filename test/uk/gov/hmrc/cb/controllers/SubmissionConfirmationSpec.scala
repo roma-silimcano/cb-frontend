@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -34,6 +35,7 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
 
       def mockSubmissionConfirmationController = new SubmissionConfirmationController {
         override val authConnector : AuthConnector = mock[AuthConnector]
+        override val cacheClient = mock[ChildBenefitKeystoreService]
       }
 
       "initialising" should {

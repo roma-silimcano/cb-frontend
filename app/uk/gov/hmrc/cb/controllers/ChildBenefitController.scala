@@ -34,6 +34,19 @@ import scala.concurrent.Future
 trait ChildBenefitController extends FrontendController with Actions with CBRoutes {
 
   val authConnector: AuthConnector
+  val cacheClient : ChildBenefitKeystoreService
 
   protected def redirectTechnicalDifficulties = Redirect(technicalDifficulties)
+
+  protected def saveToKeystore(payload : Payload, confirmation : Result, failure : Result)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    cacheClient.savePayload(payload).map {
+      claimant =>
+        Logger.debug(s"[ChildBenefitController][saveToKeystore] saved payload")
+        confirmation
+    } recover {
+      case e : Exception =>
+        Logger.error(s"[ChildBenefitController][saveToKeystore] keystore exception: ${e.getMessage}")
+        failure
+    }
+  }
 }

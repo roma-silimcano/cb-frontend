@@ -55,6 +55,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
     override val cacheClient  = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
     override val childrenService = ChildrenManager.childrenService
     override val authConnector = mock[AuthConnector]
+    override val form = ChildDateOfBirthForm.form
   }
 
   "ChildDateOfBirthController" when {
@@ -71,6 +72,7 @@ class ChildDateOfBirthControllerSpec extends UnitSpec with CBFakeApplication wit
       "wire up the dependencies correctly" in {
         ChildDateOfBirthController.authConnector shouldBe a[AuthConnector]
         ChildDateOfBirthController.cacheClient shouldBe a[ChildBenefitKeystoreService]
+        ChildDateOfBirthController.form shouldBe a[Form[_]]
       }
 
     }

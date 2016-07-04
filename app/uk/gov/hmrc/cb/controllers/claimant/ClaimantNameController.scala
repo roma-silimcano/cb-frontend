@@ -49,35 +49,25 @@ object ClaimantNameController extends ClaimantNameController {
 
 trait ClaimantNameController extends ChildBenefitController {
 
-  val cacheClient : ChildBenefitKeystoreService
   val claimantService : ClaimantService
   val form : Form[ClaimantNamePageModel]
 
   private def view(status: Status, form : Form[ClaimantNamePageModel])(implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.claimant.claimantname(form))
   }
-
-  private def redirectConfirmation() = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def resultWithNoClaimant(implicit request: Request[AnyContent]) = view(Ok, form)
 
   def get() = CBSessionProvider.withSession {
     implicit request =>
-      val resultWithNoClaimant = view(Ok, form)
       cacheClient.loadPayload().map {
         payload =>
           Logger.debug(s"[ClaimantNameController][get] loaded payload")
           payload.fold(
             resultWithNoClaimant
           )(
-            cache => {
-              cache.claimant match {
-                case Some(x) =>
-                  Logger.debug(s"[ClaimantNameController][get] loaded claimant")
-                  val pageModel : ClaimantNamePageModel = x
-                  view(Ok, form.fill(pageModel))
-                case _ =>
-                  resultWithNoClaimant
-              }
-            }
+            cache =>
+             setupView(cache)
           )
       } recover {
         case e: Exception =>
@@ -98,16 +88,8 @@ trait ClaimantNameController extends ChildBenefitController {
         pageModel =>
           cacheClient.loadPayload() flatMap {
             cache =>
-              val modifiedPayload = cache match {
-                case Some(x) =>
-                  val claimant = claimantService.editClaimantName(storedClaimant = x.claimant, model = pageModel)
-                  x.copy(claimant = Some(claimant))
-                case None =>
-                  val claimant = claimantService.editClaimantName(storedClaimant = None, model = pageModel)
-                  Payload(claimant = Some(claimant))
-              }
-
-              saveToKeystore(modifiedPayload)
+              val modifiedPayload = modifyPayload(cache, pageModel)
+              saveToKeystore(modifiedPayload, redirectConfirmation, redirectTechnicalDifficulties)
           } recover {
             case e: Exception =>
               Logger.error(s"[ClaimantNameController][post] keystore exception whilst loading payload: ${e.getMessage}")
@@ -116,15 +98,25 @@ trait ClaimantNameController extends ChildBenefitController {
       )
   }
 
-  private def saveToKeystore(payload : Payload)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.savePayload(payload).map {
-      claimant =>
-        Logger.debug(s"[ClaimantNameController][saveToKeystore] saved claimant redirecting to submission")
-        redirectConfirmation()
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ClaimantNameController][saveToKeystore] keystore exception whilst saving claimant: ${e.getMessage}")
-        redirectTechnicalDifficulties
+  private def setupView(cache : Payload)(implicit request: Request[AnyContent]) = {
+    cache.claimant match {
+      case Some(x) =>
+        Logger.debug(s"[ClaimantNameController][get] loaded claimant")
+        val pageModel : ClaimantNamePageModel = x
+        view(Ok, form.fill(pageModel))
+      case _ =>
+        resultWithNoClaimant
+    }
+  }
+
+  private def modifyPayload(payload : Option[Payload], pageModel : ClaimantNamePageModel)(implicit request: Request[AnyContent]) = {
+    payload match {
+      case Some(x) =>
+        val claimant = claimantService.editClaimantName(storedClaimant = x.claimant, model = pageModel)
+        x.copy(claimant = Some(claimant))
+      case None =>
+        val claimant = claimantService.editClaimantName(storedClaimant = None, model = pageModel)
+        Payload(claimant = Some(claimant))
     }
   }
 
