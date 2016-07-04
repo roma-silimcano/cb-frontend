@@ -36,8 +36,6 @@ object CBSessionProvider extends CBRoutes {
    * so that we can retrieve the data from keystore
    */
 
-  private val NO_SESSION = "NO-SESSION"
-
   // construct a new session with the old session data
   def generateSession()(implicit request: Request[AnyContent]) = {
     val newId = generateSessionId()
@@ -63,13 +61,9 @@ object CBSessionProvider extends CBRoutes {
     UnauthorisedAction.async {
       implicit request : Request[AnyContent] =>
         getSessionId match {
-          // $COVERAGE-OFF$Disabling highlighting by default until a workaround for https://issues.scala-lang.org/browse/SI-8596 is found
-          case Some(NO_SESSION) =>
-            futureRequest(callbackWithSession) // Continue original request with new session
-          // $COVERAGE-ON
           case None =>
             futureRequest(callbackWithSession)
-          case _ =>
+          case Some(_) =>
             f(request) // Carry on
         }
     }
