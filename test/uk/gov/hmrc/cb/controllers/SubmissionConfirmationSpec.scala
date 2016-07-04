@@ -16,6 +16,8 @@
 
 package uk.gov.hmrc.cb.controllers
 
+import java.util.concurrent.TimeUnit
+
 import org.scalatest.mock.MockitoSugar
 import play.api.http.Status
 import play.api.test.FakeRequest
@@ -24,6 +26,8 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
+
+import scala.concurrent.duration.Duration
 
 /**
  * Created by adamconder on 05/05/2016.
@@ -41,6 +45,7 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
 
         "wire up the dependencies correctly" in {
           SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
+          SubmissionConfirmationController.cacheClient shouldBe a[ChildBenefitKeystoreService]
         }
       }
 
@@ -48,18 +53,18 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
 
         "not respond with NOT_FOUND" in {
           val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-          status(result.get) shouldBe OK
+          status(result.get)(Duration.apply(10, TimeUnit.SECONDS)) shouldBe OK
         }
 
         "return HTML" in {
           val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-          contentType(result.get) shouldBe Some("text/html")
-          charset(result.get) shouldBe Some("utf-8")
+          contentType(result.get)(Duration.apply(10, TimeUnit.SECONDS)) shouldBe Some("text/html")
+          charset(result.get)(Duration.apply(10, TimeUnit.SECONDS)) shouldBe Some("utf-8")
         }
 
         "return confirmation template" in {
-          val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", ""))
-          await(status(result)) shouldBe Status.OK
+          val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", "/child-benefit/confirmation"))
+          await(status(result))(Duration.apply(10, TimeUnit.SECONDS)) shouldBe Status.OK
         }
       }
     }
