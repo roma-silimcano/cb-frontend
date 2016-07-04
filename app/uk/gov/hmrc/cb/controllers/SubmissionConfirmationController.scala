@@ -39,4 +39,5 @@ trait SubmissionConfirmationController extends ChildBenefitController {
       val claimant = Claimant(firstName = "Louise", lastName = "Smith")
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
   }
+
 }
