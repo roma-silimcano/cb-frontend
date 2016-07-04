@@ -16,13 +16,18 @@
 
 package uk.gov.hmrc.cb.models.payload.submission.claimant
 
+import play.api.libs.json._
+
 /**
   * Created by chrisianson on 23/06/16.
   */
 case class Claimant(
                      firstName: String,
                      lastName: String,
-                     middleName: Option[String],
-                     title: Option[String],
-                     reference : Int
+                     middleName: Option[String] = None,
+                     title: Option[String] = None
                    )
+
+object Claimant {
+  implicit val formats = Json.format[Claimant]
+}

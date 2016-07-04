@@ -31,6 +31,7 @@ trait CBFakeApplication extends WithFakeApplication {
     "microservice.services.auth.host" -> "localhost",
     "microservice.services.auth.port" -> "8500"
   )
+
   override lazy val fakeApplication = FakeApplication(additionalConfiguration = config)
 
 }

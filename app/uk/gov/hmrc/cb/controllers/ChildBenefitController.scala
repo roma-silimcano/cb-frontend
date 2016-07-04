@@ -16,10 +16,14 @@
 
 package uk.gov.hmrc.cb.controllers
 
-import play.api.mvc.Action
+import play.api.Logger
+import play.api.mvc.{Action, AnyContent, Request, Result}
+import uk.gov.hmrc.cb.models.payload.submission.Payload
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.frontend.controller.FrontendController
+import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
@@ -27,10 +31,22 @@ import scala.concurrent.Future
  * Created by andrew on 03/05/16.
  */
 
-trait ChildBenefitController extends FrontendController with Actions {
+trait ChildBenefitController extends FrontendController with Actions with CBRoutes {
 
   val authConnector: AuthConnector
+  val cacheClient : ChildBenefitKeystoreService
 
-  protected def redirectTechnicalDifficulties = Redirect(uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get())
+  protected def redirectTechnicalDifficulties = Redirect(technicalDifficulties)
 
+  protected def saveToKeystore(payload : Payload, confirmation : Result, failure : Result)(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
+    cacheClient.savePayload(payload).map {
+      claimant =>
+        Logger.debug(s"[ChildBenefitController][saveToKeystore] saved payload")
+        confirmation
+    } recover {
+      case e : Exception =>
+        Logger.error(s"[ChildBenefitController][saveToKeystore] keystore exception: ${e.getMessage}")
+        failure
+    }
+  }
 }

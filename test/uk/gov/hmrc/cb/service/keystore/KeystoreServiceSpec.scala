@@ -25,7 +25,9 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.config.WSHttp
 import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 import uk.gov.hmrc.play.http.HeaderCarrier
@@ -52,38 +54,31 @@ class KeystoreServiceSpec extends UnitSpec with CBFakeApplication with MockitoSu
 
   val children : List[Child] = List(Child.apply(id = 1))
 
+  val payload : Option[Payload] = Some(Payload(children = children, claimant = Some(Claimant("John", "Smith", None, None))))
+
   "GET data should " should {
 
-    "fetch children" in {
+    "fetch payload" in {
       implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
       implicit val hc = HeaderCarrier()
-      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(Some(children)))
-      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
-      result shouldBe children
-    }
-
-    "return Nil when no children exist" in {
-      implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
-      implicit val hc = HeaderCarrier()
-      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(None))
-      val result = Await.result(TestKeystoreService.cacheClient.loadChildren()(hc, request), 10 seconds)
-      result shouldBe Nil
+      when(mockSessionCache.fetchAndGetEntry[Payload](mockEq("cb-payload"))(any(), any())).thenReturn(Future.successful(payload))
+      val result = Await.result(TestKeystoreService.cacheClient.loadPayload()(hc, request), 10 seconds)
+      result shouldBe payload
     }
 
   }
 
   "POST data should" should {
 
-    "save children" in {
-      when(mockSessionCache.fetchAndGetEntry[List[Child]](mockEq("cb-children"))(any(), any())).thenReturn(Future.successful(None))
-
+    "save payload" in {
+      when(mockSessionCache.fetchAndGetEntry[Payload](mockEq("cb-payload"))(any(), any())).thenReturn(Future.successful(None))
       implicit val request = FakeRequest().withSession(CBSessionProvider.generateSessionId())
       implicit val hc = HeaderCarrier()
-      val json = Json.toJson[List[Child]](children)
+      val json = Json.toJson[Payload](payload.get)
 
-      when(mockSessionCache.cache[List[Child]](mockEq("cb-children"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-children" -> json))))
-      val result = Await.result(TestKeystoreService.cacheClient.saveChildren(children)(hc, request), 10 seconds)
-      result shouldBe Some(children)
+      when(mockSessionCache.cache[Payload](mockEq("cb-payload"), any())(any(), any())).thenReturn(Future.successful(CacheMap("sessionValue", Map("cb-payload" -> json))))
+      val result = Await.result(TestKeystoreService.cacheClient.savePayload(payload.get)(hc, request), 10 seconds)
+      result shouldBe payload
     }
 
   }

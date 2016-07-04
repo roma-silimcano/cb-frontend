@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models.payload.submission.claimant
+package uk.gov.hmrc.cb.helpers
 
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import play.api.mvc.Result
+import play.api.mvc.Call
 
 /**
- * Created by adamconder on 06/05/2016.
+ * Created by adamconder on 27/06/2016.
  */
-class ClaimantSpec extends UnitSpec with WithFakeApplication {
+trait Assertions {
+  self: uk.gov.hmrc.play.test.UnitSpec =>
 
-  "Claimant" should {
-
-    "instantiate an instance of Claimant" in {
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
-      claimant shouldBe a[Claimant]
-      claimant.firstName shouldBe "Louise"
-      claimant.lastName shouldBe "Smith"
-      claimant.middleName shouldBe None
-      claimant.title shouldBe None
-    }
+  def verifyLocation(response : Result, endpoint: String) = {
+    val location = response.header.headers.get("Location").get
+    location should include(endpoint.stripPrefix("/"))
   }
+
+  def verifyEndpoint(call : Call, endpoint : String) = {
+    call.url should include(endpoint.stripPrefix("/"))
+  }
+
 }

@@ -20,6 +20,7 @@ import play.api.Logger
 import uk.gov.hmrc.cb.connectors.KeystoreConnector
 import uk.gov.hmrc.http.cache.client.SessionCache
 import play.api.mvc.{AnyContent, Request}
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.play.http.logging.{LoggingDetails, MdcLoggingExecutionContext}
 import uk.gov.hmrc.play.http.{HeaderCarrier, SessionKeys}
@@ -57,19 +58,18 @@ object KeystoreService  {
       }
     }
 
-    def loadChildren()(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
-      fetchEntryForSession[List[Child]](childrenKey).map {
-        result =>
-          result.getOrElse(Nil)
-      }
-    }
-
-    def saveChildren(children : List[Child])(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
-      cacheEntryForSession[List[Child]](children, childrenKey).map {
+    def loadPayload()(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
+      fetchEntryForSession[Payload](payloadKey).map {
         result =>
           result
       }
     }
 
+    def savePayload(payload : Payload)(implicit hc : HeaderCarrier, request : Request[AnyContent]) = {
+      cacheEntryForSession[Payload](payload, payloadKey).map {
+        result =>
+          result
+      }
+    }
   }
 }

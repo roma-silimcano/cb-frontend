@@ -30,6 +30,7 @@ import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.play.http.HeaderCarrier
 import uk.gov.hmrc.cb.implicits.Implicits._
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 
 import scala.concurrent.Future
@@ -42,16 +43,17 @@ object ChildBirthCertificateReferenceController extends ChildBirthCertificateRef
   override val authConnector = FrontendAuthConnector
   override val cacheClient = KeystoreService.cacheClient
   override val childrenService = ChildrenManager.childrenService
+  override val form = ChildBirthCertificateReferenceForm.form
 }
 
 trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   val cacheClient : ChildBenefitKeystoreService
   val childrenService : ChildrenService
+  val form : Form[ChildBirthCertificateReferencePageModel]
 
-  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.routes.SubmissionConfirmationController.get())
+  private def redirectConfirmation = Redirect(uk.gov.hmrc.cb.controllers.claimant.routes.ClaimantNameController.get())
 
-  private val form = ChildBirthCertificateReferenceForm.form
   private def view(status : Status, form : Form[ChildBirthCertificateReferencePageModel], id : Int)
                   (implicit request: Request[AnyContent]) = {
     status(uk.gov.hmrc.cb.views.html.child.childBirthCertificate(form, id))
@@ -59,24 +61,30 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
 
   def get(id: Int) = CBSessionProvider.withSession {
     implicit request =>
-      cacheClient.loadChildren.map {
-        children =>
-          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded children $children")
-          val resultWithNoChild = view(Ok, form, id)
-          childrenService.getChildById(id, children).fold(resultWithNoChild){
-            child =>
-              if (child.hasBirthCertificateReferenceNumber) {
-                Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
-                val model : ChildBirthCertificateReferencePageModel = child
-                view(Ok, form.fill(model), id)
-              } else {
-                resultWithNoChild
+      val resultWithNoChild = view(Ok, form, id)
+      cacheClient.loadPayload().map {
+        payload =>
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded payload")
+          payload.fold(
+            resultWithNoChild
+          )(
+            cache => {
+              childrenService.getChildById(id, cache.children).fold(resultWithNoChild){
+                child =>
+                  if(child.hasBirthCertificateReferenceNumber) {
+                    Logger.debug(s"[ChildBirthCertificateReferenceController][get] child does exist at index")
+                    val model : ChildBirthCertificateReferencePageModel = child
+                    view(Ok, form.fill(model), id)
+                  } else {
+                    resultWithNoChild
+                  }
               }
-          }
+            }
+          )
       } recover {
         case e: Exception =>
           Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
-         redirectTechnicalDifficulties
+          redirectTechnicalDifficulties
       }
   }
 
@@ -89,15 +97,21 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
             view(BadRequest, formWithErrors, id)
           )},
         model =>
-          cacheClient.loadChildren() flatMap {
+          cacheClient.loadPayload() flatMap {
             cache =>
-              handleChildrenWithCallback(cache, id, model) {
-                children =>
-                  saveToKeystore(children)
+              val modifiedPayload = cache match {
+                case Some(x) =>
+                  val children = addChild(id, model, x.children)
+                  x.copy(children = children)
+                case None =>
+                  val children = addChild(id, model, List())
+                  Payload(children = children)
               }
+
+              saveToKeystore(modifiedPayload, redirectConfirmation, redirectTechnicalDifficulties)
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}}")
+              Logger.error(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -109,30 +123,4 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
     modified
   }
 
-  private def handleChildrenWithCallback(children: List[Child], id : Int, model : ChildBirthCertificateReferencePageModel)
-                                        (block: List[Child] => Future[Result]) = {
-      val child : List[Child] = childrenService.getChildById(id, children).fold {
-        val result = addChild(id, model, children)
-        result
-      }{
-        c =>
-          val modified = c.edit(birthCertificateReference = model.birthCertificateReference)
-          val result = childrenService.replaceChild(children, id, modified)
-          result
-      }
-
-    block(child)
-  }
-
-  private def saveToKeystore(children : List[Child])(implicit hc : HeaderCarrier, request: Request[AnyContent]) = {
-    cacheClient.saveChildren(children).map {
-      children =>
-        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] saved children redirecting to submission")
-        redirectConfirmation
-    } recover {
-      case e : Exception =>
-        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
-        redirectTechnicalDifficulties
-    }
-  }
 }

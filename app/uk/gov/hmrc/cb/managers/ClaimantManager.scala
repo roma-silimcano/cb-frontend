@@ -14,24 +14,24 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models.payload.submission.claimant
+package uk.gov.hmrc.cb.managers
 
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
 /**
- * Created by adamconder on 06/05/2016.
- */
-class ClaimantSpec extends UnitSpec with WithFakeApplication {
+  * Created by chrisianson on 28/06/16.
+  */
+object ClaimantManager {
 
-  "Claimant" should {
+  val claimantService = new ClaimantService
 
-    "instantiate an instance of Claimant" in {
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
-      claimant shouldBe a[Claimant]
-      claimant.firstName shouldBe "Louise"
-      claimant.lastName shouldBe "Smith"
-      claimant.middleName shouldBe None
-      claimant.title shouldBe None
+  class ClaimantService {
+
+    def editClaimantName(model: ClaimantNamePageModel, storedClaimant: Option[Claimant]): Claimant = storedClaimant match {
+      case Some(x) => x.copy(model.firstName, model.lastName)
+      case _ => Claimant(firstName = model.firstName, lastName = model.lastName)
     }
   }
+
 }

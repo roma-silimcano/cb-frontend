@@ -28,7 +28,7 @@ import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
  */
 class SubmissionConfirmationTemplateSpec extends UnitSpec with WithFakeApplication {
 
-  val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = 12345)
+  val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
 
   "SubmissionConfirmation Template" should {
 
@@ -41,7 +41,7 @@ class SubmissionConfirmationTemplateSpec extends UnitSpec with WithFakeApplicati
     "render the confirmation message" in {
       val template = views.html.confirmation_submission(claimant = claimant)(FakeRequest("GET", ""))
       val doc = Jsoup.parse(contentAsString(template))
-      doc.getElementById("confirmation-message").text() shouldBe "Thank you Louise for updating your Child Benefit. Your reference number is 12345."
+      doc.getElementById("confirmation-message").text() shouldBe "Thank you Louise for updating your Child Benefit"
     }
 
   }

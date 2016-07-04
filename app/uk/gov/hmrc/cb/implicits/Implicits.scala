@@ -19,7 +19,9 @@ package uk.gov.hmrc.cb.implicits
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
 import uk.gov.hmrc.cb.forms.ChildDateOfBirthForm.ChildDateOfBirthPageModel
 import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
+import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 
 /**
  * Created by adamconder on 06/06/2016.
@@ -48,6 +50,10 @@ object Implicits {
       case Some(x) => ChildDateOfBirthPageModel(x)
       case _ => throw new RuntimeException("[Implicits] child does not have a date of birth")
     }
+  }
+
+  implicit def claimantToClaimantNamePageModel(claimant : Claimant) : ClaimantNamePageModel = {
+      ClaimantNamePageModel(firstName = claimant.firstName, lastName = claimant.lastName)
   }
 
 }

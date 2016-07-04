@@ -27,7 +27,9 @@ import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm
 import uk.gov.hmrc.cb.forms.ChildBirthCertificateReferenceForm.ChildBirthCertificateReferencePageModel
+import uk.gov.hmrc.cb.helpers.Assertions
 import uk.gov.hmrc.cb.managers.ChildrenManager
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 import uk.gov.hmrc.cb.models.payload.submission.child.Child
 import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
@@ -40,7 +42,7 @@ import scala.concurrent.Future
 /**
   * Created by chrisianson on 06/06/16.
   */
-class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
+class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar with Assertions {
 
   val childIndex = 1
   val childIndex2 = 2
@@ -49,6 +51,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
     override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
     override val childrenService =  ChildrenManager.childrenService
     override val authConnector = mock[AuthConnector]
+    override val form = ChildBirthCertificateReferenceForm.form
   }
 
   "ChildBirthCertificateReferenceController" when {
@@ -64,6 +67,7 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
       "wire up the dependencies correctly" in {
         ChildBirthCertificateReferenceController.authConnector shouldBe a[AuthConnector]
         ChildBirthCertificateReferenceController.cacheClient shouldBe a[ChildBenefitKeystoreService]
+        ChildBirthCertificateReferenceController.form shouldBe a[Form[_]]
       }
     }
 
@@ -83,36 +87,37 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
     "GET" should {
 
       "redirect to technical-difficulties page when keystore is down" in {
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe SEE_OTHER
-        result.header.headers("Location") should include("/technical-difficulties")
+        verifyLocation(result, "/technical-difficulties")
       }
 
       "respond 200 when no children in keystore" in {
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(Nil))
+        val payload = Some(Payload())
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
       }
 
       "respond 200 when child in keystore with no birthCertificateReference" in {
-        val children = List(Child(id = 1))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
+        val payload = Some(Payload(children = List(Child(id = 1))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
       }
 
       "respond 200 when child in keystore" in {
-        val children = List(Child(id = 1, birthCertificateReference = Some("12345")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
+        val payload = Some(Payload(children = List(Child(id = 1, birthCertificateReference = Some("12345")))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
         bodyOf(result) should include("12345")
       }
 
       "respond 200 when multiple children in keystore" in {
-        val children = List(Child(id = 1, birthCertificateReference = Some("12345")), Child(id = 2, birthCertificateReference = Some("12345")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
+        val payload = Some(Payload(children = List(Child(id = 1, birthCertificateReference = Some("12345")), Child(id = 2, birthCertificateReference = Some("12345")))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
         val result = await(mockController.get(childIndex)(getRequest))
         status(result) shouldBe OK
       }
@@ -124,42 +129,54 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
       "redirect to confirmation when adding a new child to existing children" in {
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex2)
-
-        val load = List(Child(id = 1, birthCertificateReference = Some("123456789")))
-        val save = List(Child(id = 1, birthCertificateReference = Some("123456789")), Child(id = 2, birthCertificateReference = Some("123456789")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
+        val load = Some(Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789")))))
+        val save = Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789")), Child(id = 2, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val result = await(mockController.post(childIndex2).apply(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        verifyLocation(result, "/claimant/name")
       }
 
       "redirect to confirmation when updating a child" in {
-        val load = List(Child(id = 1, birthCertificateReference = Some("111111111")))
-        val save = List(Child(id = 1, birthCertificateReference = Some("123456789")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(load))
-        when(mockController.cacheClient.saveChildren(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
+        val load = Some(Payload(children=List(Child(id = 1, birthCertificateReference = Some("111111111")))))
+        val save = Payload(children=List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(Some(save)))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        verifyLocation(result, "/claimant/name")
       }
 
-      "redirect to confirmation - No children" in {
-        val children = List(Child(id = 1, birthCertificateReference = Some("123456789")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(List()))
-        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.successful(Some(children)))
+      "redirect to confirmation after adding a child" in {
+        val load = Some(Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789")))))
+        val save = Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(load))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/confirmation"
+        verifyLocation(result, "/claimant/name")
+      }
+
+      "redirect to confirmation after creating a new Payload and adding a new child" in {
+        val load = None
+        val save = Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.successful(load))
+        val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
+        val request = postRequest(form, childIndex)
+        val result = await(mockController.post(childIndex)(request))
+        status(result) shouldBe SEE_OTHER
+        verifyLocation(result, "/claimant/name")
       }
 
       "respond with BAD_REQUEST when post is unsuccessful" in {
-        val children = List(Child(id = 1))
-        when(mockController.cacheClient.loadChildren()(any(),any())).thenReturn(Future.successful(children))
+        val load = Some(Payload(children = List(Child(id = 1))))
+        when(mockController.cacheClient.loadPayload()(any(),any())).thenReturn(Future.successful(load))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("abcdef"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
@@ -167,25 +184,25 @@ class ChildBirthCertificateReferenceControllerSpec extends UnitSpec with CBFakeA
       }
 
       "redirect to technical difficulties when keystore is down when fetching children" in {
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
+        verifyLocation(result, "/technical-difficulties")
       }
 
       "redirect to technical difficulties when keystore is down when saving" in {
-        val children = List(Child(id = 1, birthCertificateReference = Some("123456789")))
-        when(mockController.cacheClient.loadChildren()(any(), any())).thenReturn(Future.successful(children))
-        when(mockController.cacheClient.saveChildren(mockEq(children))(any(), any())).thenReturn(Future.failed(new RuntimeException))
+        val load = Some(Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789")))))
+        val save = Payload(children = List(Child(id = 1, birthCertificateReference = Some("123456789"))))
+        when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(load))
+        when(mockController.cacheClient.savePayload(mockEq(save))(any(), any())).thenReturn(Future.failed(new RuntimeException))
         val form = ChildBirthCertificateReferenceForm.form.fill(ChildBirthCertificateReferencePageModel("123456789"))
         val request = postRequest(form, childIndex)
         val result = await(mockController.post(childIndex)(request))
         status(result) shouldBe SEE_OTHER
-        redirectLocation(result).get shouldBe "/child-benefit/technical-difficulties"
+        verifyLocation(result, "/technical-difficulties")
       }
-
     }
   }
 }

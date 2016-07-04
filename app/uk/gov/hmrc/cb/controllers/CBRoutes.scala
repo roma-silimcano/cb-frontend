@@ -14,24 +14,13 @@
  * limitations under the License.
  */
 
-package uk.gov.hmrc.cb.models.payload.submission.claimant
-
-import uk.gov.hmrc.play.test.{UnitSpec, WithFakeApplication}
+package uk.gov.hmrc.cb.controllers
 
 /**
- * Created by adamconder on 06/05/2016.
- */
-class ClaimantSpec extends UnitSpec with WithFakeApplication {
-
-  "Claimant" should {
-
-    "instantiate an instance of Claimant" in {
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None)
-      claimant shouldBe a[Claimant]
-      claimant.firstName shouldBe "Louise"
-      claimant.lastName shouldBe "Smith"
-      claimant.middleName shouldBe None
-      claimant.title shouldBe None
-    }
-  }
+  * Created by chrisianson on 24/06/16.
+  */
+trait CBRoutes {
+  val initialController = uk.gov.hmrc.cb.controllers.routes.UpdateChildBenefitController.get()
+  val technicalDifficulties = uk.gov.hmrc.cb.controllers.routes.TechnicalDifficultiesController.get()
 }
+

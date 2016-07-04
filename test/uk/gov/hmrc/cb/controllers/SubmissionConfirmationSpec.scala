@@ -21,6 +21,7 @@ import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
@@ -29,38 +30,40 @@ import uk.gov.hmrc.play.test.UnitSpec
  */
 class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  val mockSubmissionConfirmationController = new SubmissionConfirmationController {
-    override val authConnector : AuthConnector = mock[AuthConnector]
-  }
+  running(fakeApplication) {
+    "SubmissionController" when {
 
-  "SubmissionController" when {
+      def mockSubmissionConfirmationController = new SubmissionConfirmationController {
+        override val authConnector : AuthConnector = mock[AuthConnector]
+        override val cacheClient = mock[ChildBenefitKeystoreService]
+      }
 
-    "initialising" should {
+      "initialising" should {
 
-      "wire up the dependencies correctly" in {
-        SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
+        "wire up the dependencies correctly" in {
+          SubmissionConfirmationController.authConnector shouldBe a[AuthConnector]
+        }
+      }
+
+      "GET /confirmation" should {
+
+        "not respond with NOT_FOUND" in {
+          val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
+          status(result.get) shouldBe OK
+        }
+
+        "return HTML" in {
+          val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
+          contentType(result.get) shouldBe Some("text/html")
+          charset(result.get) shouldBe Some("utf-8")
+        }
+
+        "return confirmation template" in {
+          val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", ""))
+          await(status(result)) shouldBe Status.OK
+        }
       }
     }
-
-    "GET /confirmation" should {
-
-      "not respond with NOT_FOUND" in {
-        val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-        result.isDefined shouldBe true
-        status(result.get) should not be NOT_FOUND
-        status(result.get) shouldBe OK
-      }
-
-      "return HTML" in {
-        val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-        contentType(result.get) shouldBe Some("text/html")
-        charset(result.get) shouldBe Some("utf-8")
-      }
-
-      "return confirmation template" in {
-        val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", ""))
-        await(status(result)) shouldBe Status.OK
-      }
-    }
   }
+
 }

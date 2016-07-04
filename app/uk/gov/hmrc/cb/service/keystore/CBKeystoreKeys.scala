@@ -21,6 +21,7 @@ package uk.gov.hmrc.cb.service.keystore
   */
 trait CBKeystoreKeys {
   val childrenKey : String = "cb-children"
+  val payloadKey : String = "cb-payload"
 }
 
 object CBKeystoreKeys extends CBKeystoreKeys

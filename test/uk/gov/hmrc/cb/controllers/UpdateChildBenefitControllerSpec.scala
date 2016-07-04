@@ -24,13 +24,15 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.helpers.Assertions
+import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
 /**
   * Created by chrisianson on 04/05/16.
   */
-class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
+class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication with MockitoSugar with Assertions {
 
   "UpdateChildBenefitController" when {
 
@@ -40,6 +42,7 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
 
     val mockUpdateChildBenefitController = new UpdateChildBenefitController {
       override val authConnector: AuthConnector = mock[AuthConnector]
+      override val cacheClient = mock[ChildBenefitKeystoreService]
     }
 
     "initialising" should {
@@ -87,7 +90,7 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
           ("updateChildBenefit", "true")).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostTrue)
         status(result) shouldBe Status.SEE_OTHER
-        result.header.headers("Location") should include(resultEndpoint)
+        verifyLocation(result, resultEndpoint)
       }
 
       "post the form with NO and redirect to the technical difficulties endpoint" in {
@@ -95,7 +98,7 @@ class UpdateChildBenefitControllerSpec extends UnitSpec with CBFakeApplication w
           ("updateChildBenefit", "false")).withSession(CBSessionProvider.generateSessionId())
         val result = mockUpdateChildBenefitController.post.apply(fakeRequestPostFalse)
         status(result) shouldBe Status.SEE_OTHER
-        result.header.headers("Location") should include(techDiffEndpoint)
+        verifyLocation(result, techDiffEndpoint)
       }
 
       "post the form with an invalid result and return a BAD REQUEST code" in {

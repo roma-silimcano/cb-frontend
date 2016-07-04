@@ -19,6 +19,7 @@ package uk.gov.hmrc.cb.controllers
 import play.api.mvc.{Action, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
+import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -28,15 +29,14 @@ import scala.concurrent.Future
  */
 object SubmissionConfirmationController extends SubmissionConfirmationController {
   override val authConnector : AuthConnector = FrontendAuthConnector
+  override val cacheClient = KeystoreService.cacheClient
 }
 
 trait SubmissionConfirmationController extends ChildBenefitController {
 
-  private val REFERENCE_NUMBER = 12345
-
   def get = Action.async {
     implicit request =>
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith", None, None, reference = REFERENCE_NUMBER)
+      val claimant = Claimant(firstName = "Louise", lastName = "Smith")
       Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
   }
 }
