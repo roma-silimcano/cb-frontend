@@ -62,7 +62,7 @@ trait ChildNameController extends ChildBenefitController {
       val resultWithNoChild = view(Ok, form, id)
       cacheClient.loadPayload().map {
         payload =>
-          Logger.error(s"[ClaimantNameController][get] loaded payload")
+          Logger.debug(s"[ChildNameController][get] loaded payload")
           payload.fold(
             resultWithNoChild
           )(
@@ -70,7 +70,7 @@ trait ChildNameController extends ChildBenefitController {
               childrenService.getChildById(id, cache.children).fold(resultWithNoChild){
                 child =>
                   if(child.hasName) {
-                    Logger.debug(s"[ClaimantNameController][get] child does exist at index")
+                    Logger.debug(s"[ChildNameController][get] child does exist at index")
                     val model : ChildNamePageModel = child
                     view(Ok, form.fill(model), id)
                   } else {
@@ -81,7 +81,7 @@ trait ChildNameController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
+          Logger.debug(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -90,7 +90,7 @@ trait ChildNameController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
+          Logger.debug(s"[ChildNameController][bindFromRequest] invalid form submission $formWithErrors")
             Future.successful(
               view(BadRequest, formWithErrors, id)
             )},
@@ -109,7 +109,7 @@ trait ChildNameController extends ChildBenefitController {
               saveToKeystore(modifiedPayload, id)
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildNameController][get] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.debug(s"[ChildNameController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -127,7 +127,7 @@ trait ChildNameController extends ChildBenefitController {
         redirectConfirmation(id)
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.debug(s"[ChildNameController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

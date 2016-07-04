@@ -61,7 +61,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
       val resultWithNoChild = view(Ok, form, id)
       cacheClient.loadPayload().map {
         payload =>
-          Logger.error(s"[ChildDateOfBirthController][get] loaded payload")
+          Logger.debug(s"[ChildDateOfBirthController][get] loaded payload")
           payload.fold(
             resultWithNoChild
           )(
@@ -80,7 +80,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.error(s"[ChildDateOfBirthController][get] keystore exception whilst loading children: ${e.getMessage}")
+          Logger.debug(s"[ChildDateOfBirthController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -89,7 +89,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ChildDateOfBirthController][bindFromRequest] invalid form submission $formWithErrors")
+          Logger.debug(s"[ChildDateOfBirthController][bindFromRequest] invalid form submission $formWithErrors")
           Future.successful(
             view(BadRequest, formWithErrors, id)
           )},
@@ -108,7 +108,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
               saveToKeystore(modifiedPayload, id, redirectConfirmation(id))
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildDateOfBirthController][get] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.debug(s"[ChildDateOfBirthController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -126,7 +126,7 @@ trait ChildDateOfBirthController extends ChildBenefitController {
         success
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildBenefitController][saveToKeystore] keystore exception whilst saving: ${e.getMessage}")
+        Logger.debug(s"[ChildBenefitController][saveToKeystore] keystore exception whilst saving: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

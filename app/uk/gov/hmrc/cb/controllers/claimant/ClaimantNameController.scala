@@ -64,14 +64,14 @@ trait ClaimantNameController extends ChildBenefitController {
       val resultWithNoClaimant = view(Ok, form)
       cacheClient.loadPayload().map {
         payload =>
-          Logger.error(s"[ClaimantNameController][get] loaded payload")
+          Logger.debug(s"[ClaimantNameController][get] loaded payload")
           payload.fold(
             resultWithNoClaimant
           )(
             cache => {
               cache.claimant match {
                 case Some(x) =>
-                  Logger.error(s"[ClaimantNameController][get] loaded claimant")
+                  Logger.debug(s"[ClaimantNameController][get] loaded claimant")
                   val pageModel : ClaimantNamePageModel = x
                   view(Ok, form.fill(pageModel))
                 case _ =>
@@ -81,7 +81,7 @@ trait ClaimantNameController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.error(s"[ClaimantNameController][get] keystore exception whilst loading payload: ${e.getMessage}")
+          Logger.debug(s"[ClaimantNameController][get] keystore exception whilst loading payload: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -90,7 +90,7 @@ trait ClaimantNameController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ClaimantNameController][post] invalid form submission $formWithErrors")
+          Logger.debug(s"[ClaimantNameController][post] invalid form submission $formWithErrors")
           Future.successful(
             view(BadRequest, formWithErrors)
           )
@@ -110,7 +110,7 @@ trait ClaimantNameController extends ChildBenefitController {
               saveToKeystore(modifiedPayload)
           } recover {
             case e: Exception =>
-              Logger.error(s"[ClaimantNameController][post] keystore exception whilst loading payload: ${e.getMessage}")
+              Logger.debug(s"[ClaimantNameController][post] keystore exception whilst loading payload: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -123,7 +123,7 @@ trait ClaimantNameController extends ChildBenefitController {
         redirectConfirmation()
     } recover {
       case e : Exception =>
-        Logger.error(s"[ClaimantNameController][saveToKeystore] keystore exception whilst saving claimant: ${e.getMessage}")
+        Logger.debug(s"[ClaimantNameController][saveToKeystore] keystore exception whilst saving claimant: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }

@@ -63,7 +63,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
       val resultWithNoChild = view(Ok, form, id)
       cacheClient.loadPayload().map {
         payload =>
-          Logger.error(s"[ChildBirthCertificateReferenceController][get] loaded payload")
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] loaded payload")
           payload.fold(
             resultWithNoChild
           )(
@@ -82,7 +82,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
           )
       } recover {
         case e: Exception =>
-          Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
+          Logger.debug(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
           redirectTechnicalDifficulties
       }
   }
@@ -91,7 +91,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
     implicit request =>
       form.bindFromRequest().fold(
         formWithErrors => {
-          Logger.info(s"[ChildBirthCertificateReferenceController][bindFromRequest] invalid form submission $formWithErrors")
+          Logger.debug(s"[ChildBirthCertificateReferenceController][bindFromRequest] invalid form submission $formWithErrors")
           Future.successful(
             view(BadRequest, formWithErrors, id)
           )},
@@ -110,7 +110,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
               saveToKeystore(modifiedPayload, id)
           } recover {
             case e : Exception =>
-              Logger.error(s"[ChildBirthCertificateReferenceController][get] keystore exception whilst loading children: ${e.getMessage}")
+              Logger.debug(s"[ChildBirthCertificateReferenceController][post] keystore exception whilst loading children: ${e.getMessage}")
               redirectTechnicalDifficulties
           }
       )
@@ -129,7 +129,7 @@ trait ChildBirthCertificateReferenceController extends ChildBenefitController {
         redirectConfirmation
     } recover {
       case e : Exception =>
-        Logger.error(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
+        Logger.debug(s"[ChildBirthCertificateReferenceController][saveToKeystore] keystore exception whilst saving children: ${e.getMessage}")
         redirectTechnicalDifficulties
     }
   }
