@@ -30,7 +30,6 @@ import uk.gov.hmrc.play.test.UnitSpec
  */
 class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
 
-  running(fakeApplication) {
     "SubmissionController" when {
 
       def mockSubmissionConfirmationController = new SubmissionConfirmationController {
@@ -64,6 +63,5 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
         }
       }
     }
-  }
 
 }
