@@ -29,6 +29,7 @@ import uk.gov.hmrc.play.http.SessionKeys
 
 import scala.concurrent.Future
 
+// $COVERAGE-OFF$
 object CBSessionProvider extends CBRoutes {
 
   /**
@@ -69,3 +70,4 @@ object CBSessionProvider extends CBRoutes {
     }
   }
 }
+// $COVERAGE-ON$
