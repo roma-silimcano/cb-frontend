@@ -16,19 +16,32 @@
 
 package uk.gov.hmrc.cb.controllers
 
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.http.Status
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.cb.CBFakeApplication
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.helpers.Assertions
+import uk.gov.hmrc.cb.models.payload.submission.Payload
+import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
+import uk.gov.hmrc.cb.service.keystore.CBKeystoreKeys
 import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import uk.gov.hmrc.play.test.UnitSpec
 
+import scala.concurrent.Future
+
 /**
  * Created by adamconder on 05/05/2016.
  */
-class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with MockitoSugar {
+class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with MockitoSugar with Assertions {
+
+  val mockController = new SubmissionConfirmationController {
+    override val authConnector = mock[AuthConnector]
+    override val cacheClient = mock[ChildBenefitKeystoreService with CBKeystoreKeys]
+  }
 
   running(fakeApplication) {
     "SubmissionController" when {
@@ -37,6 +50,8 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
         override val authConnector : AuthConnector = mock[AuthConnector]
         override val cacheClient = mock[ChildBenefitKeystoreService]
       }
+
+      implicit lazy val getRequest = FakeRequest("GET", "/child-benefit/confirmation").withSession(CBSessionProvider.generateSessionId())
 
       "initialising" should {
 
@@ -47,23 +62,41 @@ class SubmissionConfirmationSpec extends UnitSpec with CBFakeApplication with Mo
 
       "GET /confirmation" should {
 
-        "not respond with NOT_FOUND" in {
-          val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-          status(result.get) shouldBe OK
+        "respond 200 when claimant in keystore" in {
+          val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith"))))
+          when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+          val result = await(mockController.get()(getRequest))
+          status(result) shouldBe OK
         }
 
-        "return HTML" in {
-          val result = route(FakeRequest("GET", "/child-benefit/confirmation"))
-          contentType(result.get) shouldBe Some("text/html")
-          charset(result.get) shouldBe Some("utf-8")
+        "include firstname when claimants in keystore" in {
+          val payload = Some(Payload(children = Nil, claimant = Some(Claimant(firstName = "Chris", lastName = "Smith"))))
+          when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+          val result = await(mockController.get()(getRequest))
+          bodyOf(result) should include("Chris")
         }
 
-        "return confirmation template" in {
-          val result = mockSubmissionConfirmationController.get()(FakeRequest("GET", ""))
-          await(status(result)) shouldBe Status.OK
+        "redirect to the initial controller when claimant doesn't exist" in {
+          val payload = Some(Payload(children = Nil, claimant = None))
+          when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+          val result = await(mockController.get()(getRequest))
+          verifyLocation(result, "/update-child-benefit")
+        }
+
+        "redirect to technical difficulties when retrieving claimant and keystore is down" in {
+          when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.failed(new RuntimeException))
+          val result = await(mockController.get()(getRequest))
+          status(result) shouldBe SEE_OTHER
+          verifyLocation(result, "/technical-difficulties")
+        }
+
+        "redirect to the initial controller when payload doesn't exist" in {
+          val payload = None
+          when(mockController.cacheClient.loadPayload()(any(), any())).thenReturn(Future.successful(payload))
+          val result = await(mockController.get()(getRequest))
+          verifyLocation(result, "/update-child-benefit")
         }
       }
     }
   }
-
 }

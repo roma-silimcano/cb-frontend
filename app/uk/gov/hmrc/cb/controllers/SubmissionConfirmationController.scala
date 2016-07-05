@@ -16,13 +16,14 @@
 
 package uk.gov.hmrc.cb.controllers
 
-import play.api.mvc.{Action, Request}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
+import play.api.Logger
+import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
+import uk.gov.hmrc.cb.models.payload.submission.Payload
 
 /**
  * Created by adamconder on 05/05/2016.
@@ -34,9 +35,34 @@ object SubmissionConfirmationController extends SubmissionConfirmationController
 
 trait SubmissionConfirmationController extends ChildBenefitController {
 
-  def get = Action.async {
-    implicit request =>
-      val claimant = Claimant(firstName = "Louise", lastName = "Smith")
-      Future.successful(Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant)))
+  protected def redirectInitialController = Redirect(initialController)
+
+  def get() = CBSessionProvider.withSession {
+      implicit request =>
+        cacheClient.loadPayload().map {
+          payload =>
+            Logger.debug(s"[SubmissionConfirmationController][get] loaded payload")
+            payload.fold(
+              redirectInitialController
+            )(
+              cache =>
+                setupView(cache)
+            )
+        } recover {
+          case e: Exception =>
+            Logger.error(s"[SubmissionConfirmationController][get] keystore exception whilst loading payload: ${e.getMessage}")
+            redirectTechnicalDifficulties
+        }
+  }
+
+  private def setupView(payload: Payload)(implicit request: Request[AnyContent]) = {
+    payload.claimant match {
+      case Some(x) =>
+        Logger.debug(s"[ClaimantNameController][get] loaded claimant")
+        val claimant = Claimant(firstName = x.firstName, lastName = x.lastName)
+        Ok(uk.gov.hmrc.cb.views.html.confirmation_submission(claimant = claimant))
+      case _ =>
+        redirectInitialController
+    }
   }
 }

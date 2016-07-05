@@ -21,18 +21,14 @@ import play.api.data.Form
 import uk.gov.hmrc.cb.config.FrontendAuthConnector
 import uk.gov.hmrc.cb.controllers.ChildBenefitController
 import uk.gov.hmrc.cb.controllers.session.CBSessionProvider
-import uk.gov.hmrc.cb.forms.ChildNameForm.ChildNamePageModel
 import uk.gov.hmrc.cb.service.keystore.KeystoreService
-import uk.gov.hmrc.cb.service.keystore.KeystoreService.ChildBenefitKeystoreService
 import uk.gov.hmrc.cb.forms.ClaimantNameForm
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.cb.forms.ClaimantNameForm.ClaimantNamePageModel
 import uk.gov.hmrc.cb.implicits.Implicits._
 import uk.gov.hmrc.cb.managers.ClaimantManager
 import uk.gov.hmrc.cb.managers.ClaimantManager.ClaimantService
 import uk.gov.hmrc.cb.models.payload.submission.Payload
-import uk.gov.hmrc.cb.models.payload.submission.claimant.Claimant
-import uk.gov.hmrc.play.http.HeaderCarrier
 
 import scala.concurrent.Future
 
