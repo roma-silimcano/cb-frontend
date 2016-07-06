@@ -1,6 +1,6 @@
 # cb-frontend
 
-[![Build Status](https://travis-ci.org/hmrc/cb-frontend.svg?branch=master)](https://travis-ci.org/hmrc/cb-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/cb-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/cb-frontend/_latestVersion)
+[![Build Status](https://travis-ci.org/hmrc/cb-frontend.svg)](https://travis-ci.org/hmrc/cb-frontend) [ ![Download](https://api.bintray.com/packages/hmrc/releases/cb-frontend/images/download.svg) ](https://bintray.com/hmrc/releases/cb-frontend/_latestVersion)
 
 This is a placeholder README.md for a new repository
 
